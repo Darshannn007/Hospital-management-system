@@ -1,8 +1,10 @@
-import { useState } from "react";
+import {useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { addPatient } from "../services/patientService";
+import { updatePatient } from "../services/patientService";
+import { toast } from "react-hot-toast";
 
-function AddPatientForm({ onClose }) {
+function AddPatientForm({ onClose, editPatient }) {
   const [formData, setFormData] = useState({
     name: "",
     age: "",
@@ -20,28 +22,46 @@ function AddPatientForm({ onClose }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
   
+    console.log("🔥 Data bhej rahe hain backend ko:", formData);
+
     try {
-      await addPatient(formData); // 🔥 API call
-      onClose(); // popup close
-    } catch (err) {
-      console.log(err);
+      if (editPatient && editPatient.id) {
+        await updatePatient(editPatient.id, formData);  
+       toast.success("Patient Updated Successfully!");
+      } else {
+        await addPatient(formData);
+        toast.success("Patient Added Successfully!");
+      }
+      
+      onClose();
+    } catch (error) {
+      console.log(error);
+      toast.error("Failed to save patient!");
     }
   };
 
+  useEffect(() => {
+    if(editPatient) {
+      setFormData(editPatient);
+    }
+  },[editPatient]);
+
   return (
     <div className="fixed inset-0 bg-black/40 flex items-center justify-center">
-
       <motion.form
-        initial={{ scale: 0.8, opacity: 0 }}
+        initial={{ scale: 1, opacity: 1}}
         animate={{ scale: 1, opacity: 1 }}
         className="bg-white p-6 rounded-xl w-[400px]"
         onSubmit={handleSubmit}
       >
-        <h2 className="text-xl font-bold mb-4">Add Patient</h2>
+        <h2 className="text-xl font-bold mb-4">
+          {editPatient ? "Edit Patient" : "Add Patient"}
+        </h2>
 
         <input
           name="name"
           placeholder="Name"
+          value={formData.name || ""}
           onChange={handleChange}
           className="w-full mb-3 p-2 border rounded"
           required
@@ -49,7 +69,9 @@ function AddPatientForm({ onClose }) {
 
         <input
           name="age"
+          type="number"
           placeholder="Age"
+          value={formData.age || ""}
           onChange={handleChange}
           className="w-full mb-3 p-2 border rounded"
           required
@@ -58,6 +80,7 @@ function AddPatientForm({ onClose }) {
         <input
           name="gender"
           placeholder="Gender"
+          value={formData.gender || ""}
           onChange={handleChange}
           className="w-full mb-3 p-2 border rounded"
           required
@@ -65,7 +88,9 @@ function AddPatientForm({ onClose }) {
 
         <input
           name="phone"
+          type="tel"
           placeholder="Phone"
+          value={formData.phone || ""}
           onChange={handleChange}
           className="w-full mb-4 p-2 border rounded"
           required

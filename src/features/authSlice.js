@@ -1,9 +1,12 @@
 import { createSlice } from "@reduxjs/toolkit";
 
+// 🔥 localStorage se token uthao
+const token = localStorage.getItem("token");
+
 const initialState = {
-  isAuthenticated: false,
-  user: null,
-  token: null,
+  isAuthenticated: !!token,
+  user: token ? { email: "persisted-user" } : null,
+  token: token || null,
 };
 
 const authSlice = createSlice({
@@ -14,11 +17,18 @@ const authSlice = createSlice({
       state.isAuthenticated = true;
       state.user = action.payload.user;
       state.token = action.payload.token;
+
+      // 🔥 save token
+      localStorage.setItem("token", action.payload.token);
     },
+
     logout: (state) => {
       state.isAuthenticated = false;
       state.user = null;
       state.token = null;
+
+      // 🔥 remove token
+      localStorage.removeItem("token");
     },
   },
 });

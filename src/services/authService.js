@@ -1,6 +1,5 @@
-export const loginUser = async (data) => {
-  return {
-    user: { email: data.email },
-    token: "dummy-token",
-  };
-};
+import api from "./api";
+
+export const LoginKaro = () =>{
+  return 
+}

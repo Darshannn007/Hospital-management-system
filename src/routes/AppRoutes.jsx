@@ -10,15 +10,42 @@ function AppRoutes() {
   return (
     <BrowserRouter>
       <Routes>
+
         {/* Public Route */}
         <Route path="/" element={<Login />} />
 
-        {/* Protected */}
-        <Route element={<ProtectedRoute><MainLayout /></ProtectedRoute>}>
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/patients" element={<Patients/>} />
-          <Route path="/appointments" element={<Appoitments/>} />
+        {/* Protected Layout */}
+        <Route element={<MainLayout />}>
+
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/patients"
+            element={
+              <ProtectedRoute>
+                <Patients />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/appointments"
+            element={
+              <ProtectedRoute>
+                <Appoitments />
+              </ProtectedRoute>
+            }
+          />
+
         </Route>
+
       </Routes>
     </BrowserRouter>
   );

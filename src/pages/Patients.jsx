@@ -2,19 +2,23 @@
 import { useEffect, useState } from "react";
 import {deletePatient, getPatients } from "../services/patientService";
 import AddPatientForm from "../components/AddPatientForm"; // 👈 ADD THIS
+import { toast } from "react-hot-toast";
+
 
 
 function Patients() {
   const [patients, setPatients] = useState([]);
+  const [editPatient, setEditPatient] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false); // 👈 ADD THIS
 
   const fetchPatients = async () => {
     try {
       const data = await getPatients();
-      setPatients(data);
+      setPatients(data.data);
     } catch (err) {
       console.log(err);
+      toast.error("Failed to fetch patients!");
     } finally {
       setLoading(false);
     }
@@ -23,9 +27,11 @@ function Patients() {
   const handleDelete = async (id) => {
     try {
       await deletePatient(id);
-      fetchPatients(); // 🔥 refresh
+      toast.success("Patient deleted successfully!");
+      fetchPatients(); 
     } catch (err) {
       console.log(err);
+      toast.error("Failed to delete patient!");
     }
   };
 
@@ -81,15 +87,17 @@ function Patients() {
                   <td className="p-3">{p.phone}</td>
                   <td className="p-3 flex gap-3">
 
-  <span className="text-blue-500 cursor-pointer">
-    Edit
-  </span>
-
+                  <button onClick={() => {
+  setEditPatient(p);   // 👉 ye data bhej raha hai form ko
+  setShowForm(true);   // 👉 form open
+}}>
+  Edit
+</button>
   <span
     onClick={() => handleDelete(p.id)}
     className="text-red-500 cursor-pointer"
   >
-    Delete
+    
   </span>
 
 </td>
@@ -101,7 +109,12 @@ function Patients() {
       </div>
   
       {/* 🔥 FORM POPUP */}
-      {showForm && (<AddPatientForm onClose={() => { setShowForm(false); fetchPatients();}}/> // 🔥 data reload
+      {showForm && (<AddPatientForm editPatient={editPatient} onClose={() => {
+      setShowForm(false);
+      setEditPatient(null);   
+      fetchPatients();
+    }}
+/>
 )}
   
     </div>

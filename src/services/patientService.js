@@ -1,20 +1,20 @@
 import api from "./api";
 
-// Get all patients
-export const getPatients = async () => {
-  try {
-    const response = await api.get("/patients");
-    return response.data;
-  } catch (error) {
-    throw error.response?.data || "Failed to fetch patients";
-  }
+// 🔥 GET all patients
+export const getPatients = () => {
+  return api.get("/api/patients");
 };
 
-export const addPatient = async (data) => {
-  const response = await api.post("/patients", data);
-  return response.data;
+// 🔥 ADD patient
+export const addPatient = (data) => {
+  return api.post("/api/patients", data);
 };
 
-export const deletePatient = async (id) => {
-  await api.delete(`/patients/${id}`);
+// 🔥 DELETE patient
+export const deletePatient = (id) => {
+  return api.delete(`/api/patients/${id}`);
+};
+
+export const updatePatient = (id, data) => {
+  return api.put(`api/patients/${id}`, data);
 };
