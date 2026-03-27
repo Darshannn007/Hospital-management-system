@@ -1,14 +1,17 @@
 import { Navigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 
-const ProtectedRoute = ({ children }) => {
-  const { isAuthenticated, token } = useSelector((state) => state.auth);
+const ProtectedRoute = ({ children, allowedRoles }) => {
+  const { isAuthenticated, role, token } = useSelector((state) => state.auth);
 
-  // 🔥 fallback from localStorage
-  const localToken = localStorage.getItem("token");
-
-  if (!isAuthenticated && !token && !localToken) {
+  // 🔒 AUTH CHECK (single source → Redux)
+  if (!isAuthenticated || !token) {
     return <Navigate to="/" replace />;
+  }
+
+  // 🔥 ROLE CHECK (only Redux)
+  if (allowedRoles && !allowedRoles.includes(role)) {
+    return <Navigate to="/dashboard" replace />;
   }
 
   return children;

@@ -2,19 +2,19 @@ import api from "./api";
 
 // 🔥 GET all patients
 export const getPatients = () => {
-  return api.get("/api/patients");
+  return api.get("/patients");
 };
 
 // 🔥 ADD patient
 export const addPatient = (data) => {
-  return api.post("/api/patients", data);
+  return api.post("/patients", data);
 };
 
 // 🔥 DELETE patient
 export const deletePatient = (id) => {
-  return api.delete(`/api/patients/${id}`);
+  return api.delete(`/patients/${id}`);
 };
 
 export const updatePatient = (id, data) => {
-  return api.put(`api/patients/${id}`, data);
+  return api.put(`/patients/${id}`, data);
 };

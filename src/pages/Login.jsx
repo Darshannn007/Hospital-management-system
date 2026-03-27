@@ -1,10 +1,10 @@
+/* eslint-disable no-unused-vars */
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { loginSuccess } from "../features/authSlice";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { motion } from "framer-motion";
-import bgImage from "../assets/hospital.jpg";
 import { toast } from "react-hot-toast";
 
 function Login() {
@@ -18,7 +18,6 @@ function Login() {
 
   const [error, setError] = useState("");
 
-  // input change
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -26,7 +25,6 @@ function Login() {
     });
   };
 
-  // 🔥 REAL LOGIN
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -36,83 +34,123 @@ function Login() {
         password: formData.password,
       });
 
-      const token = res.data;
-      toast.success("Welcome!🙂")
-      
-      // Redux me save
+      const {token, email, role } = res.data;
+      toast.success("Welcome!🙂");
+
       dispatch(
         loginSuccess({
-          user: { email: formData.email },
+          user: {email},
           token: token,
-        })
-      );
-      
+          role: role, 
+        }));
 
-      navigate("/dashboard");
+        navigate("/dashboard");
 
+      // localStorage.setItem("token",token); ---> this task is already done in authslice
+      // localStorage.setItem("role",role);
     } catch (err) {
       console.log(err);
       toast.error("Invalid email or password ❌");
-    }
-  };
+    }};
 
   return (
-    <div
-      className="h-screen w-full flex items-center justify-center bg-cover bg-center"
-      style={{ backgroundImage: `url(${bgImage})` }}
-    >
-      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
+    <div className="h-screen w-full flex">
+      
+      
+      {/* LEFT SIDE */}
+      <div className="relative w-1/2 bg-linear-to-br from-blue-500 to-indigo-900 text-white flex flex-col justify-center px-16">
+      
+        
+        <h1 className="text-4xl font-bold mb-4 text-gray-300">
+          HOSPITAL MANAGEMENT SYSTEM
+        </h1>
 
-      <motion.form
-        onSubmit={handleSubmit}
-        initial={{ opacity: 0, scale: 0.8, y: 50 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="relative z-10 bg-white/10 backdrop-blur-xl border border-white/20 p-8 rounded-2xl shadow-2xl w-96 text-white"
-      >
-        <h2 className="text-3xl font-bold text-center mb-6">
-          Welcome, HMS
+        <p className="mb-20 text-gray-100">
+        CARE IS ALWAYS BETTER THAN CURE
+        </p>
+
+        <h2 className="text-4xl text-gray-400 font-bold mb-6 leading-tight">
+          Manage Your Hospital <br /> Smarter & Better
         </h2>
 
-        {/* ERROR */}
-        {error && (
-          <p className="text-red-400 text-sm mb-3 text-center">
-            {error}
-          </p>
-        )}
+        <p className="text-gray-100  mb-3">
+          A complete solution for managing patients, doctors,
+          appointments, billing and pharmacy — all in one place.
+        </p>
 
-        {/* Email */}
-        <input
-          type="email"
-          name="email"
-          placeholder="Enter Email"
-          value={formData.email}
-          onChange={handleChange}
-          className="w-full mb-4 p-3 rounded-lg bg-white/20 placeholder-white text-white focus:outline-none"
-          required
-        />
+        <ul className="space-y-3 text-gray-100">
+          <li>• Role-based Access Control</li>
+          <li>• Real-time Patient Tracking</li>
+          <li>• Appointment Management</li>
+          <li>• Billing & Pharmacy</li>
+        </ul>
+      </div>
 
-        {/* Password */}
-        <input
-          type="password"
-          name="password"
-          placeholder="Enter Password"
-          value={formData.password}
-          onChange={handleChange}
-          className="w-full mb-6 p-3 rounded-lg bg-white/20 placeholder-white text-white focus:outline-none"
-          required
-        />
-
-        {/* Button */}
-        <motion.button
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          type="submit"
-          className="w-full bg-gradient-to-r from-[#1fad9f] to-[#67e1cf] p-3 rounded-lg font-semibold shadow-lg"
+      {/* RIGHT SIDE (FORM) */}
+      <div className="w-1/2 flex items-center justify-center bg-gray-100">
+      <h1 className="absolute top-6 right-5 text-4xl font-bold select-none text-gray-400 text-shadow-blue-900 tracking-widest">
+    Darshan Desale
+     </h1>
+        
+        <motion.form
+          onSubmit={handleSubmit}
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="bg-white p-8 rounded-2xl shadow-xl w-[400px]"
         >
-          Login
-        </motion.button>
-      </motion.form>
+          <h2 className="text-2xl font-bold mb-2">
+            Welcome Back
+          </h2>
+
+          <p className="text-gray-500 mb-6">
+            Sign in to access your dashboard
+          </p>
+
+          {error && (
+            <p className="text-red-500 text-sm mb-3">
+              {error}
+            </p>
+          )}
+
+          {/* Email */}
+          <label className="text-sm font-medium">
+            Email Address
+          </label>
+          <input
+            type="email"
+            name="email"
+            placeholder="Enter your email"
+            value={formData.email}
+            onChange={handleChange}
+            className="w-full  mb-4 mt-1 p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            required
+          />
+
+          {/* Password */}
+          <label className="text-sm font-medium">
+            Password
+          </label>
+          <input
+            type="password"
+            name="password"
+            placeholder="Enter your password"
+            value={formData.password}
+            onChange={handleChange}
+            className="w-full mb-6 mt-1 p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            required
+          />
+
+          {/* Button */}
+          <motion.button
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.95 }}
+            type="submit"
+            className="w-full bg-linear-to-br from-blue-500 to-indigo-900 text-white p-3 rounded-lg font-semibold hover:bg-blue-700 transition"
+          >
+            Sign In
+          </motion.button>
+        </motion.form>
+      </div>
     </div>
   );
 }
