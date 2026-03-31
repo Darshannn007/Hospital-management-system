@@ -29,7 +29,7 @@ function AddPatientForm({ onClose, editPatient }) {
         await updatePatient(editPatient.id, formData);  
        toast.success("Patient Updated Successfully!");
       } else {
-        await addPatient(formData);
+      await addPatient(formData);
         toast.success("Patient Added Successfully!");
       }
       

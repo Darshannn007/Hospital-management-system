@@ -94,42 +94,39 @@ function Doctor() {
   };
 
   return (
-    <div className="p-6">
+    <div className="">
       {/* 🔥 FORM (ADMIN ONLY) */}
       {role === "ADMIN" && (
         <>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4 bg-blue-100 px-10 py-5 rounded-xl">
+          <div className="grid bg-blue-200 grid-cols-1 md:grid-cols-4 gap-4 mb-4 px-10 py-5 rounded-xl">
             <input
               name="name"
               value={formData.name}
               onChange={handleChange}
               placeholder="Name"
-              className="border p-2 rounded"
+              className="bg-blue-100 border p-2 rounded"
             />
             <input name="specialization" value={formData.specialization} onChange={handleChange}
               placeholder="Specialization"
-              className="border p-2 rounded"
+              className="border p-2 rounded bg-blue-100"
             />
             <input
               name="experience"
               value={formData.experience}
               onChange={handleChange}
               placeholder="Experience"
-              className="border p-2 rounded"
+              className="border p-2 rounded bg-blue-100"
             />
             <input
               name="education"
               value={formData.education}
               onChange={handleChange}
               placeholder="Education"
-              className="border p-2 rounded"
+              className="border p-2 rounded bg-blue-100"
             />
           </div>
 
-          <button
-            onClick={handleSubmit}
-            className="bg-blue-500 text-white px-4 py-2 rounded"
-          >
+          <button onClick={handleSubmit} className="bg-blue-500 text-white px-4 py-2 rounded">
             {editId ? "Update Doctor" : "Add Doctor"}
           </button>
         </>
@@ -144,11 +141,11 @@ function Doctor() {
               className="p-5 bg-white shadow-lg rounded-xl border hover:shadow-xl transition"
             >
               <h3 className="text-lg font-bold text-gray-800">
-                {doc.name}
+                Doctor: {doc.name}
               </h3>
 
               <p className="text-xl text-gray-600 mt-1">
-                {doc.specialization}
+                Specialization: {doc.specialization}
               </p>
 
               <p className="text-xl text-gray-500">
@@ -156,7 +153,7 @@ function Doctor() {
               </p>
 
               <p className="text-xl text-gray-500 mb-3">
-                {doc.education}
+                Education: {doc.education}
               </p>
 
               <div className="flex justify-between items-center mt-3">

@@ -1,6 +1,7 @@
 import api from "./api";
 
-export const getAppointments = () => api.get("/appointments");
+export const getAppointments = () => 
+    api.get("/appointments");
 
 export const addAppointment = (data) =>{
  return api.post("/appointments", data);}

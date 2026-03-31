@@ -11,6 +11,7 @@ import Pharmacy from "../pages/Pharmacy";
 import Prescription from "../pages/Prescription";
 import Invoice from "../pages/Invoice";
 import Reports from "../pages/Reports";
+import AdminAvailability from "../pages/AdminAvailability";
 
 // Layout
 import MainLayout from "../layouts/Mainlayout";
@@ -58,6 +59,14 @@ function AppRoutes() {
               </ProtectedRoute>
             }
           />
+          <Route
+              path="/availability"
+              element={
+                <ProtectedRoute allowedRoles={["ADMIN"]}>
+                  <AdminAvailability />
+                </ProtectedRoute>
+              }
+            />
 
           {/* 📅 Appointments → ALL */}
           <Route

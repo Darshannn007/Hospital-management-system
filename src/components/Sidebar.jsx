@@ -1,6 +1,7 @@
 import { NavLink } from "react-router-dom";
 import {
   IconLayoutDashboard,
+  IconStethoscopeOff,
   IconUsers,
   IconCalendar,
   IconStethoscope,
@@ -45,33 +46,17 @@ function Sidebar() {
           {/* ADMIN ONLY */}
           {role === "ADMIN" && (
             <>
-              <NavLink
-                to="/patients"
-                className={({ isActive }) =>
-                  `flex items-center gap-3 px-4 py-3 rounded-lg ${
-                    isActive
-                      ? "bg-gradient-to-r from-blue-600 to-cyan-500 text-white"
-                      : "hover:bg-[#1e293b]"
-                  }`
-                }
-              >
-                <IconUsers size={20} />
-                Patients
-              </NavLink>
+        <NavLink to="/availability" className={({ isActive }) =>`flex items-center gap-3 px-4 py-3 rounded-lg 
+         ${isActive ? "bg-gradient-to-r from-blue-600 to-cyan-500 text-white":"hover:bg-[#1e293b]"
+            }`}><IconStethoscopeOff size={20} />DoctorAvailability</NavLink>
 
-              <NavLink
-                to="/doctors"
-                className={({ isActive }) =>
-                  `flex items-center gap-3 px-4 py-3 rounded-lg ${
-                    isActive
-                      ? "bg-gradient-to-r from-blue-600 to-cyan-500 text-white"
-                      : "hover:bg-[#1e293b]"
-                  }`
-                }
-              >
-                <IconStethoscope size={20} />
-                Doctors
-              </NavLink>
+        <NavLink to="/patients" className={({ isActive }) =>`flex items-center gap-3 px-4 py-3 rounded-lg 
+         ${isActive ? "bg-gradient-to-r from-blue-600 to-cyan-500 text-white":"hover:bg-[#1e293b]"
+           }`}><IconUsers size={20} />Patients</NavLink>
+
+        <NavLink to="/doctors" className={({ isActive }) =>`flex items-center gap-3 px-4 py-3 rounded-lg 
+         ${ isActive? "bg-gradient-to-r from-blue-600 to-cyan-500 text-white":"hover:bg-[#1e293b]"
+           }`}><IconStethoscope size={20} />Doctors</NavLink>
             </>
           )}
 
