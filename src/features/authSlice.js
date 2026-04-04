@@ -3,13 +3,13 @@ import { createSlice } from "@reduxjs/toolkit";
 // 🔥 localStorage se data uthao (refresh ke baad bhi login rahe)
 const token = localStorage.getItem("token");
 
-const validroles = ["ADMIN", "USER", "DOCTOR"];
+const validroles = ["ADMIN", "PATIENT", "DOCTOR"];
 const storedRole = localStorage.getItem("role")
 const role = validroles.includes(localStorage.getItem("role")) ?  storedRole : null;
 
 
 const initialState = {
-  isAuthenticated: !!token, // agar token hai → logged in
+  isAuthenticated: token, // agar token hai → logged in
   user: null,
   token: token || null,
   role: role,

@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { motion } from "framer-motion";
 import { toast } from "react-hot-toast";
+import { login } from "../services/authServices";
 
 function Login() {
   const dispatch = useDispatch();
@@ -17,6 +18,7 @@ function Login() {
   });
 
   const [error, setError] = useState("");
+  
 
   const handleChange = (e) => {
     setFormData({
@@ -29,7 +31,7 @@ function Login() {
     e.preventDefault();
 
     try {
-      const res = await axios.post("http://localhost:8080/auth/login", {
+      const res = await login({
         email: formData.email,
         password: formData.password,
       });
@@ -45,6 +47,7 @@ function Login() {
         }));
 
         navigate("/dashboard");
+        
 
       // localStorage.setItem("token",token); ---> this task is already done in authslice
       // localStorage.setItem("role",role);
@@ -61,7 +64,7 @@ function Login() {
       <div className="relative w-1/2 bg-linear-to-br from-blue-500 to-indigo-900 text-white flex flex-col justify-center px-16">
       
         
-        <h1 className="text-4xl font-bold mb-4 text-gray-300">
+        <h1 className="text-4xl font-bold mb-4 text-gray-400">
           HOSPITAL MANAGEMENT SYSTEM
         </h1>
 
@@ -73,7 +76,7 @@ function Login() {
           Manage Your Hospital <br /> Smarter & Better
         </h2>
 
-        <p className="text-gray-100  mb-3">
+        <p className="text-gray-200  mb-3">
           A complete solution for managing patients, doctors,
           appointments, billing and pharmacy — all in one place.
         </p>
@@ -151,6 +154,12 @@ function Login() {
           </motion.button>
         </motion.form>
       </div>
+      <p className="text-sm mt-4 text-center absolute bottom-45 right-55 transform -translate-x-1/2">
+        Don't have an account?{" "}
+      <span className="text-blue-600 cursor-pointer" onClick={() => navigate("/register")}>
+       Register
+      </span>
+      </p>
     </div>
   );
 }

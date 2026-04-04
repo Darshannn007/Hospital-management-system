@@ -5,11 +5,12 @@ import {
   deleteDoctor,
   updateDoctor,
 } from "../services/doctorService";
-
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 
 function Doctor() {
+  const { role } = useSelector((state) => state.auth);
   const [doctors, setDoctors] = useState([]);
 
   const [formData, setFormData] = useState({
@@ -21,7 +22,7 @@ function Doctor() {
 
   const [editId, setEditId] = useState(null);
 
-  const { role } = useSelector((state) => state.auth);
+ 
   const navigate = useNavigate();
 
   // 🔥 FETCH
@@ -40,11 +41,7 @@ function Doctor() {
 
   // 🔥 INPUT HANDLE
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
-  };
+    setFormData({...formData, [e.target.name]: e.target.value,});};
 
   // 🔥 ADD / UPDATE
   const handleSubmit = async () => {
@@ -54,6 +51,7 @@ function Doctor() {
         setEditId(null);
       } else {
         await addDoctor(formData);
+   
       }
 
       setFormData({
@@ -64,6 +62,7 @@ function Doctor() {
       });
 
       fetchDoctors();
+      console.log("CURRENT ROLE:", role);
     } catch (err) {
       console.log(err);
     }
@@ -73,6 +72,7 @@ function Doctor() {
   const handleDelete = async (id) => {
     await deleteDoctor(id);
     fetchDoctors();
+    toast.success("Deleted🎗️")
   };
 
   // 🔥 EDIT
@@ -133,59 +133,60 @@ function Doctor() {
       )}
 
       {/* 🔥 DOCTOR CARDS */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
-        {Array.isArray(doctors) &&
-          doctors.map((doc) => (
-            <div
-              key={doc.id}
-              className="p-5 bg-white shadow-lg rounded-xl border hover:shadow-xl transition"
-            >
-              <h3 className="text-lg font-bold text-gray-800">
-                Doctor: {doc.name}
-              </h3>
+      <div className="grid grid-cols-1 m-20 md:grid-cols-2 lg:grid-cols-3 mt-6">
+        {Array.isArray(doctors) && doctors.map((doc) => (
+            <div key={doc.id} className=" flex flex-col gap-5 bg-linear-to-br mb-20 w-80 h-80 from-blue-200 to-indigo-400 rounded-2xl shadow-md hover:shadow-xl transition duration-300 p-6 border">
+        {/* Avatar */}
+       <div className="flex items-center gap-4 mb-4">
+        <div className="w-14 h-14 bg-blue-500 text-white flex items-center justify-center rounded-full text-xl font-bold">
+          {doc.name?.charAt(0)}
+        </div>
 
-              <p className="text-xl text-gray-600 mt-1">
-                Specialization: {doc.specialization}
-              </p>
+        <div>
+          <h3 className="text-lg font-semibold text-gray-800">
+            Dr. {doc.name}
+          </h3>
+          <p className="text-sm text-gray-500">
+            {doc.specialization}
+          </p>
+        </div>
+       </div>
 
-              <p className="text-xl text-gray-500">
-                Experience: {doc.experience}
-              </p>
+  {/* Info */}
+          <div className="text-sm text-gray-600 space-y-1">
+            <p className="text-xl font-bold font-sans">🎓 {doc.education}</p>
+            <p className="text-xl font-bold font-sans mb-7">💼 {doc.experience}</p>
+          </div>
 
-              <p className="text-xl text-gray-500 mb-3">
-                Education: {doc.education}
-              </p>
+  {/* Actions */}
+      <div className="flex items-center justify-center mt-5">
 
-              <div className="flex justify-between items-center mt-3">
-                {/* 👑 ADMIN CONTROLS */}
-                {role === "ADMIN" && (
-                  <div className="flex gap-3">
-                    <button
-                      onClick={() => handleEdit(doc)}
-                      className="text-blue-500 text-sm"
-                    >
-                      Edit
-                    </button>
-                    <button
-                      onClick={() => handleDelete(doc.id)}
-                      className="text-red-500 text-sm"
-                    >
-                      Delete
-                    </button>
-                  </div>
-                )}
+    {/* ADMIN */}
+    {role === "ADMIN" && (
+      <div className="flex gap-3">
+        <button
+          onClick={() => handleEdit(doc)}
+          className="text-blue-600 text-sm font-medium"
+        >
+          Edit
+        </button>
+        <button
+          onClick={() => handleDelete(doc.id)}
+          className="text-red-500 text-sm font-medium"
+        >
+          Delete
+        </button>
+      </div>
+    )}
 
-                {/* 👤 USER BOOK BUTTON */}
-                {role === "USER" && (
-                  <button
-                    onClick={() => handleBook(doc)}
-                    className="bg-green-500 text-white px-3 py-1 rounded text-sm"
-                  >
-                    Book Appointment
-                  </button>
-                )}
-              </div>
-            </div>
+    {/* PATIENT */}
+    {(role === "PATIENT" || role === "USER" || role === "ADMIN" || role === "DOCTOR") && (
+      <button onClick={() => handleBook(doc)} className="bg-green-600 hover:bg-green-800 text-white px-6 py-2 rounded-lg text-sm">
+        Book Appointment
+      </button>
+    )}
+  </div>
+</div>
           ))}
       </div>
     </div>

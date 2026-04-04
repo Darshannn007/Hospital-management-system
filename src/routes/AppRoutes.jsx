@@ -12,6 +12,7 @@ import Prescription from "../pages/Prescription";
 import Invoice from "../pages/Invoice";
 import Reports from "../pages/Reports";
 import AdminAvailability from "../pages/AdminAvailability";
+import Register from "../pages/Register";
 
 // Layout
 import MainLayout from "../layouts/Mainlayout";
@@ -26,15 +27,16 @@ function AppRoutes() {
 
         {/* 🔓 Public Route */}
         <Route path="/" element={<Login />} />
+        <Route path="/register" element={<Register />} />
 
         {/* 🔒 Protected Layout */}
         <Route element={<MainLayout />}>
 
           {/* 🏠 Dashboard (All roles) */}
           <Route
-            path="/dashboard"
+            path="/dashboard" 
             element={
-              <ProtectedRoute>
+               <ProtectedRoute>
                 <Dashboard />
               </ProtectedRoute>
             }
@@ -54,7 +56,7 @@ function AppRoutes() {
           <Route
             path="/doctors"
             element={
-              <ProtectedRoute allowedRoles={["ADMIN", "USER"]}>
+              <ProtectedRoute allowedRoles={["ADMIN", "PATIENT"]}>
                 <Doctors />
               </ProtectedRoute>
             }
@@ -72,7 +74,7 @@ function AppRoutes() {
           <Route
             path="/appointments"
             element={
-              <ProtectedRoute allowedRoles={["ADMIN", "DOCTOR", "USER"]}>
+              <ProtectedRoute allowedRoles={["ADMIN", "DOCTOR", "PATIENT"]}>
                 <Appointments />
               </ProtectedRoute>
             }

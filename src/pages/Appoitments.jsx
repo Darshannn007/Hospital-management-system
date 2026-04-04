@@ -7,10 +7,11 @@ import { updateAppointmentStatus } from "../services/appointmentService";
 import { toast } from "react-hot-toast/headless";
 import { getSlots, bookSlot } from "../services/availabilityService";
 
+
 function Appointments() {
   const location = useLocation();
   const selectedDoctor = location.state?.doctor;
-
+  
   const { role } = useSelector((state) => state.auth);
 
   const [slots, setSlots] = useState([]);
@@ -18,11 +19,20 @@ function Appointments() {
   const [appointments, setAppointments] = useState([]);
   const [doctors, setDoctors] = useState([]);
   const [loadingId, setLoadingId] = useState(null);
+
   const [formData, setFormData] = useState({
     patientName: "",
     doctorId: "",
     date: "",
   });
+  useEffect(() => {
+    if (selectedDoctor) {
+      setFormData((prev) => ({
+        ...prev,
+        doctorId: selectedDoctor.id,
+      }));
+    }
+  }, [selectedDoctor]);
 
   const handleStatusChange = async (id, status) => {
     try {
@@ -53,14 +63,16 @@ useEffect(() => {
   fetchSlots();
 }, [formData.doctorId, formData.date]);
 
-  useEffect(() => {
-    if (selectedDoctor) {
-      setFormData((prev) => ({
-        ...prev,
-        doctorId: selectedDoctor.id,
-      }));
-    }
+useEffect(() => {
+  if (selectedDoctor) {
+    setFormData((prev) => ({
+      ...prev,
+      doctorId: selectedDoctor.id,
+    }));
+  }
   }, [selectedDoctor]);
+
+
   useEffect(() => {
     getDoctors()
       .then((res) => {
@@ -123,6 +135,12 @@ useEffect(() => {
         Appointments
       </h2>
 
+      {selectedDoctor && (
+  <div className="mb-4 p-3 bg-blue-100 rounded">
+    Selected Doctor: <b>Dr. {selectedDoctor.name}</b>
+  </div>
+)}
+
       {/* FORM */}
       <form
         onSubmit={handleSubmit}
@@ -137,6 +155,7 @@ useEffect(() => {
           className="border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:outline-none p-2.5 rounded-lg w-full md:w-1/4"
           required
         />
+    
 
         <select
           name="doctorId"
@@ -167,13 +186,13 @@ useEffect(() => {
         </button>
       </form>
       {/* 🔥 SLOT SELECTION */}
-<div className="mb-6">
-  <p className="text-sm text-gray-600 mb-2">Available Slots</p>
+      <div className="mb-6">
+        <p className="text-sm text-gray-600 mb-2">Available Slots</p>
 
-  <div className="flex gap-3 flex-wrap">
-    {slots.length === 0 && (
-      <p className="text-gray-400 text-sm">No slots available</p>
-    )}
+        <div className="flex gap-3 flex-wrap">
+          {slots.length === 0 && (
+            <p className="text-gray-400 text-sm">No slots available</p>
+          )}
 
     {slots.map((slot) => (
       <button
