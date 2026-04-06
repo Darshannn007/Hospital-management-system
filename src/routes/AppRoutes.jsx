@@ -11,7 +11,7 @@ import Pharmacy from "../pages/Pharmacy";
 import Prescription from "../pages/Prescription";
 import Invoice from "../pages/Invoice";
 import Reports from "../pages/Reports";
-import AdminAvailability from "../pages/AdminAvailability";
+import Availability from "../pages/Availability";
 import Register from "../pages/Register";
 
 // Layout
@@ -65,7 +65,7 @@ function AppRoutes() {
               path="/availability"
               element={
                 <ProtectedRoute allowedRoles={["ADMIN"]}>
-                  <AdminAvailability />
+                  <Availability />
                 </ProtectedRoute>
               }
             />
