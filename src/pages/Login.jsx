@@ -103,13 +103,13 @@ function Login() {
   ];
 
   return (
-    <div className="h-screen w-full flex overflow-hidden">
-      {/* LEFT SIDE - Animated Background */}
+    <div className="min-h-screen w-full flex flex-col lg:flex-row overflow-hidden">
+      {/* LEFT SIDE - Animated Background (Hidden on mobile) */}
       <motion.div
         initial={{ x: 0, opacity: 0 }}
         animate={{ x: 0, opacity: 2 }}
         transition={{ duration: 0.8, ease: "easeOut" }}
-        className="relative w-1/2 bg-gradient-to-br from-blue-600 via-indigo-700 to-purple-800 text-white flex flex-col justify-center px-16 overflow-hidden"
+        className="hidden lg:flex relative w-full lg:w-1/2 bg-gradient-to-br from-blue-600 via-indigo-700 to-purple-800 text-white flex-col justify-center px-8 lg:px-16 overflow-hidden"
       >
         {/* Animated Background Elements */}
         <div className="absolute inset-0 overflow-hidden">
@@ -195,13 +195,13 @@ function Login() {
       </motion.div>
 
       {/* RIGHT SIDE (FORM) */}
-      <div className="w-1/2 flex items-center justify-center bg-gradient-to-br from-gray-200 to-gray-50 relative">
+      <div className="w-full lg:w-1/2 min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-200 to-gray-50 relative px-4 py-8 lg:px-0 lg:py-0">
         {/* Brand Name */}
         <motion.h1
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5, duration: 0.6 }}
-          className="absolute top-6 right-8 text-2xl font-bold text-gray-400 tracking-widest select-none"
+          className="absolute top-4 right-4 lg:top-6 lg:right-8 text-lg lg:text-2xl font-bold text-gray-400 tracking-widest select-none"
         >
           Darshan Desale
         </motion.h1>
@@ -211,7 +211,7 @@ function Login() {
           initial={{ opacity: 0, y: 30, scale: 0.95 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ duration: 0.6, delay: 0.3, ease: "easeOut" }}
-          className="bg-white p-10 rounded-3xl shadow-2xl shadow-blue-500/10 w-[420px] border border-gray-100"
+          className="bg-white p-6 sm:p-8 lg:p-10 rounded-3xl shadow-2xl shadow-blue-500/10 w-full max-w-[420px] border border-gray-100"
         >
           {/* Form Header */}
           <motion.div

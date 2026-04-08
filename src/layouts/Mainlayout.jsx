@@ -1,19 +1,35 @@
+import { useState } from "react";
 import { Outlet } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
 import { motion } from "framer-motion";
-import { IconBell, IconSearch, IconSettings } from "@tabler/icons-react";
+import { IconBell, IconSearch, IconSettings, IconMenu2 } from "@tabler/icons-react";
 
 function MainLayout() {
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
   return (
     <div className="flex h-screen overflow-hidden bg-gray-50">
 
-      {/* 🔥 Sidebar (fixed) */}
-      <div className="h-screen sticky top-0">
+      {/* 🔥 Sidebar (fixed) - Hidden on mobile, visible on md+ */}
+      <div className="hidden md:block h-screen sticky top-0">
         <Sidebar />
       </div>
 
+      {/* 🔥 Mobile Sidebar Overlay */}
+      {isSidebarOpen && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-40 md:hidden"
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
+
+      {/* 🔥 Mobile Sidebar */}
+      <div className={`fixed top-0 left-0 h-screen z-50 md:hidden transform transition-transform duration-300 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+        <Sidebar onClose={() => setIsSidebarOpen(false)} />
+      </div>
+
       {/* 🔥 Right Side */}
-      <div className="flex-1 flex flex-col h-screen">
+      <div className="flex-1 flex flex-col h-screen min-w-0 overflow-hidden">
 
         {/* 🔥 Navbar */}
         <motion.div 
@@ -21,7 +37,7 @@ function MainLayout() {
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.5 }}
           className="relative h-16 bg-gradient-to-r from-blue-600
-           via-indigo-700 to-purple-800 px-6 flex items-center justify-between shadow-lg sticky top-0 z-10 overflow-hidden"
+           via-indigo-700 to-purple-800 px-4 md:px-6 flex items-center justify-between shadow-lg sticky top-0 z-10 overflow-hidden"
         >
           {/* Background Decorations */}
           <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -37,11 +53,22 @@ function MainLayout() {
             />
           </div>
 
-          {/* Left Side - Search */}
-          <div className="relative z-10 flex items-center gap-4">
+          {/* Left Side - Hamburger + Search */}
+          <div className="relative z-10 flex items-center gap-3">
+            {/* Hamburger Menu - Mobile Only */}
+            <motion.button
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => setIsSidebarOpen(true)}
+              className="md:hidden p-2 bg-white/10 backdrop-blur-sm rounded-xl border border-white/10 hover:bg-white/20 transition-colors"
+            >
+              <IconMenu2 size={22} className="text-white" />
+            </motion.button>
+
+            {/* Search - Hidden on mobile */}
             <motion.div 
               whileHover={{ scale: 1.02 }}
-              className="flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-xl border border-white/10"
+              className="hidden md:flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-xl border border-white/10"
             >
               <IconSearch size={18} className="text-blue-200" />
               <input 
@@ -104,7 +131,7 @@ function MainLayout() {
 
         {/* 🔥 Scrollable Content */}
         <motion.div
-          className="flex-1 overflow-y-auto bg-gradient-to-br from-gray-50 to-gray-100"
+          className="flex-1 overflow-x-hidden overflow-y-auto bg-gradient-to-br from-gray-50 to-gray-100"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
         >

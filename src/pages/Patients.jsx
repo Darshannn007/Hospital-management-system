@@ -66,7 +66,7 @@ function Patients() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 text-gray-800 p-6 overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 text-gray-800 p-4 md:p-6 w-full box-border">
       {/* Background Decorations */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-0 right-0 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl" />
@@ -74,28 +74,28 @@ function Patients() {
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-purple-500/5 rounded-full blur-3xl" />
       </div>
 
-      <div className="relative z-10">
+      <div className="relative z-10 w-full">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="mb-8"
+          className="mb-6 md:mb-8"
         >
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-            <div>
-              <div className="flex items-center gap-3 mb-2">
-                <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/30">
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-3 mb-2 flex-wrap">
+                <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/30 shrink-0">
                   <IconUsers size={20} className="text-white" />
                 </div>
                 <span className="text-sm font-medium text-blue-700 bg-blue-100 px-3 py-1 rounded-full">
                   🏥 Patient Management
                 </span>
               </div>
-              <h1 className="text-4xl font-bold bg-gradient-to-r from-gray-900 via-blue-800 to-indigo-700 bg-clip-text text-transparent">
+              <h1 className="text-2xl md:text-4xl font-bold bg-gradient-to-r from-gray-900 via-blue-800 to-indigo-700 bg-clip-text text-transparent">
                 Patients
               </h1>
-              <p className="text-gray-600 mt-1">
+              <p className="text-gray-600 mt-1 text-sm md:text-base">
                 Manage and view all registered patients
               </p>
             </div>
@@ -104,7 +104,7 @@ function Patients() {
               onClick={() => setShowForm(true)}
               whileHover={{ scale: 1.02, boxShadow: "0 20px 40px rgba(59, 130, 246, 0.3)" }}
               whileTap={{ scale: 0.98 }}
-              className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white px-6 py-3 rounded-xl font-semibold shadow-lg shadow-blue-500/30 transition-all duration-300 flex items-center gap-2"
+              className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white px-4 md:px-6 py-3 rounded-xl font-semibold shadow-lg shadow-blue-500/30 transition-all duration-300 flex items-center justify-center gap-2 w-full md:w-auto shrink-0"
             >
               <IconUserPlus size={20} />
               Add Patient
@@ -120,38 +120,32 @@ function Patients() {
           className="mb-6 flex flex-col md:flex-row gap-4"
         >
           {/* Search */}
-          <div className="flex-1">
-            <motion.div
-              whileHover={{ scale: 1.01 }}
-              className="relative"
-            >
+          <div className="flex-1 min-w-0">
+            <div className="relative">
               <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
                 <IconSearch size={20} />
               </span>
               <input
                 type="text"
-                placeholder="Search patients by name or phone..."
+                placeholder="Search patients..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-12 pr-4 py-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all duration-300 bg-white"
+                className="w-full pl-12 pr-4 py-3 md:py-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all duration-300 bg-white text-sm md:text-base"
               />
-            </motion.div>
+            </div>
           </div>
 
           {/* Stats */}
-          <div className="flex gap-3">
-            <motion.div
-              whileHover={{ scale: 1.02 }}
-              className="bg-white border border-gray-100 px-5 py-3 rounded-xl shadow-lg shadow-blue-500/10 flex items-center gap-3"
-            >
-              <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center">
+          <div className="flex gap-3 shrink-0">
+            <div className="bg-white border border-gray-100 px-4 md:px-5 py-3 rounded-xl shadow-lg shadow-blue-500/10 flex items-center gap-3">
+              <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center shrink-0">
                 <IconUsers size={18} className="text-white" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-gray-900">{patients.length}</p>
+                <p className="text-xl md:text-2xl font-bold text-gray-900">{patients.length}</p>
                 <p className="text-xs text-gray-500">Total Patients</p>
               </div>
-            </motion.div>
+            </div>
           </div>
         </motion.div>
 
@@ -160,16 +154,16 @@ function Patients() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="bg-white border border-gray-100 rounded-2xl shadow-xl shadow-blue-500/10 overflow-hidden"
+          className="bg-white border border-gray-100 rounded-2xl shadow-xl shadow-blue-500/10 overflow-hidden w-full"
         >
           {/* Table Header Info */}
-          <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+          <div className="px-4 md:px-6 py-4 border-b border-gray-100 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-pink-600 rounded-lg flex items-center justify-center">
                 <IconUser size={16} className="text-white" />
               </div>
               <div>
-                <h2 className="text-lg font-semibold text-gray-800">Patient Records</h2>
+                <h2 className="text-base md:text-lg font-semibold text-gray-800">Patient Records</h2>
                 <p className="text-gray-500 text-xs">
                   Showing {filteredPatients.length} of {patients.length} patients
                 </p>
@@ -178,23 +172,23 @@ function Patients() {
           </div>
 
           {/* Table */}
-          <div className="overflow-x-auto">
-            <table className="min-w-full">
+          <div className="overflow-x-auto w-full">
+            <table className="w-full min-w-[600px]">
               <thead>
                 <tr className="bg-gradient-to-r from-gray-50 to-gray-100">
-                  <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
+                  <th className="px-4 md:px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
                     Patient Name
                   </th>
-                  <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
+                  <th className="px-4 md:px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
                     Age
                   </th>
-                  <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
+                  <th className="px-4 md:px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
                     Gender
                   </th>
-                  <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
+                  <th className="px-4 md:px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
                     Phone
                   </th>
-                  <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
+                  <th className="px-4 md:px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
                     Actions
                   </th>
                 </tr>
@@ -243,21 +237,21 @@ function Patients() {
                       variants={rowVariants}
                       className="border-b border-gray-50 hover:bg-blue-50/50 transition-colors group"
                     >
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center text-white font-bold shadow-md">
+                      <td className="px-4 md:px-6 py-4">
+                        <div className="flex items-center gap-2 md:gap-3">
+                          <div className="w-8 h-8 md:w-10 md:h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center text-white font-bold shadow-md text-sm md:text-base">
                             {p.name?.charAt(0)?.toUpperCase() || "P"}
                           </div>
-                          <span className="font-medium text-gray-900">{p.name}</span>
+                          <span className="font-medium text-gray-900 text-sm md:text-base">{p.name}</span>
                         </div>
                       </td>
-                      <td className="px-6 py-4">
-                        <span className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm font-medium">
+                      <td className="px-4 md:px-6 py-4">
+                        <span className="bg-gray-100 text-gray-700 px-2 md:px-3 py-1 rounded-full text-xs md:text-sm font-medium">
                           {p.age} yrs
                         </span>
                       </td>
-                      <td className="px-6 py-4">
-                        <span className={`px-3 py-1 rounded-full text-sm font-medium ${
+                      <td className="px-4 md:px-6 py-4">
+                        <span className={`px-2 md:px-3 py-1 rounded-full text-xs md:text-sm font-medium ${
                           p.gender === "Male" 
                             ? "bg-blue-100 text-blue-700" 
                             : "bg-pink-100 text-pink-700"
@@ -265,10 +259,10 @@ function Patients() {
                           {p.gender === "Male" ? "👨" : "👩"} {p.gender}
                         </span>
                       </td>
-                      <td className="px-6 py-4">
-                        <span className="text-gray-600">📞 {p.phone}</span>
+                      <td className="px-4 md:px-6 py-4">
+                        <span className="text-gray-600 text-sm">📞 {p.phone}</span>
                       </td>
-                      <td className="px-6 py-4">
+                      <td className="px-4 md:px-6 py-4">
                         <div className="flex items-center gap-2 opacity-70 group-hover:opacity-100 transition-opacity">
                           <motion.button
                             onClick={() => {
@@ -277,17 +271,17 @@ function Patients() {
                             }}
                             whileHover={{ scale: 1.1 }}
                             whileTap={{ scale: 0.95 }}
-                            className="p-2 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 transition-colors"
+                            className="p-1.5 md:p-2 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 transition-colors"
                           >
-                            <IconEdit size={18} />
+                            <IconEdit size={16} />
                           </motion.button>
                           <motion.button
                             onClick={() => handleDelete(p.id)}
                             whileHover={{ scale: 1.1 }}
                             whileTap={{ scale: 0.95 }}
-                            className="p-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-colors"
+                            className="p-1.5 md:p-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-colors"
                           >
-                            <IconTrash size={18} />
+                            <IconTrash size={16} />
                           </motion.button>
                         </div>
                       </td>

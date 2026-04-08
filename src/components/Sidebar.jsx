@@ -7,11 +7,12 @@ import {
   IconStethoscope,
   IconLogout,
   IconChevronRight,
+  IconX,
 } from "@tabler/icons-react";
 import { motion } from "framer-motion";
 import { useSelector } from "react-redux";
 
-function Sidebar() {
+function Sidebar({ onClose }) {
   const { role } = useSelector((state) => state.auth);
 
   const floatingAnimation = {

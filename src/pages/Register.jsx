@@ -108,13 +108,13 @@ function Register() {
   ];
 
   return (
-    <div className="h-screen w-full flex overflow-hidden">
-      {/* LEFT SIDE - Animated Background */}
+    <div className="min-h-screen w-full flex flex-col lg:flex-row overflow-hidden">
+      {/* LEFT SIDE - Animated Background (Hidden on mobile) */}
       <motion.div
         initial={{ x: -100, opacity: 0 }}
         animate={{ x: 0, opacity: 1 }}
         transition={{ duration: 0.8, ease: "easeOut" }}
-        className="relative w-1/2 bg-gradient-to-br from-indigo-600 via-purple-700 to-blue-800 text-white flex flex-col justify-center px-16 overflow-hidden"
+        className="hidden lg:flex relative w-full lg:w-1/2 bg-gradient-to-br from-indigo-600 via-purple-700 to-blue-800 text-white flex-col justify-center px-8 lg:px-16 overflow-hidden"
       >
         {/* Animated Background Elements */}
         <div className="absolute inset-0 overflow-hidden">
@@ -206,13 +206,13 @@ function Register() {
       </motion.div>
 
       {/* RIGHT SIDE (FORM) */}
-      <div className="w-1/2 flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 relative py-8">
+      <div className="w-full lg:w-1/2 min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 relative px-4 py-8 lg:px-0">
         {/* Brand Name */}
         <motion.h1
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5, duration: 0.6 }}
-          className="absolute top-6 right-8 text-2xl font-bold text-gray-300 tracking-widest select-none"
+          className="absolute top-4 right-4 lg:top-6 lg:right-8 text-lg lg:text-2xl font-bold text-gray-300 tracking-widest select-none"
         >
           Darshan Desale
         </motion.h1>
@@ -222,7 +222,7 @@ function Register() {
           initial={{ opacity: 0, y: 30, scale: 0.95 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ duration: 0.6, delay: 0.3, ease: "easeOut" }}
-          className="bg-white p-8 rounded-3xl shadow-2xl shadow-purple-500/10 w-[450px] border border-gray-100 max-h-[90vh] overflow-y-auto scrollbar-hide"
+          className="bg-white p-6 sm:p-8 rounded-3xl shadow-2xl shadow-purple-500/10 w-full max-w-[450px] border border-gray-100 max-h-[90vh] overflow-y-auto scrollbar-hide"
           style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
         >
           {/* Form Header */}
