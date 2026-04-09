@@ -1,13 +1,27 @@
 import { useEffect, useState } from "react";
-import { getAppointments, addAppointment } from "../services/appointmentService";
+import {
+  getAppointments,
+  addAppointment,
+  updateAppointmentStatus,
+  deleteAppointment,
+} from "../services/appointmentService";
 import { getDoctors } from "../services/doctorService";
 import { useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { updateAppointmentStatus } from "../services/appointmentService";
 import { toast } from "react-hot-toast/headless";
 import { getSlots, bookSlot } from "../services/availabilityService";
 import { motion, AnimatePresence } from "framer-motion";
-import { IconCalendar, IconClock, IconUser, IconStethoscope, IconCheck, IconX, IconCalendarPlus, IconSearch } from "@tabler/icons-react";
+import {
+  IconCalendar,
+  IconClock,
+  IconUser,
+  IconStethoscope,
+  IconCheck,
+  IconX,
+  IconCalendarPlus,
+  IconSearch,
+  IconTrash,
+} from "@tabler/icons-react";
 
 function Appointments() {
   const location = useLocation();
@@ -20,6 +34,7 @@ function Appointments() {
   const [appointments, setAppointments] = useState([]);
   const [doctors, setDoctors] = useState([]);
   const [loadingId, setLoadingId] = useState(null);
+  const [deletingId, setDeletingId] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -49,6 +64,20 @@ function Appointments() {
       console.log(err);
     } finally {
       setLoadingId(null);
+    }
+  };
+
+  const handleDeleteAppointment = async (id) => {
+    try {
+      setDeletingId(id);
+      await deleteAppointment(id);
+      fetchAppointments();
+      toast.success("Appointment deleted successfully");
+    } catch (err) {
+      toast.error("Error deleting appointment");
+      console.log(err);
+    } finally {
+      setDeletingId(null);
     }
   };
 
@@ -168,12 +197,12 @@ function Appointments() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 text-gray-800 p-4 md:p-6 overflow-hidden">
+    <div className="min-h-screen bg-linear-to-br from-gray-50 to-gray-100 text-gray-800 p-4 md:p-6 overflow-hidden">
       {/* Background Decorations */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-0 right-0 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl" />
         <div className="absolute bottom-0 left-0 w-96 h-96 bg-indigo-500/5 rounded-full blur-3xl" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-purple-500/5 rounded-full blur-3xl" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-150 h-150 bg-purple-500/5 rounded-full blur-3xl" />
       </div>
 
       <div className="relative z-10">
@@ -185,14 +214,14 @@ function Appointments() {
           className="mb-8"
         >
           <div className="flex items-center gap-3 mb-2">
-            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/30">
+            <div className="w-10 h-10 bg-linear-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/30">
               <IconCalendar size={20} className="text-white" />
             </div>
             <span className="text-sm font-medium text-blue-700 bg-blue-100 px-3 py-1 rounded-full">
               📅 Appointment Management
             </span>
           </div>
-          <h1 className="text-2xl md:text-4xl font-bold bg-gradient-to-r from-gray-900 via-blue-800 to-indigo-700 bg-clip-text text-transparent">
+          <h1 className="text-2xl md:text-4xl font-bold bg-linear-to-r from-gray-900 via-blue-800 to-indigo-700 bg-clip-text text-transparent">
             Appointments
           </h1>
           <p className="text-gray-600 mt-1">
@@ -207,7 +236,7 @@ function Appointments() {
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
-              className="mb-6 p-4 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl shadow-lg shadow-blue-500/20 flex items-center gap-4"
+              className="mb-6 p-4 bg-linear-to-r from-blue-500 to-indigo-600 rounded-xl shadow-lg shadow-blue-500/20 flex items-center gap-4"
             >
               <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center text-white font-bold text-xl">
                 {selectedDoctor.name?.charAt(0)}
@@ -228,7 +257,7 @@ function Appointments() {
           className="bg-white border border-gray-100 p-6 rounded-2xl shadow-xl shadow-blue-500/10 mb-8"
         >
           <div className="flex items-center gap-2 mb-6">
-            <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center">
+            <div className="w-8 h-8 bg-linear-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center">
               <IconCalendarPlus size={16} className="text-white" />
             </div>
             <div>
@@ -337,8 +366,8 @@ function Appointments() {
                         slot.booked
                           ? "bg-gray-100 text-gray-400 cursor-not-allowed line-through"
                           : selectedSlotId === slot.id
-                          ? "bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-lg shadow-green-500/30"
-                          : "bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-md shadow-blue-500/20 hover:shadow-lg"
+                          ? "bg-linear-to-r from-green-500 to-emerald-600 text-white shadow-lg shadow-green-500/30"
+                          : "bg-linear-to-r from-blue-500 to-indigo-600 text-white shadow-md shadow-blue-500/20 hover:shadow-lg"
                       }`}
                     >
                       <IconClock size={16} />
@@ -357,7 +386,7 @@ function Appointments() {
                 disabled={isSubmitting}
                 whileHover={{ scale: 1.02, boxShadow: "0 20px 40px rgba(59, 130, 246, 0.3)" }}
                 whileTap={{ scale: 0.98 }}
-                className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white px-8 py-4 rounded-xl font-semibold shadow-lg shadow-blue-500/30 transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed flex items-center gap-2"
+                className="bg-linear-to-r from-blue-600 via-indigo-600 to-purple-600 text-white px-8 py-4 rounded-xl font-semibold shadow-lg shadow-blue-500/30 transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed flex items-center gap-2"
               >
                 {isSubmitting ? (
                   <>
@@ -407,7 +436,7 @@ function Appointments() {
               whileHover={{ scale: 1.02 }}
               className="bg-white border border-gray-100 px-5 py-3 rounded-xl shadow-lg shadow-blue-500/10 flex items-center gap-3"
             >
-              <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center">
+              <div className="w-10 h-10 bg-linear-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center">
                 <IconCalendar size={18} className="text-white" />
               </div>
               <div>
@@ -427,7 +456,7 @@ function Appointments() {
         >
           <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-pink-600 rounded-lg flex items-center justify-center">
+              <div className="w-8 h-8 bg-linear-to-br from-purple-500 to-pink-600 rounded-lg flex items-center justify-center">
                 <IconCalendar size={16} className="text-white" />
               </div>
               <div>
@@ -442,7 +471,7 @@ function Appointments() {
           <div className="overflow-x-auto">
             <table className="min-w-full">
               <thead>
-                <tr className="bg-gradient-to-r from-gray-50 to-gray-100">
+                <tr className="bg-linear-to-r from-gray-50 to-gray-100">
                   <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
                     Patient
                   </th>
@@ -483,7 +512,7 @@ function Appointments() {
                     >
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center text-white font-bold shadow-md">
+                          <div className="w-10 h-10 bg-linear-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center text-white font-bold shadow-md">
                             {a.patientName?.charAt(0)?.toUpperCase() || "P"}
                           </div>
                           <span className="font-medium text-gray-900">{a.patientName}</span>
@@ -544,6 +573,25 @@ function Appointments() {
                               >
                                 <IconX size={14} />
                                 {loadingId === a.id ? "..." : "Reject"}
+                              </motion.button>
+                            </div>
+                          )}
+
+                          {role === "ADMIN" && (
+                            <div className="opacity-70 group-hover:opacity-100 transition-opacity">
+                              <motion.button
+                                disabled={deletingId === a.id}
+                                onClick={() => handleDeleteAppointment(a.id)}
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
+                                className={`flex items-center gap-1 px-3 py-1.5 text-xs rounded-lg font-medium transition ${
+                                  deletingId === a.id
+                                    ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+                                    : "bg-red-100 text-red-700 hover:bg-red-200"
+                                }`}
+                              >
+                                <IconTrash size={14} />
+                                {deletingId === a.id ? "Deleting..." : "Delete"}
                               </motion.button>
                             </div>
                           )}

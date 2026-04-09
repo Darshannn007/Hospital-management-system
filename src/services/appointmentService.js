@@ -6,6 +6,10 @@ export const getAppointments = () =>
 export const addAppointment = (data) =>{
  return api.post("/appointments", data);}
 
+export const deleteAppointment = (id) => {
+    return api.delete(`/appointments/${id}`);
+};
+
  export const updateAppointmentStatus = (id, status) =>{
     const token = localStorage.getItem("token");
 

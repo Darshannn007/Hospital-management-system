@@ -8,7 +8,7 @@ import Appointments from "../pages/Appoitments";
 import Doctors from "../pages/Doctor";
 import Billing from "../pages/Billing";
 import Pharmacy from "../pages/Pharmacy";
-import Prescription from "../pages/Prescription";
+// import Prescription from "../pages/Prescription";
 import Invoice from "../pages/Invoice";
 import Reports from "../pages/Reports";
 import Availability from "../pages/Availability";
@@ -33,102 +33,62 @@ function AppRoutes() {
         <Route element={<MainLayout />}>
 
           {/* 🏠 Dashboard (All roles) */}
-          <Route
-            path="/dashboard" 
-            element={
-               <ProtectedRoute>
-                <Dashboard />
-              </ProtectedRoute>
-            }
-          />
+          <Route path="/dashboard"  
+            element={<ProtectedRoute><Dashboard /></ProtectedRoute>}/>
 
           {/* 👨‍⚕️ Patients → ADMIN + DOCTOR */}
-          <Route
-            path="/patients"
-            element={
-              <ProtectedRoute allowedRoles={["ADMIN", "DOCTOR"]}>
-                <Patients />
-              </ProtectedRoute>
-            }
-          />
+          <Route path="/patients"
+            element={<ProtectedRoute allowedRoles={["ADMIN", "DOCTOR"]}>
+                <Patients /></ProtectedRoute>}/>
+
 
           {/* 🩺 Doctors → ADMIN + USER */}
-          <Route
-            path="/doctors"
-            element={
-              <ProtectedRoute allowedRoles={["ADMIN", "PATIENT"]}>
-                <Doctors />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-              path="/availability"
-              element={
-                <ProtectedRoute allowedRoles={["ADMIN"]}>
-                  <Availability />
-                </ProtectedRoute>
-              }
-            />
+          <Route path="/doctors"
+            element={<ProtectedRoute allowedRoles={["ADMIN", "PATIENT"]}>
+                <Doctors /></ProtectedRoute>}/>
+          <Route path="/availability"
+              element={<ProtectedRoute allowedRoles={["ADMIN"]}>
+                  <Availability /></ProtectedRoute>}/>
+
 
           {/* 📅 Appointments → ALL */}
-          <Route
-            path="/appointments"
-            element={
-              <ProtectedRoute allowedRoles={["ADMIN", "DOCTOR", "PATIENT"]}>
-                <Appointments />
-              </ProtectedRoute>
-            }
-          />
+          <Route path="/appointments"
+            element={<ProtectedRoute allowedRoles={["ADMIN", "DOCTOR", "PATIENT"]}><Appointments /></ProtectedRoute>}/>
+
 
           {/* 💰 Billing → ADMIN */}
-          <Route
-            path="/billing"
-            element={
-              <ProtectedRoute allowedRoles={["ADMIN"]}>
-                <Billing />
-              </ProtectedRoute>
-            }
-          />
+          <Route path="/billing"
+            element={<ProtectedRoute allowedRoles={["ADMIN"]}>
+                <Billing /></ProtectedRoute>}/>
+
 
           {/* 💊 Pharmacy → ADMIN */}
-          <Route
-            path="/pharmacy"
-            element={
-              <ProtectedRoute allowedRoles={["ADMIN"]}>
-                <Pharmacy />
-              </ProtectedRoute>
-            }
-          />
+          <Route path="/pharmacy"
+            element={<ProtectedRoute allowedRoles={["ADMIN"]}>
+                <Pharmacy /></ProtectedRoute>}/>
+
 
           {/* 📄 Prescription → DOCTOR */}
-          <Route
+          {/* <Route
             path="/prescription"
             element={
               <ProtectedRoute allowedRoles={["DOCTOR"]}>
                 <Prescription />
               </ProtectedRoute>
             }
-          />
+          /> */}
+
 
           {/* 🧾 Invoice → ADMIN */}
-          <Route
-            path="/invoice"
-            element={
-              <ProtectedRoute allowedRoles={["ADMIN"]}>
-                <Invoice />
-              </ProtectedRoute>
-            }
-          />
+          <Route path="/invoice"
+            element={<ProtectedRoute allowedRoles={["ADMIN"]}>
+                <Invoice /></ProtectedRoute>}/>
+
 
           {/* 📊 Reports → ADMIN */}
-          <Route
-            path="/reports"
-            element={
-              <ProtectedRoute allowedRoles={["ADMIN"]}>
-                <Reports />
-              </ProtectedRoute>
-            }
-          />
+          <Route path="/reports"
+            element={<ProtectedRoute allowedRoles={["ADMIN"]}>
+                <Reports /></ProtectedRoute>}/>
 
         </Route>
 

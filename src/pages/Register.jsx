@@ -206,7 +206,7 @@ function Register() {
       </motion.div>
 
       {/* RIGHT SIDE (FORM) */}
-      <div className="w-full lg:w-1/2 min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 relative px-4 py-8 lg:px-0">
+      <div className="w-full lg:w-1/2 min-h-screen flex items-center justify-center bg-linear-to-br from-gray-50 to-gray-100 relative px-4 py-8 lg:px-0">
         {/* Brand Name */}
         <motion.h1
           initial={{ opacity: 0, y: -20 }}
