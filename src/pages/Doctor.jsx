@@ -9,7 +9,7 @@ import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { motion, AnimatePresence } from "framer-motion";
-import { IconStethoscope, IconUserPlus, IconEdit, IconTrash, IconCalendarPlus, IconSearch, IconBriefcase, IconSchool } from "@tabler/icons-react";
+import { IconStethoscope, IconUserPlus, IconEdit, IconTrash, IconCalendarPlus, IconSearch, IconBriefcase, IconSchool, IconFileInvoice } from "@tabler/icons-react";
 
 function Doctor() {
   const { role } = useSelector((state) => state.auth);

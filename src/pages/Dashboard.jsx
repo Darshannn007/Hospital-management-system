@@ -21,6 +21,7 @@ import { useSelector } from "react-redux";
 import { getPatients } from "../services/patientService";
 import { getDoctors } from "../services/doctorService";
 import { getAppointments } from "../services/appointmentService";
+import toast from "react-hot-toast";
 
 const hospitalInfo = {
   name: "CityCare Multispeciality Hospital",
@@ -148,7 +149,7 @@ function Dashboard() {
         rejected,
       });
     } catch (err) {
-      console.log(err);
+      toast.error(err);
     } finally {
       setIsLoading(false);
     }
@@ -423,12 +424,12 @@ function Dashboard() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 text-gray-800 p-4 md:p-6 overflow-hidden">
+    <div className="min-h-screen bg-linear-to-br from-gray-50 to-gray-100 text-gray-800 p-4 md:p-6 overflow-hidden">
       {/* Background Decorations */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-0 right-0 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl" />
         <div className="absolute bottom-0 left-0 w-96 h-96 bg-indigo-500/5 rounded-full blur-3xl" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-purple-500/5 rounded-full blur-3xl" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-150 h-150 bg-purple-500/5 rounded-full blur-3xl" />
       </div>
 
       <div className="relative z-10">
@@ -442,14 +443,14 @@ function Dashboard() {
           <div className="flex items-center justify-between">
             <div>
               <div className="flex items-center gap-3 mb-2">
-                <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/30">
+                <div className="w-10 h-10 bg-linear-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/30">
                   <Activity size={20} />
                 </div>
                 <span className="text-sm font-medium text-blue-700 bg-blue-100 px-3 py-1 rounded-full">
                   🏥 HMS Dashboard
                 </span>
               </div>
-              <h1 className="text-2xl md:text-4xl font-bold bg-gradient-to-r from-gray-900 via-blue-800 to-indigo-700 bg-clip-text text-transparent">
+              <h1 className="text-2xl md:text-4xl font-bold bg-linear-to-r from-gray-900 via-blue-800 to-indigo-700 bg-clip-text text-transparent">
                 {isPatient ? "Hospital Network Overview" : "Welcome Back!"}
               </h1>
               <p className="text-gray-600 mt-1">
@@ -493,7 +494,7 @@ function Dashboard() {
                   className={`relative bg-white border border-gray-100 p-6 rounded-2xl shadow-xl shadow-blue-500/10 ${item.bgGlow} overflow-hidden group`}
                 >
                   <div
-                    className={`absolute inset-0 bg-gradient-to-br ${item.gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-500`}
+                    className={`absolute inset-0 bg-linear-to-br ${item.gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-500`}
                   />
 
                   <div className="relative z-10 flex justify-between items-start">
@@ -512,7 +513,7 @@ function Dashboard() {
                     </div>
 
                     <div
-                      className={`p-3 rounded-xl bg-gradient-to-br ${item.gradient} shadow-lg`}
+                      className={`p-3 rounded-xl bg-linear-to-br ${item.gradient} shadow-lg`}
                     >
                       {item.icon}
                     </div>
@@ -529,7 +530,7 @@ function Dashboard() {
             >
               <div className="bg-white border border-gray-100 p-6 rounded-2xl shadow-xl shadow-blue-500/10 xl:col-span-1">
                 <div className="flex items-center gap-3 mb-5">
-                  <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 text-white flex items-center justify-center">
+                  <div className="w-9 h-9 rounded-lg bg-linear-to-br from-blue-500 to-indigo-600 text-white flex items-center justify-center">
                     <Building2 size={18} />
                   </div>
                   <div>
@@ -570,7 +571,7 @@ function Dashboard() {
 
               <div className="bg-white border border-gray-100 p-6 rounded-2xl shadow-xl shadow-blue-500/10 xl:col-span-2">
                 <div className="flex items-center gap-3 mb-6">
-                  <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 text-white flex items-center justify-center">
+                  <div className="w-9 h-9 rounded-lg bg-linear-to-br from-indigo-500 to-purple-600 text-white flex items-center justify-center">
                     <MapPin size={18} />
                   </div>
                   <div>
@@ -624,7 +625,7 @@ function Dashboard() {
             >
               <div className="bg-white border border-gray-100 p-6 rounded-2xl shadow-xl shadow-blue-500/10">
                 <div className="flex items-center gap-2 mb-6">
-                  <div className="w-8 h-8 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-lg flex items-center justify-center text-white">
+                  <div className="w-8 h-8 bg-linear-to-br from-emerald-500 to-teal-600 rounded-lg flex items-center justify-center text-white">
                     <Activity size={16} />
                   </div>
                   <div>
@@ -653,7 +654,7 @@ function Dashboard() {
 
               <div className="bg-white border border-gray-100 p-6 rounded-2xl shadow-xl shadow-blue-500/10">
                 <div className="flex items-center gap-2 mb-6">
-                  <div className="w-8 h-8 bg-gradient-to-br from-amber-500 to-orange-600 rounded-lg flex items-center justify-center text-white">
+                  <div className="w-8 h-8 bg-linear-to-br from-amber-500 to-orange-600 rounded-lg flex items-center justify-center text-white">
                     <Star size={16} />
                   </div>
                   <div>
@@ -705,7 +706,7 @@ function Dashboard() {
                 >
                   {/* Gradient Glow */}
                   <div
-                    className={`absolute inset-0 bg-gradient-to-br ${item.gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-500`}
+                    className={`absolute inset-0 bg-linear-to-br ${item.gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-500`}
                   />
 
                   <div className="relative z-10 flex justify-between items-start">
@@ -730,7 +731,7 @@ function Dashboard() {
                     </div>
 
                     <div
-                      className={`p-3 rounded-xl bg-gradient-to-br ${item.gradient} shadow-lg`}
+                      className={`p-3 rounded-xl bg-linear-to-br ${item.gradient} shadow-lg`}
                     >
                       {item.icon}
                     </div>
@@ -791,7 +792,7 @@ function Dashboard() {
               {/* Quick Links */}
               <div className="bg-white border border-gray-100 p-6 rounded-2xl shadow-xl shadow-blue-500/10">
                 <div className="flex items-center gap-2 mb-6">
-                  <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center">
+                  <div className="w-8 h-8 bg-linear-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center">
                     <Plus size={16} />
                   </div>
                   <div>
@@ -809,7 +810,7 @@ function Dashboard() {
                       className="w-full flex items-center gap-3 bg-gray-50 hover:bg-blue-50 border border-gray-200 p-4 rounded-xl transition-all duration-300 group"
                     >
                       <div
-                        className={`p-2 rounded-lg bg-gradient-to-br ${link.color} shadow-lg group-hover:shadow-xl transition-shadow`}
+                        className={`p-2 rounded-lg bg-linear-to-br ${link.color} shadow-lg group-hover:shadow-xl transition-shadow`}
                       >
                         {link.icon}
                       </div>
@@ -827,7 +828,7 @@ function Dashboard() {
               {/* Recent Activity */}
               <div className="bg-white border border-gray-100 p-6 rounded-2xl shadow-xl shadow-blue-500/10">
                 <div className="flex items-center gap-2 mb-6">
-                  <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-pink-600 rounded-lg flex items-center justify-center">
+                  <div className="w-8 h-8 bg-linear-to-br from-purple-500 to-pink-600 rounded-lg flex items-center justify-center">
                     <Activity size={16} />
                   </div>
                   <div>

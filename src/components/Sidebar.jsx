@@ -1,13 +1,15 @@
+/* eslint-disable no-unused-vars */
 import { NavLink } from "react-router-dom";
 import {
   IconLayoutDashboard,
   IconStethoscopeOff,
   IconUsers,
+  IconUser,
   IconCalendar,
   IconStethoscope,
   IconLogout,
   IconChevronRight,
-  IconX,
+  IconFileInvoice,
 } from "@tabler/icons-react";
 import { motion } from "framer-motion";
 import { useSelector } from "react-redux";
@@ -93,7 +95,7 @@ function Sidebar({ onClose }) {
       initial={{ x: -100, opacity: 0 }}
       animate={{ x: 0, opacity: 1 }}
       transition={{ duration: 0.6, ease: "easeOut" }}
-      className="relative w-72 h-screen bg-gradient-to-br from-blue-600 via-indigo-700 to-purple-800 text-white flex flex-col justify-between p-5 shadow-2xl overflow-hidden"
+      className="relative w-72 h-screen bg-linear-to-br from-blue-600 via-indigo-700 to-purple-800 text-white flex flex-col justify-between p-5 shadow-2xl overflow-hidden"
     >
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -138,7 +140,7 @@ function Sidebar({ onClose }) {
             initial={{ scaleX: 0 }}
             animate={{ scaleX: 1 }}
             transition={{ delay: 0.5, duration: 0.6 }}
-            className="h-px bg-gradient-to-r from-transparent via-white/30 to-transparent"
+            className="h-px bg-linear-to-r from-transparent via-white/30 to-transparent"
           />
         </motion.div>
 
@@ -161,11 +163,15 @@ function Sidebar({ onClose }) {
               <NavItem to="/availability" icon={IconStethoscopeOff} label="Doctor Availability" index={navIndex++} />
               <NavItem to="/patients" icon={IconUsers} label="Patients" index={navIndex++} />
               <NavItem to="/doctors" icon={IconStethoscope} label="Doctors" index={navIndex++} />
+              <NavItem to="/billing" icon={IconFileInvoice} label="Billing" index={navIndex++} />
             </>
           )}
 
           {role === "PATIENT" && (
-            <NavItem to="/doctors" icon={IconStethoscope} label="Doctors" index={navIndex++} />
+            <>
+              <NavItem to="/doctors" icon={IconStethoscope} label="Doctors" index={navIndex++} />
+              <NavItem to="/billing" icon={IconFileInvoice} label="My Invoices" index={navIndex++} />
+            </>
           )}
 
           {role === "DOCTOR" && (
@@ -184,7 +190,7 @@ function Sidebar({ onClose }) {
         className="relative z-10"
       >
         {/* Divider */}
-        <div className="h-px bg-gradient-to-r from-transparent via-white/20 to-transparent mb-4" />
+        <div className="h-px bg-linear-to-r from-transparent via-white/20 to-transparent mb-4" />
 
         {/* User Profile Card */}
         <motion.div
@@ -196,9 +202,9 @@ function Sidebar({ onClose }) {
               whileHover={{ scale: 1.1 }}
               className="relative"
             >
-              <div className="w-11 h-11 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center text-white font-bold shadow-lg">
-                D
-              </div>
+              <IconUser className="w-9 h-9 px-1 rounded-xl bg-white/20 flex items-center justify-center text-white font-bold shadow-lg">
+                
+              </IconUser>
               <motion.div
                 animate={{ scale: [1, 1.2, 1] }}
                 transition={{ duration: 2, repeat: Infinity }}

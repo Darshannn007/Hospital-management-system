@@ -56,9 +56,9 @@ function AppRoutes() {
             element={<ProtectedRoute allowedRoles={["ADMIN", "DOCTOR", "PATIENT"]}><Appointments /></ProtectedRoute>}/>
 
 
-          {/* 💰 Billing → ADMIN */}
+          {/* 💰 Billing → ADMIN + PATIENT */}
           <Route path="/billing"
-            element={<ProtectedRoute allowedRoles={["ADMIN"]}>
+            element={<ProtectedRoute allowedRoles={["ADMIN", "PATIENT"]}>
                 <Billing /></ProtectedRoute>}/>
 
 
