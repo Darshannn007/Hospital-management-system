@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API = "http://localhost:8080/auth";
+const API = "https://hms-deployement.onrender.com/auth";
 
 export const register = (data) => {
   return axios.post(`${API}/register`, data);
