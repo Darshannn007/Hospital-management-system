@@ -10,6 +10,7 @@ import {
   IconLogout,
   IconChevronRight,
   IconFileInvoice,
+  IconMedicineSyrup,
 } from "@tabler/icons-react";
 import { motion } from "framer-motion";
 import { useSelector } from "react-redux";
@@ -164,6 +165,7 @@ function Sidebar({ onClose }) {
               <NavItem to="/patients" icon={IconUsers} label="Patients" index={navIndex++} />
               <NavItem to="/doctors" icon={IconStethoscope} label="Doctors" index={navIndex++} />
               <NavItem to="/billing" icon={IconFileInvoice} label="Billing" index={navIndex++} />
+              <NavItem to="/pharmacy" icon={IconMedicineSyrup} label="Pharmacy" index={navIndex++} />
             </>
           )}
 

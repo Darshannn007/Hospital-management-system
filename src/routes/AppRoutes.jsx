@@ -8,9 +8,6 @@ import Appointments from "../pages/Appoitments";
 import Doctors from "../pages/Doctor";
 import Billing from "../pages/Billing";
 import Pharmacy from "../pages/Pharmacy";
-// import Prescription from "../pages/Prescription";
-import Invoice from "../pages/Invoice";
-import Reports from "../pages/Reports";
 import Availability from "../pages/Availability";
 import Register from "../pages/Register";
 
@@ -80,15 +77,15 @@ function AppRoutes() {
 
 
           {/* 🧾 Invoice → ADMIN */}
-          <Route path="/invoice"
+          {/* <Route path="/invoice"
             element={<ProtectedRoute allowedRoles={["ADMIN"]}>
-                <Invoice /></ProtectedRoute>}/>
+                <Invoice /></ProtectedRoute>}/> */}
 
 
           {/* 📊 Reports → ADMIN */}
-          <Route path="/reports"
+          {/* <Route path="/reports"
             element={<ProtectedRoute allowedRoles={["ADMIN"]}>
-                <Reports /></ProtectedRoute>}/>
+                <Reports /></ProtectedRoute>}/> */}
 
         </Route>
 

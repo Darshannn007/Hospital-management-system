@@ -10,6 +10,11 @@ import {
   uploadInvoiceForPatient,
 } from "../services/billingService";
 
+const PAYMENT_STATUS = {
+  DONE: "DONE",
+  PENDING: "PENDING",
+};
+
 const getInvoiceNumber = (invoice) =>
   invoice.invoiceNumber || invoice.number || `INV-${invoice.id || "NA"}`;
 
@@ -21,7 +26,18 @@ const getInvoiceAmount = (invoice) =>
 const getPatientIdFromInvoice = (invoice) =>
   invoice.patientId || invoice.patient?.id || invoice.patient?.patientId || "-";
 
-const getPaymentStatus = (invoice) => (invoice.paymentStatus || invoice.status || "pending").toUpperCase();
+const getPaymentStatus = (invoice) => {
+  const rawStatus = String(invoice.paymentStatus || invoice.status || PAYMENT_STATUS.PENDING).toUpperCase();
+
+  if (rawStatus === PAYMENT_STATUS.DONE || rawStatus === "PAID") {
+    return PAYMENT_STATUS.DONE;
+  }
+
+  return PAYMENT_STATUS.PENDING;
+};
+
+const toBackendPaymentStatus = (status) =>
+  status === PAYMENT_STATUS.DONE ? PAYMENT_STATUS.DONE : PAYMENT_STATUS.PENDING;
 
 const normalizeInvoices = (payload) => {
   if (Array.isArray(payload)) return payload;
@@ -76,7 +92,7 @@ const Billing = () => {
   const [updatingId, setUpdatingId] = useState(null);
   const [adminForm, setAdminForm] = useState({
     patientId: "",
-    paymentStatus: "Pending",
+    paymentStatus: PAYMENT_STATUS.PENDING,
     invoiceFile: null,
   });
 
@@ -87,7 +103,7 @@ const Billing = () => {
       setInvoices(normalizeInvoices(res.data));
     } catch (err) {
       console.log(err);
-      toast.error("Unable to load invoices");
+      toast.error("invoices not found");
       setInvoices([]);
     } finally {
       setLoading(false);
@@ -101,7 +117,7 @@ const Billing = () => {
       setInvoices(normalizeInvoices(res.data));
     } catch (err) {
       console.log(err);
-      toast.error("Unable to load admin invoices");
+      toast.error("Unable to load invoices");
       setInvoices([]);
     } finally {
       setLoading(false);
@@ -139,7 +155,7 @@ const Billing = () => {
       setUploading(true);
       await uploadInvoiceForPatient({
         patientId: adminForm.patientId.trim(),
-        paymentStatus: adminForm.paymentStatus,
+        paymentStatus: toBackendPaymentStatus(adminForm.paymentStatus),
         invoiceFile: adminForm.invoiceFile,
       });
 
@@ -147,7 +163,7 @@ const Billing = () => {
 
       setAdminForm({
         patientId: "",
-        paymentStatus: "Pending",
+        paymentStatus: PAYMENT_STATUS.PENDING,
         invoiceFile: null,
       });
 
@@ -170,7 +186,7 @@ const Billing = () => {
 
     try {
       setUpdatingId(invoiceId);
-      await updateInvoicePaymentStatus(invoiceId, status);
+      await updateInvoicePaymentStatus(invoiceId, toBackendPaymentStatus(status));
       toast.success(`Payment status marked ${status}`);
       fetchAdminInvoices();
     } catch (err) {
@@ -216,7 +232,7 @@ const Billing = () => {
       toast.success("Invoice downloaded");
     } catch (err) {
       console.log(err);
-      toast.error("Error occured during download Invoice");
+      toast.error("Error occurred while downloading invoice");
     } finally {
       setDownloadingId(null);
     }
@@ -244,7 +260,7 @@ const Billing = () => {
               Admin Billing
             </h1>
             <p className="text-gray-600 mt-1">
-              Patient ID ke basis par invoice upload karo aur payment status manually update karo.
+              Upload invoices by Patient ID and manually manage payment status.
             </p>
           </div>
 
@@ -281,8 +297,8 @@ const Billing = () => {
                   }
                   className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all duration-300 bg-gray-50 focus:bg-white"
                 >
-                  <option value="pending">PENDING</option>
-                  <option value="DONE">DONE</option>
+                  <option value={PAYMENT_STATUS.PENDING}>PENDING</option>
+                  <option value={PAYMENT_STATUS.DONE}>DONE</option>
                 </select>
               </div>
 
@@ -369,7 +385,7 @@ const Billing = () => {
                           <td className="px-6 py-4">
                             <span
                               className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                                paymentStatus === "DONE"
+                                paymentStatus === PAYMENT_STATUS.DONE
                                   ? "bg-green-100 text-green-700"
                                   : "bg-amber-100 text-amber-700"
                               }`}
@@ -380,18 +396,18 @@ const Billing = () => {
                           <td className="px-6 py-4">
                             <div className="flex items-center gap-2">
                               <button
-                                onClick={() => handleAdminStatusUpdate(invoice, "DONE")}
+                                onClick={() => handleAdminStatusUpdate(invoice, PAYMENT_STATUS.DONE)}
                                 disabled={updatingId === (invoice.id || invoice.invoiceId)}
                                 className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-green-100 text-green-700 hover:bg-green-200 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
                               >
                                 Mark Done
                               </button>
                               <button
-                                onClick={() => handleAdminStatusUpdate(invoice, "pending")}
+                                onClick={() => handleAdminStatusUpdate(invoice, PAYMENT_STATUS.PENDING)}
                                 disabled={updatingId === (invoice.id || invoice.invoiceId)}
                                 className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-amber-100 text-amber-700 hover:bg-amber-200 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
                               >
-                                Mark pending
+                                Mark Pending
                               </button>
                             </div>
                           </td>
@@ -482,13 +498,13 @@ const Billing = () => {
                 ) : invoices.length === 0 ? (
                   <tr>
                     <td colSpan="5" className="text-center py-12 text-gray-500">
-                      Aapke account me abhi koi invoice available nahi hai.
+                      No invoices are available for your account.
                     </td>
                   </tr>
                 ) : (
                   invoices.map((invoice, index) => {
                     const invoiceId = invoice.id || invoice.invoiceId || `row-${index}`;
-                    const status = invoice.status || "PENDING";
+                    const status = getPaymentStatus(invoice);
 
                     return (
                       <tr
@@ -499,7 +515,13 @@ const Billing = () => {
                         <td className="px-6 py-4 text-gray-700">{formatDate(getInvoiceDate(invoice))}</td>
                         <td className="px-6 py-4 text-gray-700">{formatAmount(getInvoiceAmount(invoice))}</td>
                         <td className="px-6 py-4">
-                          <span className="px-3 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-700">
+                          <span
+                            className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                              status === PAYMENT_STATUS.DONE
+                                ? "bg-green-100 text-green-700"
+                                : "bg-amber-100 text-amber-700"
+                            }`}
+                          >
                             {status}
                           </span>
                         </td>

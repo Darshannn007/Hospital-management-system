@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Outlet } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
+// eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
 import { IconUser, IconBell, IconSearch, IconSettings, IconMenu2 } from "@tabler/icons-react";
 import { useSelector } from "react-redux";
