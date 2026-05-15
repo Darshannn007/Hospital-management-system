@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API = "https://hms-deployment.onrender.com/auth";
+const API = "https://hms-deployment-eh4s.onrender.com/auth";
 
 
 export const register = (data) => {
