@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "https://hms-deployement.onrender.com/api",
+  baseURL: "https://hms-deployment.onrender.com/api",
 });
 
 //AUTO TOKEN ATTACH
