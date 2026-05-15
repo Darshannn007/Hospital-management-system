@@ -43,6 +43,7 @@ const formatDate = (value) => {
   return parsed.toLocaleDateString("en-IN");
 };
 
+// eslint-disable-next-line no-unused-vars
 const formatAmount = (value) => {
   const amount = toNumber(value, 0);
   return new Intl.NumberFormat("en-IN", {
@@ -483,7 +484,7 @@ const Pharmacy = () => {
           </div>
 
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[900px]">
+            <table className="w-full min-w-225">
               <thead>
                 <tr className="bg-linear-to-r from-gray-50 to-gray-100">
                   <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Medicine</th>
