@@ -139,8 +139,9 @@ function Appointments() {
     setIsSubmitting(true);
     try {
       await addAppointment(formData);
+      toast.success("Appointment Booked Successfully!!!🎉");
       await bookSlot(selectedSlotId);
-      toast.success("Appointment Booked Successfully! 🎉");
+      
 
       setFormData({
         patientName: "",
