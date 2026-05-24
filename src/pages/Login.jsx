@@ -1,11 +1,11 @@
 /* eslint-disable no-unused-vars */
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { loginSuccess } from "../features/authSlice";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "react-hot-toast";
-import { login } from "../services/authServices";
+import { login, warmupBackend } from "../services/authServices";
 
 function Login() {
   const dispatch = useDispatch();
@@ -19,6 +19,13 @@ function Login() {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [focusedField, setFocusedField] = useState(null);
+  
+
+  useEffect(() => {
+    warmupBackend().catch((err) => {
+      console.debug("Backend warmup failed", err);
+    });
+  }, []);
 
   const handleChange = (e) => {
     setFormData({
@@ -55,6 +62,97 @@ function Login() {
     } finally {
       setIsLoading(false);
     }
+  };
+  const handleDemoAdminLogin = async () => {
+
+    const demoData = {
+      email: "admin@gmail.com",
+      password: "1234"
+    };
+  
+    // auto fill fields
+    setFormData(demoData);
+  
+    // optional tiny delay for UX
+    setTimeout(async () => {
+  
+      try {
+  
+        setIsLoading(true);
+  
+        const res = await login(demoData);
+  
+        const { token, email, role } = res.data;
+  
+        dispatch(
+          loginSuccess({
+            user: { email },
+            token,
+            role,
+          })
+        );
+  
+        toast.success("Logged in as Demo Admin 🚀");
+  
+        navigate("/dashboard");
+  
+      } catch (err) {
+  
+        console.log(err);
+  
+        toast.error("Demo admin login failed");
+  
+      } finally {
+  
+        setIsLoading(false);
+      }
+  
+    }, 500);
+  };
+  const handleDemoPatientLogin = async () => {
+
+    const demoData = {
+      email: "patient@gmail.com",
+      password: "1234"
+    };
+  
+    // auto fill fields
+    setFormData(demoData);
+  
+    setTimeout(async () => {
+  
+      try {
+  
+        setIsLoading(true);
+  
+        const res = await login(demoData);
+  
+        const { token, email, role } = res.data;
+  
+        dispatch(
+          loginSuccess({
+            user: { email },
+            token,
+            role,
+          })
+        );
+  
+        toast.success("Logged in as Demo Patient 🏥");
+  
+        navigate("/dashboard");
+  
+      } catch (err) {
+  
+        console.log(err);
+  
+        toast.error("Demo patient login failed");
+  
+      } finally {
+  
+        setIsLoading(false);
+      }
+  
+    }, 500);
   };
 
   const containerVariants = {
@@ -103,6 +201,7 @@ function Login() {
   ];
 
   return (
+    
     <div className="min-h-screen w-full flex flex-col lg:flex-row overflow-hidden">
       {/* LEFT SIDE - Animated Background (Hidden on mobile) */}
       <motion.div
@@ -111,6 +210,7 @@ function Login() {
         transition={{ duration: 0.8, ease: "easeOut" }}
         className="hidden lg:flex relative w-full lg:w-1/2 bg-gradient-to-br from-blue-600 via-indigo-700 to-purple-800 text-white flex-col justify-center px-8 lg:px-16 overflow-hidden"
       >
+        
         {/* Animated Background Elements */}
         <div className="absolute inset-0 overflow-hidden">
           <motion.div
@@ -351,6 +451,49 @@ function Login() {
             </span>
             <div className="absolute inset-0 bg-gradient-to-r from-indigo-600 via-purple-600 to-blue-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
           </motion.button>
+
+{/* Demo Access */}
+
+<motion.div
+  initial={{ opacity: 0 }}
+  animate={{ opacity: 1 }}
+  transition={{ delay: 1.1 }}
+  className="mt-6 border-t pt-6"
+>
+
+  <div className="text-center mb-4">
+    <p className="text-sm font-semibold text-gray-700">
+      Quick Demo Access
+    </p>
+
+    <p className="text-xs text-gray-500 mt-1">
+      Explore HMS instantly with demo accounts
+    </p>
+  </div>
+
+  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+
+    <motion.button
+      whileHover={{ scale: 1.02 }}
+      whileTap={{ scale: 0.98 }}
+      onClick={handleDemoAdminLogin}
+      className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white py-3 rounded-xl font-medium shadow-lg shadow-purple-500/20"
+    >
+      👨‍💼 Demo Admin
+    </motion.button>
+
+    <motion.button
+      whileHover={{ scale: 1.02 }}
+      whileTap={{ scale: 0.98 }}
+      onClick={handleDemoPatientLogin}
+      className="bg-gradient-to-r from-blue-500 to-cyan-500 text-white py-3 rounded-xl font-medium shadow-lg shadow-blue-500/20"
+    >
+      🏥 Demo Patient
+    </motion.button>
+
+  </div>
+
+</motion.div>
 
           {/* Register Link */}
           <motion.p

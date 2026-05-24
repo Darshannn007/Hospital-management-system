@@ -1,5 +1,8 @@
 /* eslint-disable no-unused-vars */
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { logout } from "../features/authSlice";
+
 import {
   IconLayoutDashboard,
   IconStethoscopeOff,
@@ -12,12 +15,26 @@ import {
   IconFileInvoice,
   IconMedicineSyrup,
 } from "@tabler/icons-react";
+
 import { motion } from "framer-motion";
-import { useSelector } from "react-redux";
 
 function Sidebar({ onClose }) {
+
   const { role } = useSelector((state) => state.auth);
 
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  // LOGOUT FUNCTION
+  const handleLogout = () => {
+
+    dispatch(logout());
+
+    navigate("/");
+
+  };
+
+  // FLOATING BG ANIMATION
   const floatingAnimation = {
     y: [-8, 8, -8],
     transition: {
@@ -27,22 +44,31 @@ function Sidebar({ onClose }) {
     },
   };
 
+  // NAV ITEM ANIMATION
   const navItemVariants = {
     hidden: { opacity: 0, x: -20 },
+
     visible: (i) => ({
       opacity: 1,
       x: 0,
-      transition: { delay: 0.3 + i * 0.1, duration: 0.4 },
+
+      transition: {
+        delay: 0.3 + i * 0.1,
+        duration: 0.4,
+      },
     }),
   };
 
+  // NAV ITEM COMPONENT
   const NavItem = ({ to, icon: Icon, label, index }) => (
+
     <motion.div
       custom={index}
       variants={navItemVariants}
       initial="hidden"
       animate="visible"
     >
+
       <NavLink
         to={to}
         className={({ isActive }) =>
@@ -53,8 +79,10 @@ function Sidebar({ onClose }) {
           }`
         }
       >
+
         {({ isActive }) => (
           <>
+
             <motion.div
               whileHover={{ scale: 1.1, rotate: 5 }}
               transition={{ duration: 0.2 }}
@@ -66,8 +94,13 @@ function Sidebar({ onClose }) {
             >
               <Icon size={20} />
             </motion.div>
-            <span className="font-medium">{label}</span>
+
+            <span className="font-medium">
+              {label}
+            </span>
+
             {isActive && (
+
               <motion.div
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
@@ -75,77 +108,100 @@ function Sidebar({ onClose }) {
               >
                 <IconChevronRight size={16} />
               </motion.div>
+
             )}
+
             {!isActive && (
+
               <motion.div
                 initial={{ width: 0 }}
                 whileHover={{ width: "100%" }}
                 className="absolute bottom-0 left-0 h-0.5 bg-white/50 rounded-full"
               />
+
             )}
+
           </>
         )}
+
       </NavLink>
+
     </motion.div>
   );
 
   let navIndex = 0;
 
   return (
+
     <motion.div
       initial={{ x: -100, opacity: 0 }}
       animate={{ x: 0, opacity: 1 }}
       transition={{ duration: 0.6, ease: "easeOut" }}
-      className="relative w-72 h-screen bg-linear-to-br from-blue-600 via-indigo-700 to-purple-800 text-white flex flex-col justify-between p-5 shadow-2xl overflow-hidden"
+      className="relative w-72 h-screen bg-linear-to-br from-blue-600 via-indigo-700 to-purple-800 text-white flex flex-col p-5 shadow-2xl"
     >
-      {/* Animated Background Elements */}
+
+      {/* Animated Background */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
+
         <motion.div
           animate={floatingAnimation}
           className="absolute -top-10 -left-10 w-40 h-40 bg-white/10 rounded-full blur-3xl"
         />
+
         <motion.div
           animate={{ ...floatingAnimation, y: [10, -10, 10] }}
           className="absolute top-1/3 -right-10 w-32 h-32 bg-blue-400/10 rounded-full blur-2xl"
         />
+
         <motion.div
           animate={{ ...floatingAnimation, y: [-5, 15, -5] }}
           className="absolute bottom-20 left-10 w-24 h-24 bg-purple-400/10 rounded-full blur-2xl"
         />
+
       </div>
 
       {/* TOP */}
-      <div className="relative z-10">
-        {/* Logo Section */}
+      <div className="relative z-10 flex flex-col flex-1 min-h-0">
+
+        {/* LOGO */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2, duration: 0.5 }}
           className="mb-8"
         >
+
           <div className="flex items-center gap-3 mb-2">
+
             <motion.div
               whileHover={{ scale: 1.1, rotate: 10 }}
               className="w-12 h-12 bg-white/10 backdrop-blur-sm rounded-xl flex items-center justify-center shadow-lg"
             >
               <span className="text-2xl">🏥</span>
             </motion.div>
+
             <div>
               <h2 className="text-xl font-bold text-white">
                 HMS
               </h2>
-              <p className="text-xs text-blue-200">Healthcare System</p>
+
+              <p className="text-xs text-blue-200">
+                Healthcare System
+              </p>
             </div>
+
           </div>
+
           <motion.div
             initial={{ scaleX: 0 }}
             animate={{ scaleX: 1 }}
             transition={{ delay: 0.5, duration: 0.6 }}
             className="h-px bg-linear-to-r from-transparent via-white/30 to-transparent"
           />
+
         </motion.div>
 
-        {/* Navigation Label */}
+        {/* MENU LABEL */}
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -155,89 +211,182 @@ function Sidebar({ onClose }) {
           Menu
         </motion.p>
 
-        {/* Nav Items */}
-        <nav className="space-y-2">
-          <NavItem to="/dashboard" icon={IconLayoutDashboard} label="Dashboard" index={navIndex++} />
+        {/* NAVIGATION */}
+        <nav className="space-y-2 flex-1 pr-1 overflow-y-auto scrollbar-hide">
 
+          <NavItem
+            to="/dashboard"
+            icon={IconLayoutDashboard}
+            label="Dashboard"
+            index={navIndex++}
+          />
+
+          {/* ADMIN */}
           {role === "ADMIN" && (
             <>
-              <NavItem to="/availability" icon={IconStethoscopeOff} label="Doctor Availability" index={navIndex++} />
-              <NavItem to="/patients" icon={IconUsers} label="Patients" index={navIndex++} />
-              <NavItem to="/doctors" icon={IconStethoscope} label="Doctors" index={navIndex++} />
-              <NavItem to="/billing" icon={IconFileInvoice} label="Billing" index={navIndex++} />
-              <NavItem to="/pharmacy" icon={IconMedicineSyrup} label="Pharmacy" index={navIndex++} />
+
+              <NavItem
+                to="/availability"
+                icon={IconStethoscopeOff}
+                label="Doctor Availability"
+                index={navIndex++}
+              />
+
+              <NavItem
+                to="/patients"
+                icon={IconUsers}
+                label="Patients"
+                index={navIndex++}
+              />
+
+              <NavItem
+                to="/doctors"
+                icon={IconStethoscope}
+                label="Doctors"
+                index={navIndex++}
+              />
+
+              <NavItem
+                to="/billing"
+                icon={IconFileInvoice}
+                label="Billing"
+                index={navIndex++}
+              />
+
+              <NavItem
+                to="/pharmacy"
+                icon={IconMedicineSyrup}
+                label="Pharmacy"
+                index={navIndex++}
+              />
+
             </>
           )}
 
+          {/* PATIENT */}
           {role === "PATIENT" && (
             <>
-              <NavItem to="/doctors" icon={IconStethoscope} label="Doctors" index={navIndex++} />
-              <NavItem to="/billing" icon={IconFileInvoice} label="My Invoices" index={navIndex++} />
+
+              <NavItem
+                to="/doctors"
+                icon={IconStethoscope}
+                label="Doctors"
+                index={navIndex++}
+              />
+
+              <NavItem
+                to="/billing"
+                icon={IconFileInvoice}
+                label="My Invoices"
+                index={navIndex++}
+              />
+
             </>
           )}
 
+          {/* DOCTOR */}
           {role === "DOCTOR" && (
-            <NavItem to="/appointments" icon={IconCalendar} label="My Appointments" index={navIndex++} />
+
+            <NavItem
+              to="/appointments"
+              icon={IconCalendar}
+              label="My Appointments"
+              index={navIndex++}
+            />
+
           )}
 
-          <NavItem to="/appointments" icon={IconCalendar} label="Appointments" index={navIndex++} />
+          {/* COMMON */}
+          <NavItem
+            to="/appointments"
+            icon={IconCalendar}
+            label="Appointments"
+            index={navIndex++}
+          />
+
         </nav>
+
       </div>
 
       {/* BOTTOM */}
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.8, duration: 0.5 }}
-        className="relative z-10"
-      >
-        {/* Divider */}
+  initial={{ opacity: 0, y: 20 }}
+  animate={{ opacity: 1, y: 0 }}
+  transition={{ delay: 0.8, duration: 0.5 }}
+   className="relative z-10 pt-4 mt-4 border-t border-white/10"
+>
+
+        {/* DIVIDER */}
         <div className="h-px bg-linear-to-r from-transparent via-white/20 to-transparent mb-4" />
 
-        {/* User Profile Card */}
+        {/* USER CARD */}
         <motion.div
           whileHover={{ scale: 1.02 }}
           className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/10 mb-4"
         >
+
           <div className="flex items-center gap-3">
+
             <motion.div
               whileHover={{ scale: 1.1 }}
               className="relative"
             >
-              <IconUser className="w-9 h-9 px-1 rounded-xl bg-white/20 flex items-center justify-center text-white font-bold shadow-lg">
-                
-              </IconUser>
+
+              <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center shadow-lg">
+                <IconUser size={20} />
+              </div>
+
               <motion.div
                 animate={{ scale: [1, 1.2, 1] }}
                 transition={{ duration: 2, repeat: Infinity }}
                 className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-400 rounded-full border-2 border-indigo-500"
               />
+
             </motion.div>
+
             <div className="flex-1">
-              <p className="text-sm font-semibold text-white">Darshan</p>
-              <p className="text-xs text-blue-200 flex items-center gap-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-green-400"></span>
-                {role}
+
+              <p className="text-sm font-semibold text-white">
+                Darshan
               </p>
+
+              <p className="text-xs text-blue-200 flex items-center gap-1">
+
+                <span className="w-1.5 h-1.5 rounded-full bg-green-400"></span>
+
+                {role}
+
+              </p>
+
             </div>
+
           </div>
+
         </motion.div>
 
-        {/* Logout Button */}
+        {/* LOGOUT BUTTON */}
         <motion.button
+          onClick={handleLogout}
           whileHover={{ scale: 1.02, x: 5 }}
           whileTap={{ scale: 0.98 }}
           className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-blue-200 hover:text-white hover:bg-white/10 transition-all duration-300 group"
         >
+
           <motion.div
             whileHover={{ rotate: -10 }}
             className="p-2 rounded-lg bg-white/5 group-hover:bg-white/10 transition-colors"
           >
             <IconLogout size={18} />
           </motion.div>
-          <span className="font-medium">Logout</span>
+
+          <span className="font-medium">
+            Logout
+          </span>
+
         </motion.button>
+
       </motion.div>
+
     </motion.div>
   );
 }
