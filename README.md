@@ -65,6 +65,25 @@ This project demonstrates practical implementation of:
 - Reusable Components using React
 
 ---
+## Demo Admin Access
+
+To help recruiters and reviewers explore the full functionality of the application, a demo admin account has been provided.
+
+Email: admin@gmail.com
+Password: 1234
+
+You can use these credentials to access the admin dashboard and test features such as:
+
+- Patient Management
+- Doctor Management
+- Appointment Booking
+- Dashboard Analytics
+- Role-Based Authentication
+- CRUD Operations
+
+Note: This is a demo application built for learning and portfolio purposes. All data used inside the system is sample data.
+
+---
 
 # Tech Stack
 
