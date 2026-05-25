@@ -1,4 +1,5 @@
 /* eslint-disable no-unused-vars */
+import { memo, useMemo } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../features/authSlice";
@@ -35,17 +36,17 @@ function Sidebar({ onClose }) {
   };
 
   // FLOATING BG ANIMATION
-  const floatingAnimation = {
+  const floatingAnimation = useMemo(() => ({
     y: [-8, 8, -8],
     transition: {
       duration: 4,
       repeat: Infinity,
       ease: "easeInOut",
     },
-  };
+  }), []);
 
   // NAV ITEM ANIMATION
-  const navItemVariants = {
+  const navItemVariants = useMemo(() => ({
     hidden: { opacity: 0, x: -20 },
 
     visible: (i) => ({
@@ -57,17 +58,12 @@ function Sidebar({ onClose }) {
         duration: 0.4,
       },
     }),
-  };
+  }), []);
 
   // NAV ITEM COMPONENT
-  const NavItem = ({ to, icon: Icon, label, index }) => (
+  const NavItem = ({ to, icon: Icon, label }) => (
 
-    <motion.div
-      custom={index}
-      variants={navItemVariants}
-      initial="hidden"
-      animate="visible"
-    >
+    <div>
 
       <NavLink
         to={to}
@@ -126,7 +122,7 @@ function Sidebar({ onClose }) {
 
       </NavLink>
 
-    </motion.div>
+    </div>
   );
 
   let navIndex = 0;
@@ -212,13 +208,12 @@ function Sidebar({ onClose }) {
         </motion.p>
 
         {/* NAVIGATION */}
-        <nav className="space-y-2 flex-1 pr-1 overflow-y-auto scrollbar-hide">
+        <nav className="relative space-y-2 flex-1 pr-2 overflow-y-auto sidebar-scrollbar">
 
           <NavItem
             to="/dashboard"
             icon={IconLayoutDashboard}
             label="Dashboard"
-            index={navIndex++}
           />
 
           {/* ADMIN */}
@@ -229,35 +224,30 @@ function Sidebar({ onClose }) {
                 to="/availability"
                 icon={IconStethoscopeOff}
                 label="Doctor Availability"
-                index={navIndex++}
               />
 
               <NavItem
                 to="/patients"
                 icon={IconUsers}
                 label="Patients"
-                index={navIndex++}
               />
 
               <NavItem
                 to="/doctors"
                 icon={IconStethoscope}
                 label="Doctors"
-                index={navIndex++}
               />
 
               <NavItem
                 to="/billing"
                 icon={IconFileInvoice}
                 label="Billing"
-                index={navIndex++}
               />
 
               <NavItem
                 to="/pharmacy"
                 icon={IconMedicineSyrup}
                 label="Pharmacy"
-                index={navIndex++}
               />
 
             </>
@@ -271,14 +261,12 @@ function Sidebar({ onClose }) {
                 to="/doctors"
                 icon={IconStethoscope}
                 label="Doctors"
-                index={navIndex++}
               />
 
               <NavItem
                 to="/billing"
                 icon={IconFileInvoice}
                 label="My Invoices"
-                index={navIndex++}
               />
 
             </>
@@ -291,7 +279,6 @@ function Sidebar({ onClose }) {
               to="/appointments"
               icon={IconCalendar}
               label="My Appointments"
-              index={navIndex++}
             />
 
           )}
@@ -301,11 +288,9 @@ function Sidebar({ onClose }) {
             to="/appointments"
             icon={IconCalendar}
             label="Appointments"
-            index={navIndex++}
           />
 
         </nav>
-
       </div>
 
       {/* BOTTOM */}
@@ -391,4 +376,4 @@ function Sidebar({ onClose }) {
   );
 }
 
-export default Sidebar;
+export default memo(Sidebar);

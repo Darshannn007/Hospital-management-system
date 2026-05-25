@@ -202,13 +202,13 @@ function Login() {
 
   return (
     
-    <div className="min-h-screen w-full flex flex-col lg:flex-row overflow-hidden">
+    <div className="min-h-dvh w-full flex flex-col lg:flex-row overflow-x-hidden">
       {/* LEFT SIDE - Animated Background (Hidden on mobile) */}
       <motion.div
         initial={{ x: 0, opacity: 0 }}
         animate={{ x: 0, opacity: 2 }}
         transition={{ duration: 0.8, ease: "easeOut" }}
-        className="hidden lg:flex relative w-full lg:w-1/2 bg-gradient-to-br from-blue-600 via-indigo-700 to-purple-800 text-white flex-col justify-center px-8 lg:px-16 overflow-hidden"
+        className="hidden lg:flex relative w-full lg:w-1/2 bg-linear-to-br from-blue-600 via-indigo-700 to-purple-800 text-white flex-col justify-center px-8 lg:px-16 overflow-hidden"
       >
         
         {/* Animated Background Elements */}
@@ -295,7 +295,7 @@ function Login() {
       </motion.div>
 
       {/* RIGHT SIDE (FORM) */}
-      <div className="w-full lg:w-1/2 min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-200 to-gray-50 relative px-4 py-8 lg:px-0 lg:py-0">
+      <div className="w-full lg:w-1/2 min-h-dvh flex items-start lg:items-center justify-center bg-linear-to-br from-gray-200 to-gray-50 relative px-3 sm:px-4 py-4 sm:py-6 lg:px-0 lg:py-0 overflow-x-hidden">
         {/* Brand Name */}
         <motion.h1
           initial={{ opacity: 0, y: -20 }}
@@ -311,27 +311,27 @@ function Login() {
           initial={{ opacity: 0, y: 30, scale: 0.95 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ duration: 0.6, delay: 0.3, ease: "easeOut" }}
-          className="bg-white p-6 sm:p-8 lg:p-10 rounded-3xl shadow-2xl shadow-blue-500/10 w-full max-w-[420px] border border-gray-100"
+          className="bg-white p-4 sm:p-6 lg:p-7 rounded-3xl shadow-2xl shadow-blue-500/10 w-full max-w-97.5 sm:max-w-105 border border-gray-100 max-h-[calc(100dvh-1rem)] overflow-y-auto scrollbar-hide"
         >
           {/* Form Header */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.5 }}
-            className="text-center mb-8"
+            className="text-center mb-5 sm:mb-6"
           >
             <motion.div
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ delay: 0.6, type: "spring", stiffness: 200 }}
-              className="w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-blue-500/30"
+              className="w-14 h-14 bg-linear-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-lg shadow-blue-500/30"
             >
               <span className="text-3xl">👋</span>
             </motion.div>
-            <h2 className="text-3xl font-bold text-gray-800 mb-2">
+            <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-1.5">
               Welcome Back
             </h2>
-            <p className="text-gray-500">Sign in to access your dashboard</p>
+            <p className="text-sm sm:text-base text-gray-500">Sign in to access your dashboard</p>
           </motion.div>
 
           <AnimatePresence>
@@ -352,9 +352,9 @@ function Login() {
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.7 }}
-            className="mb-5"
+            className="mb-3 sm:mb-4"
           >
-            <label className="text-sm font-semibold text-gray-700 mb-2 block">
+            <label className="text-sm font-semibold text-gray-700 mb-1 block">
               Email Address
             </label>
             <div
@@ -373,7 +373,7 @@ function Login() {
                 onChange={handleChange}
                 onFocus={() => setFocusedField("email")}
                 onBlur={() => setFocusedField(null)}
-                className="w-full pl-12 pr-4 py-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all duration-300 bg-gray-50 focus:bg-white"
+                className="w-full pl-12 pr-4 py-2.5 sm:py-3.5 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all duration-300 bg-gray-50 focus:bg-white"
                 required
               />
             </div>
@@ -384,9 +384,9 @@ function Login() {
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.8 }}
-            className="mb-6"
+            className="mb-3 sm:mb-4"
           >
-            <label className="text-sm font-semibold text-gray-700 mb-2 block">
+            <label className="text-sm font-semibold text-gray-700 mb-1 block">
               Password
             </label>
             <div
@@ -405,7 +405,7 @@ function Login() {
                 onChange={handleChange}
                 onFocus={() => setFocusedField("password")}
                 onBlur={() => setFocusedField(null)}
-                className="w-full pl-12 pr-4 py-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all duration-300 bg-gray-50 focus:bg-white"
+                className="w-full pl-12 pr-4 py-2.5 sm:py-3.5 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all duration-300 bg-gray-50 focus:bg-white"
                 required
               />
             </div>
@@ -423,7 +423,7 @@ function Login() {
             whileTap={{ scale: 0.98 }}
             type="submit"
             disabled={isLoading}
-            className="w-full bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white py-4 rounded-xl font-semibold text-lg shadow-lg shadow-blue-500/30 transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed relative overflow-hidden group"
+            className="w-full bg-linear-to-r from-blue-600 via-indigo-600 to-purple-600 text-white py-3 sm:py-3.5 rounded-xl font-semibold text-base sm:text-lg shadow-lg shadow-blue-500/30 transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed relative overflow-hidden group"
           >
             <span className="relative z-10 flex items-center justify-center gap-2">
               {isLoading ? (
@@ -449,7 +449,7 @@ function Login() {
                 </>
               )}
             </span>
-            <div className="absolute inset-0 bg-gradient-to-r from-indigo-600 via-purple-600 to-blue-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+            <div className="absolute inset-0 bg-linear-to-r from-indigo-600 via-purple-600 to-blue-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
           </motion.button>
 
 {/* Demo Access */}
@@ -458,10 +458,10 @@ function Login() {
   initial={{ opacity: 0 }}
   animate={{ opacity: 1 }}
   transition={{ delay: 1.1 }}
-  className="mt-6 border-t pt-6"
+  className="mt-4 border-t pt-4"
 >
 
-  <div className="text-center mb-4">
+  <div className="text-center mb-3">
     <p className="text-sm font-semibold text-gray-700">
       Quick Demo Access
     </p>
@@ -471,13 +471,13 @@ function Login() {
     </p>
   </div>
 
-  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
 
     <motion.button
       whileHover={{ scale: 1.02 }}
       whileTap={{ scale: 0.98 }}
       onClick={handleDemoAdminLogin}
-      className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white py-3 rounded-xl font-medium shadow-lg shadow-purple-500/20"
+      className="bg-linear-to-r from-indigo-500 to-purple-600 text-white py-2.5 sm:py-3 rounded-xl font-medium shadow-lg shadow-purple-500/20"
     >
       👨‍💼 Demo Admin
     </motion.button>
@@ -486,7 +486,7 @@ function Login() {
       whileHover={{ scale: 1.02 }}
       whileTap={{ scale: 0.98 }}
       onClick={handleDemoPatientLogin}
-      className="bg-gradient-to-r from-blue-500 to-cyan-500 text-white py-3 rounded-xl font-medium shadow-lg shadow-blue-500/20"
+      className="bg-linear-to-r from-blue-500 to-cyan-500 text-white py-2.5 sm:py-3 rounded-xl font-medium shadow-lg shadow-blue-500/20"
     >
       🏥 Demo Patient
     </motion.button>
@@ -500,7 +500,7 @@ function Login() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 1 }}
-            className="text-sm mt-6 text-center text-gray-600"
+            className="text-sm mt-5 text-center text-gray-600"
           >
             Don't have an account?{" "}
             <motion.span

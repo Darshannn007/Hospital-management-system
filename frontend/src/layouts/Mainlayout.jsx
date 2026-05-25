@@ -1,14 +1,60 @@
-import { useState } from "react";
-import { Outlet } from "react-router-dom";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { Outlet, useNavigate } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
 // eslint-disable-next-line no-unused-vars
-import { motion } from "framer-motion";
-import { IconUser, IconBell, IconSearch, IconSettings, IconMenu2 } from "@tabler/icons-react";
-import { useSelector } from "react-redux";
+import { AnimatePresence, motion } from "framer-motion";
+import { IconUser, IconBell, IconSearch, IconSettings, IconMenu2, IconLogout } from "@tabler/icons-react";
+import { useDispatch, useSelector } from "react-redux";
+import { logout } from "../features/authSlice";
 
 function MainLayout() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [activeDropdown, setActiveDropdown] = useState(null);
   const {role} = useSelector((state) => state.auth);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const headerRef = useRef(null);
+
+  const demoNotifications = [
+    {
+      title: "New appointment request",
+      message: "Dr. Sharma has accepted a follow-up slot for today.",
+      time: "2m ago",
+      tone: "from-blue-500 to-indigo-600",
+    },
+    {
+      title: "Payment received",
+      message: "Invoice #204 has been marked as paid successfully.",
+      time: "18m ago",
+      tone: "from-emerald-500 to-teal-600",
+    },
+    {
+      title: "Prescription ready",
+      message: "Your pharmacy order is packed and ready for pickup.",
+      time: "1h ago",
+      tone: "from-purple-500 to-pink-600",
+    },
+  ];
+
+  useEffect(() => {
+    const handleOutsideClick = (event) => {
+      if (headerRef.current && !headerRef.current.contains(event.target)) {
+        setActiveDropdown(null);
+      }
+    };
+
+    document.addEventListener("mousedown", handleOutsideClick);
+    return () => document.removeEventListener("mousedown", handleOutsideClick);
+  }, []);
+
+  const handleLogout = () => {
+    dispatch(logout());
+    navigate("/");
+  };
+
+  const handleCloseSidebar = useCallback(() => {
+    setIsSidebarOpen(false);
+  }, []);
 
   return (
     <div className="flex h-screen overflow-hidden bg-gray-50">
@@ -22,13 +68,13 @@ function MainLayout() {
       {isSidebarOpen && (
         <div 
           className="fixed inset-0 bg-black/50 z-40 md:hidden"
-          onClick={() => setIsSidebarOpen(false)}
+          onClick={handleCloseSidebar}
         />
       )}
 
       {/* 🔥 Mobile Sidebar */}
       <div className={`fixed top-0 left-0 h-screen z-50 md:hidden transform transition-transform duration-300 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
-        <Sidebar onClose={() => setIsSidebarOpen(false)} />
+        <Sidebar onClose={handleCloseSidebar} />
       </div>
 
       {/* 🔥 Right Side */}
@@ -39,8 +85,8 @@ function MainLayout() {
           initial={{ y: -20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.5 }}
-          className="relative h-16 bg-linear-to-r from-blue-600
-           via-indigo-700 to-purple-800 px-4 md:px-6 flex items-center justify-between shadow-lg top-0 z-10 overflow-hidden"
+          ref={headerRef}
+          className="relative h-16 bg-linear-to-r from-blue-600 via-indigo-700 to-purple-800 px-4 md:px-6 flex items-center justify-between shadow-lg top-0 z-20 overflow-visible"
         >
           {/* Background Decorations */}
           <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -83,36 +129,115 @@ function MainLayout() {
           </div>
 
           {/* Right Side - Actions */}
-          <div className="relative z-10 flex items-center gap-4">
+          <div className="relative z-10 flex items-center gap-3 md:gap-4 flex-nowrap shrink-0">
             {/* Notification Bell */}
-            <motion.button
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.95 }}
-              className="relative p-2.5 bg-white/10 backdrop-blur-sm rounded-xl border border-white/10 hover:bg-white/20 transition-colors"
-            >
-              <IconBell size={20} className="text-white" />
-              <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full text-[10px] text-white flex items-center justify-center font-bold">
-                1
-              </span>
-            </motion.button>
+            <div className="relative shrink-0">
+              <motion.button
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() =>
+                  setActiveDropdown((current) =>
+                    current === "notifications" ? null : "notifications"
+                  )
+                }
+                className="relative p-2.5 bg-white/10 backdrop-blur-sm rounded-xl border border-white/10 hover:bg-white/20 transition-colors"
+              >
+                <IconBell size={20} className="text-white" />
+                <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full text-[10px] text-white flex items-center justify-center font-bold">
+                  3
+                </span>
+              </motion.button>
+
+              <AnimatePresence>
+                {activeDropdown === "notifications" && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10, scale: 0.96 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: -10, scale: 0.96 }}
+                    transition={{ duration: 0.18 }}
+                    className="fixed top-16 left-3 right-3 w-auto max-w-none sm:absolute sm:top-full sm:mt-3 sm:left-auto sm:right-0 sm:w-72 md:w-80 sm:max-w-[calc(100vw-1rem)] rounded-2xl bg-white shadow-2xl border border-gray-100 overflow-hidden z-50"
+                  >
+                    <div className="px-4 py-3 border-b border-gray-100 bg-linear-to-r from-blue-50 to-indigo-50">
+                      <p className="text-sm font-semibold text-gray-800">Notifications</p>
+                      <p className="text-xs text-gray-500">Demo alerts for HMS activity</p>
+                    </div>
+
+                    <div className="max-h-[calc(100vh-9rem)] overflow-y-auto">
+                      {demoNotifications.map((item) => (
+                        <div
+                          key={item.title}
+                          className="flex gap-3 px-4 py-3 hover:bg-gray-50 transition-colors border-b border-gray-50 last:border-b-0"
+                        >
+                          <div className={`w-10 h-10 rounded-xl bg-linear-to-br ${item.tone} flex items-center justify-center text-white shadow-lg shrink-0`}>
+                            <IconBell size={16} />
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-start justify-between gap-3">
+                              <p className="text-sm font-semibold text-gray-800 truncate">{item.title}</p>
+                              <span className="text-[11px] text-gray-400 shrink-0">{item.time}</span>
+                            </div>
+                            <p className="text-xs text-gray-500 mt-1 leading-relaxed">{item.message}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
 
             {/* Settings */}
-            <motion.button
-              whileHover={{ scale: 1.1, rotate: 90 }}
-              whileTap={{ scale: 0.95 }}
-              transition={{ duration: 0.3 }}
-              className="p-2.5 bg-white/10 backdrop-blur-sm rounded-xl border border-white/10 hover:bg-white/20 transition-colors"
-            >
-              <IconSettings size={20} className="text-white" />
-            </motion.button>
+            <div className="relative shrink-0">
+              <motion.button
+                whileHover={{ scale: 1.1, rotate: 90 }}
+                whileTap={{ scale: 0.95 }}
+                transition={{ duration: 0.3 }}
+                onClick={() =>
+                  setActiveDropdown((current) =>
+                    current === "settings" ? null : "settings"
+                  )
+                }
+                className="p-2.5 bg-white/10 backdrop-blur-sm rounded-xl border border-white/10 hover:bg-white/20 transition-colors"
+              >
+                <IconSettings size={20} className="text-white" />
+              </motion.button>
+
+              <AnimatePresence>
+                {activeDropdown === "settings" && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10, scale: 0.96 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: -10, scale: 0.96 }}
+                    transition={{ duration: 0.18 }}
+                    className="fixed top-16 left-3 right-3 w-auto sm:absolute sm:top-full sm:mt-3 sm:left-auto sm:right-0 sm:w-56 rounded-2xl bg-white shadow-2xl border border-gray-100 overflow-hidden z-50"
+                  >
+                    <div className="px-4 py-3 border-b border-gray-100 bg-linear-to-r from-gray-50 to-blue-50">
+                      <p className="text-sm font-semibold text-gray-800">Quick Settings</p>
+                      <p className="text-xs text-gray-500">Account and session actions</p>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={handleLogout}
+                      className="w-full flex items-center gap-3 px-4 py-3 text-left text-sm font-medium text-red-600 hover:bg-red-50 transition-colors"
+                    >
+                      <span className="w-9 h-9 rounded-xl bg-red-100 text-red-600 flex items-center justify-center shrink-0">
+                        <IconLogout size={16} />
+                      </span>
+                      <span className="flex-1">Logout</span>
+                    </button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
 
             {/* Divider */}
-            <div className="h-8 w-px bg-white/20" />
+            <div className="h-8 w-px bg-white/20 shrink-0" />
 
             {/* User Profile */}
             <motion.div 
               whileHover={{ scale: 1.02 }}
-              className="flex items-center gap-3 bg-white/10 backdrop-blur-sm pl-3 pr-4 py-1.5 rounded-xl border border-white/10 cursor-pointer"
+              className="flex items-center gap-3 bg-white/10 backdrop-blur-sm pl-3 pr-4 py-1.5 rounded-xl border border-white/10 cursor-pointer shrink-0"
             >
               <div className="relative">
                 <IconUser className="w-9 h-9 px-1 rounded-xl bg-white/20 flex items-center justify-center text-white font-bold shadow-lg">

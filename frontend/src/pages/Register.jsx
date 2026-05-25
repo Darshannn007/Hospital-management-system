@@ -108,13 +108,13 @@ function Register() {
   ];
 
   return (
-    <div className="min-h-screen w-full flex flex-col lg:flex-row overflow-hidden">
+    <div className="min-h-dvh w-full flex flex-col lg:flex-row overflow-x-hidden">
       {/* LEFT SIDE - Animated Background (Hidden on mobile) */}
       <motion.div
         initial={{ x: -100, opacity: 0 }}
         animate={{ x: 0, opacity: 1 }}
         transition={{ duration: 0.8, ease: "easeOut" }}
-        className="hidden lg:flex relative w-full lg:w-1/2 bg-gradient-to-br from-indigo-600 via-purple-700 to-blue-800 text-white flex-col justify-center px-8 lg:px-16 overflow-hidden"
+        className="hidden lg:flex relative w-full lg:w-1/2 bg-linear-to-br from-indigo-600 via-purple-700 to-blue-800 text-white flex-col justify-center px-8 lg:px-16 overflow-hidden"
       >
         {/* Animated Background Elements */}
         <div className="absolute inset-0 overflow-hidden">
@@ -154,7 +154,7 @@ function Register() {
 
           <motion.h1
             variants={itemVariants}
-            className="text-5xl font-bold mb-4 bg-gradient-to-r from-white to-purple-200 bg-clip-text text-transparent"
+            className="text-5xl font-bold mb-4 bg-linear-to-r from-white to-purple-200 bg-clip-text text-transparent"
           >
             Join Our Healthcare Network
           </motion.h1>
@@ -206,7 +206,7 @@ function Register() {
       </motion.div>
 
       {/* RIGHT SIDE (FORM) */}
-      <div className="w-full lg:w-1/2 min-h-screen flex items-center justify-center bg-linear-to-br from-gray-50 to-gray-100 relative px-4 py-8 lg:px-0">
+      <div className="w-full lg:w-1/2 min-h-dvh flex items-start lg:items-center justify-center bg-linear-to-br from-gray-50 to-gray-100 relative px-3 sm:px-4 py-4 sm:py-6 lg:px-0 lg:py-0 overflow-x-hidden">
         {/* Brand Name */}
         <motion.h1
           initial={{ opacity: 0, y: -20 }}
@@ -222,7 +222,7 @@ function Register() {
           initial={{ opacity: 0, y: 30, scale: 0.95 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ duration: 0.6, delay: 0.3, ease: "easeOut" }}
-          className="bg-white p-6 sm:p-8 rounded-3xl shadow-2xl shadow-purple-500/10 w-full max-w-[450px] border border-gray-100 max-h-[90vh] overflow-y-auto scrollbar-hide"
+          className="bg-white p-4 sm:p-6 lg:p-8 rounded-3xl shadow-2xl shadow-purple-500/10 w-full max-w-97.5 sm:max-w-107.5 border border-gray-100 max-h-[calc(100dvh-1rem)] lg:max-h-[90vh] overflow-y-auto scrollbar-hide"
           style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
         >
           {/* Form Header */}
@@ -230,13 +230,13 @@ function Register() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.5 }}
-            className="text-center mb-6"
+            className="text-center mb-5 sm:mb-6"
           >
             <motion.div
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ delay: 0.6, type: "spring", stiffness: 200 }}
-              className="w-14 h-14 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-lg shadow-purple-500/30"
+              className="w-14 h-14 bg-linear-to-br from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-lg shadow-purple-500/30"
             >
               <span className="text-2xl">✨</span>
             </motion.div>
@@ -253,7 +253,7 @@ function Register() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.65 }}
-            className="mb-5"
+            className="mb-4 sm:mb-5"
           >
             <label className="text-sm font-semibold text-gray-700 mb-2 block">
               I am a
@@ -264,9 +264,9 @@ function Register() {
                 onClick={() => setRole("PATIENT")}
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
-                className={`flex-1 py-3 px-4 rounded-lg font-medium transition-all duration-300 flex items-center justify-center gap-2 ${
+                className={`flex-1 py-2.5 sm:py-3 px-3 sm:px-4 rounded-lg font-medium transition-all duration-300 flex items-center justify-center gap-2 ${
                   role === "PATIENT"
-                    ? "bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-lg shadow-blue-500/30"
+                    ? "bg-linear-to-r from-blue-500 to-indigo-600 text-white shadow-lg shadow-blue-500/30"
                     : "text-gray-600 hover:bg-gray-200"
                 }`}
               >
@@ -278,9 +278,9 @@ function Register() {
                 onClick={() => setRole("DOCTOR")}
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
-                className={`flex-1 py-3 px-4 rounded-lg font-medium transition-all duration-300 flex items-center justify-center gap-2 ${
+                className={`flex-1 py-2.5 sm:py-3 px-3 sm:px-4 rounded-lg font-medium transition-all duration-300 flex items-center justify-center gap-2 ${
                   role === "DOCTOR"
-                    ? "bg-gradient-to-r from-purple-500 to-indigo-600 text-white shadow-lg shadow-purple-500/30"
+                    ? "bg-linear-to-r from-purple-500 to-indigo-600 text-white shadow-lg shadow-purple-500/30"
                     : "text-gray-600 hover:bg-gray-200"
                 }`}
               >
@@ -290,7 +290,7 @@ function Register() {
           </motion.div>
 
           {/* Common Fields */}
-          <div className="space-y-4">
+          <div className="space-y-3 sm:space-y-4">
             {/* Email */}
             <motion.div
               initial={{ opacity: 0, x: -20 }}
@@ -319,7 +319,7 @@ function Register() {
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.75 }}
-              className="grid grid-cols-2 gap-3"
+              className="grid grid-cols-1 sm:grid-cols-2 gap-3"
             >
               <div className="relative">
                 <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
@@ -385,9 +385,9 @@ function Register() {
                   animate={{ opacity: 1, height: "auto" }}
                   exit={{ opacity: 0, height: 0 }}
                   transition={{ duration: 0.3 }}
-                  className="space-y-4"
+                  className="space-y-3 sm:space-y-4"
                 >
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div className="relative">
                       <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
                         🎂
@@ -447,7 +447,7 @@ function Register() {
                   animate={{ opacity: 1, height: "auto" }}
                   exit={{ opacity: 0, height: 0 }}
                   transition={{ duration: 0.3 }}
-                  className="space-y-4"
+                  className="space-y-3 sm:space-y-4"
                 >
                   <div className="relative">
                     <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
@@ -526,7 +526,7 @@ function Register() {
             whileTap={{ scale: 0.98 }}
             type="submit"
             disabled={isLoading}
-            className="w-full mt-6 bg-gradient-to-r from-indigo-600 via-purple-600 to-blue-600 text-white py-4 rounded-xl font-semibold text-lg shadow-lg shadow-purple-500/30 transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed relative overflow-hidden group"
+            className="w-full mt-5 bg-linear-to-r from-indigo-600 via-purple-600 to-blue-600 text-white py-3.5 sm:py-4 rounded-xl font-semibold text-lg shadow-lg shadow-purple-500/30 transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed relative overflow-hidden group"
           >
             <span className="relative z-10 flex items-center justify-center gap-2">
               {isLoading ? (
@@ -556,7 +556,7 @@ function Register() {
                 </>
               )}
             </span>
-            <div className="absolute inset-0 bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+            <div className="absolute inset-0 bg-linear-to-r from-purple-600 via-blue-600 to-indigo-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
           </motion.button>
 
           {/* Login Link */}
@@ -564,7 +564,7 @@ function Register() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 1 }}
-            className="text-sm mt-5 text-center text-gray-600"
+            className="text-sm mt-4 text-center text-gray-600"
           >
             Already have an account?{" "}
             <motion.span
