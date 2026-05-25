@@ -29,36 +29,36 @@ This project demonstrates practical implementation of:
 
 # Key Features
 
-## 🔐 Authentication & Security
+## Authentication & Security
 - JWT-based Authentication & Authorization
 - Secure Login & Registration System
 - Protected Routes & API Security
 - Role-Based Access Control (Admin / Doctor / Patient)
 
-## 👨‍⚕️ Doctor Management
+## Doctor Management
 - Doctor Dashboard
 - Doctor Schedule Monitoring
 - Appointment Management
 - Patient Consultation Workflow
 
-## 🧑‍🤝‍🧑 Patient Management
+## Patient Management
 - Patient Registration & Profile Management
 - Medical History Tracking
 - Appointment Booking System
 - Secure Patient Data Handling
 
-## 📅 Appointment System
+## Appointment System
 - Real-Time Appointment Scheduling
 - Appointment Status Management
 - Doctor Availability Handling
 
-## ⚙️ Backend Architecture
+## Backend Architecture
 - RESTful API Architecture
 - CRUD Operations for Hospital Resources
 - Scalable Spring Boot Backend
 - MySQL Database Integration
 
-## 🎨 Frontend Experience
+## Frontend Experience
 - Responsive UI Design
 - Modern React Component Architecture
 - Clean User Experience
