@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const BASE_ORIGIN = "https://hms-deployment-eh4s.onrender.com";
+const BASE_ORIGIN = "https://hospital-management-system-production-ee9f.up.railway.app";
 const API = `${BASE_ORIGIN}/auth`;
 
 

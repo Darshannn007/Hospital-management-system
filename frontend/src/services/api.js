@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "https://hms-deployment-eh4s.onrender.com/api",
+  baseURL: "https://hospital-management-system-production-ee9f.up.railway.app/api",
 });
 
 //AUTO TOKEN ATTACH
