@@ -8,7 +8,7 @@ import {
 import { getDoctors } from "../services/doctorService";
 import { useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { toast } from "react-hot-toast/headless";
+import { toast } from "react-hot-toast";
 import { getSlots, bookSlot } from "../services/availabilityService";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -68,6 +68,7 @@ function Appointments() {
   };
 
   const handleDeleteAppointment = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this appointment?")) return;
     try {
       setDeletingId(id);
       await deleteAppointment(id);
@@ -141,7 +142,6 @@ function Appointments() {
       await addAppointment(formData);
       toast.success("Appointment Booked Successfully!!!🎉");
       await bookSlot(selectedSlotId);
-      
 
       setFormData({
         patientName: "",
@@ -172,13 +172,12 @@ function Appointments() {
       opacity: 1,
       transition: {
         staggerChildren: 0.05,
-        delayChildren: 0.1,
       },
     },
   };
 
   const rowVariants = {
-    hidden: { opacity: 0, x: -20 },
+    hidden: { opacity: 0, x: -10 },
     visible: {
       opacity: 1,
       x: 0,
@@ -189,423 +188,361 @@ function Appointments() {
   const getStatusColor = (status) => {
     switch (status) {
       case "APPROVED":
-        return "bg-green-100 text-green-700 border-green-200";
+        return "bg-emerald-500/10 text-emerald-450 border-emerald-500/20";
       case "REJECTED":
-        return "bg-red-100 text-red-700 border-red-200";
+        return "bg-rose-500/10 text-rose-450 border-rose-500/20";
       default:
-        return "bg-amber-100 text-amber-700 border-amber-200";
+        return "bg-amber-500/10 text-amber-450 border-amber-500/20";
     }
   };
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-gray-50 to-gray-100 text-gray-800 p-4 md:p-6 overflow-hidden">
-      {/* Background Decorations */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 left-0 w-96 h-96 bg-indigo-500/5 rounded-full blur-3xl" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-150 h-150 bg-purple-500/5 rounded-full blur-3xl" />
-      </div>
-
-      <div className="relative z-10">
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="mb-8"
-        >
-          <div className="flex items-center gap-3 mb-2">
-            <div className="w-10 h-10 bg-linear-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/30">
-              <IconCalendar size={20} className="text-white" />
-            </div>
-            <span className="text-sm font-medium text-blue-700 bg-blue-100 px-3 py-1 rounded-full">
-              📅 Appointment Management
+    <div className="p-5 md:p-8 space-y-6 text-slate-200">
+      
+      {/* Header Banner */}
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white/3 border border-white/10 backdrop-blur-xl rounded-3xl p-6 shadow-2xl"
+      >
+        <div>
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-black text-cyan-400 bg-cyan-950/20 border border-cyan-500/20 px-2.5 py-1 rounded-full uppercase tracking-widest">
+              Bookings
             </span>
           </div>
-          <h1 className="text-2xl md:text-4xl font-bold bg-linear-to-r from-gray-900 via-blue-800 to-indigo-700 bg-clip-text text-transparent">
-            Appointments
+          <h1 className="text-2xl md:text-3xl font-black text-white tracking-tight mt-2 uppercase">
+            Appointments Ledger
           </h1>
-          <p className="text-gray-600 mt-1">
-            Book and manage patient appointments
+          <p className="text-xs text-slate-400 mt-1.5 font-medium tracking-wide">
+            Book slots and manage patient appointments rosters dynamically.
           </p>
-        </motion.div>
+        </div>
+      </motion.div>
 
-        {/* Selected Doctor Banner */}
-        <AnimatePresence>
-          {selectedDoctor && (
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              className="mb-6 p-4 bg-linear-to-r from-blue-500 to-indigo-600 rounded-xl shadow-lg shadow-blue-500/20 flex items-center gap-4"
-            >
-              <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center text-white font-bold text-xl">
-                {selectedDoctor.name?.charAt(0)}
-              </div>
-              <div className="text-white">
-                <p className="text-sm opacity-80">Selected Doctor</p>
-                <p className="text-lg font-semibold">Dr. {selectedDoctor.name}</p>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* Booking Form Card */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="bg-white border border-gray-100 p-6 rounded-2xl shadow-xl shadow-blue-500/10 mb-8"
-        >
-          <div className="flex items-center gap-2 mb-6">
-            <div className="w-8 h-8 bg-linear-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center">
-              <IconCalendarPlus size={16} className="text-white" />
+      {/* Selected Doctor Banner */}
+      <AnimatePresence>
+        {selectedDoctor && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            className="p-4 bg-cyan-950/20 border border-cyan-500/30 rounded-2xl flex items-center gap-4 shadow-lg shadow-cyan-500/5"
+          >
+            <div className="w-12 h-12 border border-cyan-500/30 rounded-xl flex items-center justify-center text-cyan-400 font-bold text-xl">
+              {selectedDoctor.name?.charAt(0)}
             </div>
             <div>
-              <h2 className="text-lg font-semibold text-gray-800">Book New Appointment</h2>
-              <p className="text-gray-500 text-xs">Fill in the details to schedule an appointment</p>
+              <p className="text-[10px] text-cyan-400 font-bold uppercase tracking-widest">Selected Specialist</p>
+              <p className="text-base font-extrabold text-white">Dr. {selectedDoctor.name}</p>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Booking Form Card */}
+      <motion.div
+        initial={{ opacity: 0, y: 15 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1 }}
+        className="glass-card p-6 rounded-3xl border border-white/10"
+      >
+        <div className="flex items-center gap-3 mb-6">
+          <div className="w-8 h-8 rounded-lg border border-cyan-500/20 text-cyan-400 flex items-center justify-center bg-cyan-950/10">
+            <IconCalendarPlus size={16} />
+          </div>
+          <div>
+            <h2 className="text-sm font-bold text-white uppercase tracking-wider">Book New Appointment</h2>
+            <p className="text-slate-500 text-[10px] font-bold uppercase tracking-widest mt-0.5">Fill in the details to schedule an appointment slot</p>
+          </div>
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-5">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/* Patient Name */}
+            <div>
+              <label className="text-[10px] font-bold text-slate-450 uppercase tracking-widest block mb-1.5">Patient Name</label>
+              <div className="relative">
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-450">
+                  <IconUser size={18} />
+                </span>
+                <input
+                  type="text"
+                  name="patientName"
+                  placeholder="Enter patient name"
+                  value={formData.patientName}
+                  onChange={handleChange}
+                  className="w-full pl-12 pr-4 py-3.5 glass-input rounded-xl text-xs outline-none"
+                  required
+                />
+              </div>
+            </div>
+
+            {/* Doctor Select */}
+            <div>
+              <label className="text-[10px] font-bold text-slate-455 uppercase tracking-widest block mb-1.5">Select Doctor</label>
+              <div className="relative">
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-455">
+                  <IconStethoscope size={18} />
+                </span>
+                <select
+                  name="doctorId"
+                  value={formData.doctorId}
+                  onChange={handleChange}
+                  className="w-full pl-12 pr-4 py-3.5 bg-slate-900/80 border border-white/12 rounded-xl text-xs outline-none text-slate-200 cursor-pointer focus:border-cyan-500"
+                  required
+                >
+                  <option value="" className="bg-slate-900 text-slate-400">Choose a doctor...</option>
+                  {doctors.map((d) => (
+                    <option key={d.id} value={d.id} className="bg-slate-900 text-slate-200">
+                      Dr. {d.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            {/* Date */}
+            <div>
+              <label className="text-[10px] font-bold text-slate-460 uppercase tracking-widest block mb-1.5">Appointment Date</label>
+              <div className="relative">
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-460">
+                  <IconCalendar size={18} />
+                </span>
+                <input
+                  type="date"
+                  name="date"
+                  value={formData.date}
+                  onChange={handleChange}
+                  className="w-full pl-12 pr-4 py-3.5 bg-slate-900/80 border border-white/12 rounded-xl text-xs outline-none text-slate-200 cursor-pointer focus:border-cyan-500"
+                  required
+                />
+              </div>
             </div>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {/* Patient Name */}
-              <motion.div whileHover={{ scale: 1.01 }}>
-                <label className="text-sm font-semibold text-gray-700 mb-2 block">Patient Name</label>
-                <div className="relative">
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
-                    <IconUser size={18} />
-                  </span>
-                  <input
-                    type="text"
-                    name="patientName"
-                    placeholder="Enter patient name"
-                    value={formData.patientName}
-                    onChange={handleChange}
-                    className="w-full pl-12 pr-4 py-3.5 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all duration-300 bg-gray-50 focus:bg-white"
-                    required
-                  />
-                </div>
-              </motion.div>
-
-              {/* Doctor Select */}
-              <motion.div whileHover={{ scale: 1.01 }}>
-                <label className="text-sm font-semibold text-gray-700 mb-2 block">Select Doctor</label>
-                <div className="relative">
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
-                    <IconStethoscope size={18} />
-                  </span>
-                  <select
-                    name="doctorId"
-                    value={formData.doctorId}
-                    onChange={handleChange}
-                    className="w-full pl-12 pr-4 py-3.5 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all duration-300 bg-gray-50 focus:bg-white appearance-none cursor-pointer"
-                    required
-                  >
-                    <option value="">Choose a doctor...</option>
-                    {doctors.map((d) => (
-                      <option key={d.id} value={d.id}>
-                        Dr. {d.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </motion.div>
-
-              {/* Date */}
-              <motion.div whileHover={{ scale: 1.01 }}>
-                <label className="text-sm font-semibold text-gray-700 mb-2 block">Appointment Date</label>
-                <div className="relative">
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
-                    <IconCalendar size={18} />
-                  </span>
-                  <input
-                    type="date"
-                    name="date"
-                    value={formData.date}
-                    onChange={handleChange}
-                    className="w-full pl-12 pr-4 py-3.5 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all duration-300 bg-gray-50 focus:bg-white cursor-pointer"
-                    required
-                  />
-                </div>
-              </motion.div>
+          {/* Available Slots */}
+          <div className="pt-2">
+            <div className="flex items-center gap-2 mb-3">
+              <IconClock size={16} className="text-cyan-400" />
+              <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Available Time Slots</p>
             </div>
 
-            {/* Available Slots */}
-            <div className="pt-4">
-              <div className="flex items-center gap-2 mb-3">
-                <IconClock size={18} className="text-gray-500" />
-                <p className="text-sm font-semibold text-gray-700">Available Time Slots</p>
-              </div>
-
-              <div className="flex gap-3 flex-wrap">
-                {slots.length === 0 ? (
-                  <p className="text-gray-400 text-sm bg-gray-50 px-4 py-3 rounded-lg">
-                    {formData.doctorId && formData.date
-                      ? "No slots available for selected date"
-                      : "Select doctor and date to view available slots"}
-                  </p>
-                ) : (
-                  slots.map((slot, index) => (
-                    <motion.button
-                      key={slot.id}
-                      type="button"
-                      initial={{ opacity: 0, scale: 0.8 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      transition={{ delay: index * 0.05 }}
-                      disabled={slot.booked}
-                      onClick={() => {
-                        setSelectedSlotId(slot.id);
-                        setFormData({
-                          ...formData,
-                          timeSlot: slot.timeSlot,
-                        });
-                      }}
-                      whileHover={!slot.booked ? { scale: 1.05 } : {}}
-                      whileTap={!slot.booked ? { scale: 0.95 } : {}}
-                      className={`px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-300 flex items-center gap-2 ${
-                        slot.booked
-                          ? "bg-gray-100 text-gray-400 cursor-not-allowed line-through"
-                          : selectedSlotId === slot.id
-                          ? "bg-linear-to-r from-green-500 to-emerald-600 text-white shadow-lg shadow-green-500/30"
-                          : "bg-linear-to-r from-blue-500 to-indigo-600 text-white shadow-md shadow-blue-500/20 hover:shadow-lg"
-                      }`}
-                    >
-                      <IconClock size={16} />
-                      {slot.timeSlot}
-                      {selectedSlotId === slot.id && <IconCheck size={16} />}
-                    </motion.button>
-                  ))
-                )}
-              </div>
-            </div>
-
-            {/* Submit Button */}
-            <div className="pt-4">
-              <motion.button
-                type="submit"
-                disabled={isSubmitting}
-                whileHover={{ scale: 1.02, boxShadow: "0 20px 40px rgba(59, 130, 246, 0.3)" }}
-                whileTap={{ scale: 0.98 }}
-                className="bg-linear-to-r from-blue-600 via-indigo-600 to-purple-600 text-white px-8 py-4 rounded-xl font-semibold shadow-lg shadow-blue-500/30 transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed flex items-center gap-2"
-              >
-                {isSubmitting ? (
-                  <>
-                    <motion.span
-                      animate={{ rotate: 360 }}
-                      transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                    >
-                      ⏳
-                    </motion.span>
-                    Booking...
-                  </>
-                ) : (
-                  <>
-                    <IconCalendarPlus size={20} />
-                    Book Appointment
-                  </>
-                )}
-              </motion.button>
-            </div>
-          </form>
-        </motion.div>
-
-        {/* Search & Stats */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          className="mb-6 flex flex-col md:flex-row gap-4"
-        >
-          <div className="flex-1">
-            <motion.div whileHover={{ scale: 1.01 }} className="relative">
-              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
-                <IconSearch size={20} />
-              </span>
-              <input
-                type="text"
-                placeholder="Search appointments by patient or doctor..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-12 pr-4 py-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all duration-300 bg-white"
-              />
-            </motion.div>
-          </div>
-
-          <div className="flex gap-3">
-            <motion.div
-              whileHover={{ scale: 1.02 }}
-              className="bg-white border border-gray-100 px-5 py-3 rounded-xl shadow-lg shadow-blue-500/10 flex items-center gap-3"
-            >
-              <div className="w-10 h-10 bg-linear-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center">
-                <IconCalendar size={18} className="text-white" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold text-gray-900">{appointments.length}</p>
-                <p className="text-xs text-gray-500">Total Appointments</p>
-              </div>
-            </motion.div>
-          </div>
-        </motion.div>
-
-        {/* Appointments Table */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-          className="bg-white border border-gray-100 rounded-2xl shadow-xl shadow-blue-500/10 overflow-hidden"
-        >
-          <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-linear-to-br from-purple-500 to-pink-600 rounded-lg flex items-center justify-center">
-                <IconCalendar size={16} className="text-white" />
-              </div>
-              <div>
-                <h2 className="text-lg font-semibold text-gray-800">Appointment Records</h2>
-                <p className="text-gray-500 text-xs">
-                  Showing {filteredAppointments.length} of {appointments.length} appointments
+            <div className="flex gap-3 flex-wrap">
+              {slots.length === 0 ? (
+                <p className="text-slate-500 text-xs bg-white/2 px-4 py-3 rounded-xl border border-white/5 font-bold uppercase tracking-wider">
+                  {formData.doctorId && formData.date
+                    ? "No slots available for selected date"
+                    : "Select doctor and date to view available slots"}
                 </p>
-              </div>
+              ) : (
+                slots.map((slot, index) => (
+                  <motion.button
+                    key={slot.id}
+                    type="button"
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: index * 0.03 }}
+                    disabled={slot.booked}
+                    onClick={() => {
+                      setSelectedSlotId(slot.id);
+                      setFormData({
+                        ...formData,
+                        timeSlot: slot.timeSlot,
+                      });
+                    }}
+                    className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all duration-300 flex items-center gap-2 border uppercase tracking-wider ${
+                      slot.booked
+                        ? "bg-slate-900/50 text-slate-500 border-white/5 cursor-not-allowed line-through"
+                        : selectedSlotId === slot.id
+                        ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/30 shadow-[0_0_15px_rgba(16,185,129,0.12)]"
+                        : "btn-teal-outline"
+                    }`}
+                  >
+                    <IconClock size={14} />
+                    {slot.timeSlot}
+                    {selectedSlotId === slot.id && <IconCheck size={14} />}
+                  </motion.button>
+                ))
+              )}
             </div>
           </div>
 
-          <div className="overflow-x-auto">
-            <table className="min-w-full">
-              <thead>
-                <tr className="bg-linear-to-r from-gray-50 to-gray-100">
-                  <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
-                    Patient
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
-                    Doctor
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
-                    Date
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
-                    Status
-                  </th>
-                </tr>
-              </thead>
+          {/* Submit Button */}
+          <div className="pt-2">
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="btn-teal-outline px-8 py-3.5 rounded-xl font-bold uppercase tracking-wider text-xs flex items-center gap-2 disabled:opacity-60"
+            >
+              {isSubmitting ? (
+                <>
+                  <div className="hms-spinner w-4 h-4 border-2"></div>
+                  <span>Booking...</span>
+                </>
+              ) : (
+                <>
+                  <IconCalendarPlus size={18} />
+                  <span>Book Appointment</span>
+                </>
+              )}
+            </button>
+          </div>
+        </form>
+      </motion.div>
 
-              <motion.tbody
-                variants={containerVariants}
-                initial="hidden"
-                animate="visible"
-              >
-                {filteredAppointments.length === 0 ? (
-                  <tr>
-                    <td colSpan="4" className="text-center py-12">
-                      <div className="flex flex-col items-center gap-3">
-                        <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center">
-                          <IconCalendar size={32} className="text-gray-400" />
+      {/* Search & Stats Bar */}
+      <div className="flex flex-col md:flex-row gap-4 items-stretch">
+        <div className="flex-1">
+          <div className="relative">
+            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-450">
+              <IconSearch size={18} />
+            </span>
+            <input
+              type="text"
+              placeholder="Search appointments by patient or doctor..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-11 pr-4 py-3.5 glass-input rounded-xl text-xs outline-none"
+            />
+          </div>
+        </div>
+
+        <div className="glass-card px-5 py-3 rounded-xl flex items-center gap-3.5 border border-white/10 shadow-sm">
+          <div className="w-9 h-9 bg-cyan-950/20 border border-cyan-500/20 text-cyan-400 rounded-lg flex items-center justify-center shadow-sm">
+            <IconCalendar size={18} />
+          </div>
+          <div>
+            <span className="text-xl font-black text-white block leading-tight">{appointments.length}</span>
+            <span className="text-[9px] text-slate-500 font-bold uppercase tracking-widest block">Total Bookings</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Appointments Table */}
+      <motion.div
+        initial={{ opacity: 0, y: 15 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.2 }}
+        className="glass-card rounded-3xl border border-white/10 overflow-hidden"
+      >
+        <div className="px-6 py-4 border-b border-white/5 flex items-center justify-between">
+          <div>
+            <h3 className="font-bold text-white text-sm uppercase tracking-wider">Appointment Records</h3>
+            <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-0.5">
+              Showing {filteredAppointments.length} matching logs
+            </p>
+          </div>
+        </div>
+
+        <div className="overflow-x-auto">
+          <table className="min-w-full">
+            <thead>
+              <tr className="bg-white/2 border-b border-white/5 text-slate-400">
+                <th className="px-6 py-3.5 text-left text-[10px] font-bold uppercase tracking-widest">Patient</th>
+                <th className="px-6 py-3.5 text-left text-[10px] font-bold uppercase tracking-widest">Doctor</th>
+                <th className="px-6 py-3.5 text-left text-[10px] font-bold uppercase tracking-widest">Date</th>
+                <th className="px-6 py-3.5 text-left text-[10px] font-bold uppercase tracking-widest">Status / Controls</th>
+              </tr>
+            </thead>
+
+            <motion.tbody
+              variants={containerVariants}
+              initial="hidden"
+              animate="visible"
+              className="divide-y divide-white/5"
+            >
+              {filteredAppointments.length === 0 ? (
+                <tr>
+                  <td colSpan="4" className="text-center py-12">
+                    <div className="flex flex-col items-center gap-3">
+                      <div className="w-12 h-12 bg-white/2 rounded-full flex items-center justify-center border border-white/5">
+                        <IconCalendar size={22} className="text-slate-500" />
+                      </div>
+                      <p className="text-xs text-slate-500 font-bold uppercase tracking-wider">No appointments found</p>
+                    </div>
+                  </td>
+                </tr>
+              ) : (
+                filteredAppointments.map((a) => (
+                  <motion.tr
+                    key={a.id}
+                    variants={rowVariants}
+                    className="hover:bg-white/2 transition-colors group"
+                  >
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-lg border border-cyan-500/20 text-cyan-400 bg-cyan-950/10 flex items-center justify-center font-black text-xs shadow-sm">
+                          {a.patientName?.charAt(0)?.toUpperCase() || "P"}
                         </div>
-                        <p className="text-gray-500">No appointments found</p>
+                        <span className="font-bold text-xs text-slate-100">{a.patientName}</span>
                       </div>
                     </td>
-                  </tr>
-                ) : (
-                  filteredAppointments.map((a) => (
-                    <motion.tr
-                      key={a.id}
-                      variants={rowVariants}
-                      className="border-b border-gray-50 hover:bg-blue-50/50 transition-colors group"
-                    >
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 bg-linear-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center text-white font-bold shadow-md">
-                            {a.patientName?.charAt(0)?.toUpperCase() || "P"}
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-2 text-xs text-slate-300 font-semibold">
+                        <IconStethoscope size={16} className="text-cyan-400" />
+                        <span>Dr. {a.doctorName}</span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 text-xs text-slate-400">
+                      <div className="flex items-center gap-2">
+                        <IconCalendar size={16} className="text-slate-550" />
+                        <span>{a.date}</span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-4">
+                        <span
+                          className={`px-3 py-1 text-[10px] font-bold rounded-lg border uppercase tracking-wider inline-flex items-center gap-1 ${getStatusColor(
+                            a.status
+                          )}`}
+                        >
+                          {a.status || "PENDING"}
+                        </span>
+
+                        {role === "DOCTOR" && (
+                          <div className="flex gap-2">
+                            <button
+                              disabled={loadingId === a.id}
+                              onClick={() => handleStatusChange(a.id, "APPROVED")}
+                              className="px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider bg-emerald-950/20 text-emerald-400 hover:bg-emerald-950/40 border border-emerald-500/20 transition-colors disabled:opacity-60"
+                            >
+                              Approve
+                            </button>
+
+                            <button
+                              disabled={loadingId === a.id}
+                              onClick={() => handleStatusChange(a.id, "REJECTED")}
+                              className="px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider bg-rose-950/20 text-rose-400 hover:bg-rose-950/40 border border-rose-500/20 transition-colors disabled:opacity-60"
+                            >
+                              Reject
+                            </button>
                           </div>
-                          <span className="font-medium text-gray-900">{a.patientName}</span>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-2">
-                          <IconStethoscope size={16} className="text-indigo-500" />
-                          <span className="text-gray-700">Dr. {a.doctorName}</span>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-2">
-                          <IconCalendar size={16} className="text-gray-400" />
-                          <span className="text-gray-600">{a.date}</span>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="flex flex-col gap-2">
-                          <span
-                            className={`px-3 py-1.5 text-xs font-semibold rounded-lg border w-fit ${getStatusColor(
-                              a.status
-                            )}`}
-                          >
-                            {a.status === "APPROVED" && "✅ "}
-                            {a.status === "REJECTED" && "❌ "}
-                            {(!a.status || a.status === "PENDING") && "⏳ "}
-                            {a.status || "PENDING"}
-                          </span>
+                        )}
 
-                          {role === "DOCTOR" && (
-                            <div className="flex gap-2 opacity-70 group-hover:opacity-100 transition-opacity">
-                              <motion.button
-                                disabled={loadingId === a.id}
-                                onClick={() => handleStatusChange(a.id, "APPROVED")}
-                                whileHover={{ scale: 1.05 }}
-                                whileTap={{ scale: 0.95 }}
-                                className={`flex items-center gap-1 px-3 py-1.5 text-xs rounded-lg font-medium transition ${
-                                  loadingId === a.id
-                                    ? "bg-gray-200 text-gray-400 cursor-not-allowed"
-                                    : "bg-green-100 text-green-700 hover:bg-green-200"
-                                }`}
-                              >
-                                <IconCheck size={14} />
-                                {loadingId === a.id ? "..." : "Approve"}
-                              </motion.button>
+                        {role === "ADMIN" && (
+                          <div>
+                            <button
+                              disabled={deletingId === a.id}
+                              onClick={() => handleDeleteAppointment(a.id)}
+                              className="px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider bg-rose-950/20 text-rose-450 hover:bg-rose-950/40 border border-rose-500/20 transition-colors disabled:opacity-60 flex items-center gap-1"
+                            >
+                              <IconTrash size={12} />
+                              Delete
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    </td>
+                  </motion.tr>
+                ))
+              )}
+            </motion.tbody>
+          </table>
+        </div>
+      </motion.div>
 
-                              <motion.button
-                                disabled={loadingId === a.id}
-                                onClick={() => handleStatusChange(a.id, "REJECTED")}
-                                whileHover={{ scale: 1.05 }}
-                                whileTap={{ scale: 0.95 }}
-                                className={`flex items-center gap-1 px-3 py-1.5 text-xs rounded-lg font-medium transition ${
-                                  loadingId === a.id
-                                    ? "bg-gray-200 text-gray-400 cursor-not-allowed"
-                                    : "bg-red-100 text-red-700 hover:bg-red-200"
-                                }`}
-                              >
-                                <IconX size={14} />
-                                {loadingId === a.id ? "..." : "Reject"}
-                              </motion.button>
-                            </div>
-                          )}
-
-                          {role === "ADMIN" && (
-                            <div className="opacity-70 group-hover:opacity-100 transition-opacity">
-                              <motion.button
-                                disabled={deletingId === a.id}
-                                onClick={() => handleDeleteAppointment(a.id)}
-                                whileHover={{ scale: 1.05 }}
-                                whileTap={{ scale: 0.95 }}
-                                className={`flex items-center gap-1 px-3 py-1.5 text-xs rounded-lg font-medium transition ${
-                                  deletingId === a.id
-                                    ? "bg-gray-200 text-gray-400 cursor-not-allowed"
-                                    : "bg-red-100 text-red-700 hover:bg-red-200"
-                                }`}
-                              >
-                                <IconTrash size={14} />
-                                {deletingId === a.id ? "Deleting..." : "Delete"}
-                              </motion.button>
-                            </div>
-                          )}
-                        </div>
-                      </td>
-                    </motion.tr>
-                  ))
-                )}
-              </motion.tbody>
-            </table>
-          </div>
-        </motion.div>
-      </div>
     </div>
   );
 }

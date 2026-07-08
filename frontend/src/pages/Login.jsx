@@ -19,12 +19,21 @@ function Login() {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [focusedField, setFocusedField] = useState(null);
-  
 
   useEffect(() => {
     warmupBackend().catch((err) => {
       console.debug("Backend warmup failed", err);
     });
+
+    // Force dark theme on login page
+    document.documentElement.classList.add("dark");
+
+    return () => {
+      const savedTheme = localStorage.getItem("theme") || "dark";
+      if (savedTheme === "light") {
+        document.documentElement.classList.remove("dark");
+      }
+    };
   }, []);
 
   const handleChange = (e) => {
@@ -37,6 +46,7 @@ function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
+    setError("");
 
     try {
       const res = await login({
@@ -45,7 +55,7 @@ function Login() {
       });
 
       const { token, email, role } = res.data;
-      toast.success("Welcome! 🙂");
+      toast.success("Welcome back! 🙂");
 
       dispatch(
         loginSuccess({
@@ -59,115 +69,65 @@ function Login() {
     } catch (err) {
       console.log(err);
       toast.error("Invalid email or password ❌");
+      setError("Invalid credentials. Please try again.");
     } finally {
       setIsLoading(false);
     }
   };
-  const handleDemoAdminLogin = async () => {
 
-    const demoData = {
-      email: "admin@gmail.com",
-      password: "1234"
-    };
-  
-    // auto fill fields
+  const handleDemoLogin = async (email, password, roleLabel) => {
+    const demoData = { email, password };
     setFormData(demoData);
-  
-    // optional tiny delay for UX
+
+    // Short delay for visual feedback of autofill
     setTimeout(async () => {
-  
       try {
-  
         setIsLoading(true);
-  
+        setError("");
         const res = await login(demoData);
-  
-        const { token, email, role } = res.data;
-  
+        const { token, email: resEmail, role } = res.data;
+
         dispatch(
           loginSuccess({
-            user: { email },
+            user: { email: resEmail },
             token,
             role,
           })
         );
-  
-        toast.success("Logged in as Demo Admin 🚀");
-  
+
+        toast.success(`Logged in as Demo ${roleLabel} 🚀`);
         navigate("/dashboard");
-  
       } catch (err) {
-  
         console.log(err);
-  
-        toast.error("Demo admin login failed");
-  
+        toast.error("Demo login failed ❌");
       } finally {
-  
         setIsLoading(false);
       }
-  
-    }, 500);
-  };
-  const handleDemoPatientLogin = async () => {
-
-    const demoData = {
-      email: "patient@gmail.com",
-      password: "1234"
-    };
-  
-    // auto fill fields
-    setFormData(demoData);
-  
-    setTimeout(async () => {
-  
-      try {
-  
-        setIsLoading(true);
-  
-        const res = await login(demoData);
-  
-        const { token, email, role } = res.data;
-  
-        dispatch(
-          loginSuccess({
-            user: { email },
-            token,
-            role,
-          })
-        );
-  
-        toast.success("Logged in as Demo Patient 🏥");
-  
-        navigate("/dashboard");
-  
-      } catch (err) {
-  
-        console.log(err);
-  
-        toast.error("Demo patient login failed");
-  
-      } finally {
-  
-        setIsLoading(false);
-      }
-  
-    }, 500);
+    }, 400);
   };
 
+  const handleDemoAdminLogin = () => {
+    handleDemoLogin("admin@gmail.com", "1234", "Admin");
+  };
+
+  const handleDemoPatientLogin = () => {
+    handleDemoLogin("patient@gmail.com", "1234", "Patient");
+  };
+
+  // Animations configuration
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
       transition: {
         staggerChildren: 0.1,
-        delayChildren: 0.2,
+        delayChildren: 0.1,
       },
     },
   };
 
   const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
+    hidden: { opacity: 0, y: 15 },
     visible: {
       opacity: 1,
       y: 0,
@@ -175,344 +135,211 @@ function Login() {
     },
   };
 
-  const featureVariants = {
-    hidden: { opacity: 0, x: -30 },
-    visible: (i) => ({
-      opacity: 1,
-      x: 0,
-      transition: { delay: 0.6 + i * 0.1, duration: 0.5 },
-    }),
-  };
-
-  const floatingAnimation = {
-    y: [-5, 5, -5],
-    transition: {
-      duration: 1,
-      repeat: Infinity,
-      ease: "easeInOut",
-    },
-  };
-
   const features = [
-    { icon: "🔐", text: "Role-based Access Control" },
-    { icon: "📊", text: "Real-time Patient Tracking" },
-    { icon: "📅", text: "Appointment Management" },
-    { icon: "💊", text: "Billing & Pharmacy" },
+    { icon: "🔐", text: "Role-Based Access Control (RBAC)" },
+    { icon: "📅", text: "Real-Time Appointment Scheduling" },
+    { icon: "🧾", text: "Automated Billing & Digital Receipts" },
+    { icon: "💊", text: "Pharmacy Inventory Stock Tracking" },
   ];
 
   return (
-    
-    <div className="min-h-dvh w-full flex flex-col lg:flex-row overflow-x-hidden">
-      {/* LEFT SIDE - Animated Background (Hidden on mobile) */}
-      <motion.div
-        initial={{ x: 0, opacity: 0 }}
-        animate={{ x: 0, opacity: 2 }}
-        transition={{ duration: 0.8, ease: "easeOut" }}
-        className="hidden lg:flex relative w-full lg:w-1/2 bg-linear-to-br from-blue-600 via-indigo-700 to-purple-800 text-white flex-col justify-center px-8 lg:px-16 overflow-hidden"
-      >
+    <div className="h-screen w-full flex flex-col lg:flex-row bg-transparent overflow-hidden text-slate-200 select-none">
+      
+      {/* LEFT SIDE - Info Panel (Hidden on mobile/tablet) */}
+      <div className="hidden lg:flex relative w-1/2 h-full flex-col justify-center px-12 xl:px-20 overflow-hidden border-r border-white/5 shrink-0">
         
-        {/* Animated Background Elements */}
-        <div className="absolute inset-0 overflow-hidden">
-          <motion.div
-            animate={floatingAnimation}
-            className="absolute top-20 left-10 w-32 h-32 bg-white/10 rounded-full blur-xl"
-          />
-          <motion.div
-            animate={{ ...floatingAnimation, y: [10, -10, 10] }}
-            className="absolute bottom-32 right-20 w-48 h-48 bg-blue-400/10 rounded-full blur-2xl"
-          />
-          <motion.div
-            animate={{ ...floatingAnimation, y: [-5, 15, -5] }}
-            className="absolute top-1/2 left-1/3 w-24 h-24 bg-purple-400/10 rounded-full blur-xl"
-          />
+        {/* Abstract Glowing Aura Background */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-40">
+          <div className="absolute -top-24 -left-24 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl animate-blob-float" />
+          <div className="absolute top-1/2 -right-24 w-80 h-80 bg-indigo-500/10 rounded-full blur-3xl animate-blob-float [animation-delay:2s]" />
+          <div className="absolute -bottom-24 left-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl animate-blob-float [animation-delay:4s]" />
         </div>
 
-        {/* Content */}
+        {/* Brand/Logo Section */}
         <motion.div
           variants={containerVariants}
           initial="hidden"
           animate="visible"
-          className="relative z-10"
+          className="relative z-10 space-y-6"
         >
-          {/* Logo/Badge */}
           <motion.div
-            variants={itemVariants}
-            className="mb-6 inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full"
+            indigo-brand="true"
+            className="inline-flex items-center gap-3 bg-white/3 backdrop-blur-md px-4 py-2 rounded-full border border-white/10 shadow-sm w-fit"
           >
-            <span className="text-2xl">🏥</span>
-            <span className="text-sm font-medium tracking-wide">HMS v2.0</span>
+            <span className="text-xl">🏥</span>
+            <span className="text-[10px] font-black tracking-widest uppercase text-cyan-400">HMS v2.0 Enterprise</span>
           </motion.div>
 
-          <motion.h1
-            variants={itemVariants}
-            className="text-5xl font-bold bg-linear-to-r from-white to-blue-200 bg-clip-text text-transparent"
-          >
-            Hospital Management System
-          </motion.h1>
-
-          <motion.p
-            variants={itemVariants}
-            className="text-lg mb-12 text-blue-100 font-light italic"
-          >
-            "Care is always better than cure"
-          </motion.p>
-
-          <motion.h2
-            variants={itemVariants}
-            className="text-3xl font-semibold mb-4 leading-tight"
-          >
-            Manage Your Hospital
-            <br />
-            <span className="text-blue-300">Smarter & Better</span>
-          </motion.h2>
-
-          <motion.p
-            variants={itemVariants}
-            className="text-blue-100 mb-8 max-w-md leading-relaxed"
-          >
-            A complete solution for managing patients, doctors, appointments,
-            billing and pharmacy — all in one place.
-          </motion.p>
-
-          {/* Features List */}
-          <div className="space-y-4">
-            {features.map((feature, i) => (
-              <motion.div
-                key={feature.text}
-                custom={i}
-                variants={featureVariants}
-                initial="hidden"
-                animate="visible"
-                whileHover={{ x: 10, transition: { duration: 0.2 } }}
-                className="flex items-center gap-3 bg-white/5 backdrop-blur-sm px-4 py-3 rounded-xl w-fit cursor-default"
-              >
-                <span className="text-xl">{feature.icon}</span>
-                <span className="text-blue-50">{feature.text}</span>
-              </motion.div>
-            ))}
-          </div>
-        </motion.div>
-      </motion.div>
-
-      {/* RIGHT SIDE (FORM) */}
-      <div className="w-full lg:w-1/2 min-h-dvh flex items-start lg:items-center justify-center bg-linear-to-br from-gray-200 to-gray-50 relative px-3 sm:px-4 py-4 sm:py-6 lg:px-0 lg:py-0 overflow-x-hidden">
-        {/* Brand Name */}
-        <motion.h1
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5, duration: 0.6 }}
-          className="absolute top-4 right-4 lg:top-6 lg:right-8 text-lg lg:text-2xl font-bold text-gray-400 tracking-widest select-none"
-        >
-          Darshan Desale
-        </motion.h1>
-
-        <motion.form
-          onSubmit={handleSubmit}
-          initial={{ opacity: 0, y: 30, scale: 0.95 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          transition={{ duration: 0.6, delay: 0.3, ease: "easeOut" }}
-          className="bg-white p-4 sm:p-6 lg:p-7 rounded-3xl shadow-2xl shadow-blue-500/10 w-full max-w-97.5 sm:max-w-105 border border-gray-100 max-h-[calc(100dvh-1rem)] overflow-y-auto scrollbar-hide"
-        >
-          {/* Form Header */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.5 }}
-            className="text-center mb-5 sm:mb-6"
-          >
-            <motion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ delay: 0.6, type: "spring", stiffness: 200 }}
-              className="w-14 h-14 bg-linear-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-lg shadow-blue-500/30"
+          <div className="space-y-3">
+            <motion.h1
+              variants={itemVariants}
+              className="text-4xl xl:text-5xl font-black leading-tight text-white uppercase tracking-tight"
             >
-              <span className="text-3xl">👋</span>
-            </motion.div>
-            <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-1.5">
-              Welcome Back
-            </h2>
-            <p className="text-sm sm:text-base text-gray-500">Sign in to access your dashboard</p>
+              Healthcare Management, <br />
+              <span className="teal-gradient-text">Elevated.</span>
+            </motion.h1>
+            
+            <motion.p
+              variants={itemVariants}
+              className="text-xs text-slate-400 font-medium leading-relaxed max-w-sm"
+            >
+              A robust, role-based platform designed to optimize medical workflows, billing registry, and patient check-ins seamlessly.
+            </motion.p>
+          </div>
+
+          {/* Feature Showcase Grid */}
+          <motion.div variants={itemVariants} className="pt-4 space-y-3">
+            <h3 className="text-[10px] font-black uppercase tracking-widest text-cyan-455">Core Modules</h3>
+            <div className="grid grid-cols-1 gap-2.5 max-w-md">
+              {features.map((feature, idx) => (
+                <motion.div
+                  key={idx}
+                  whileHover={{ x: 6 }}
+                  className="flex items-center gap-4 bg-white/2 border border-white/5 px-4 py-3 rounded-2xl cursor-default transition-all duration-300"
+                >
+                  <span className="text-xl bg-white/5 p-1.5 rounded-xl border border-white/5 shrink-0">{feature.icon}</span>
+                  <span className="text-xs font-bold text-slate-350 tracking-wide">{feature.text}</span>
+                </motion.div>
+              ))}
+            </div>
           </motion.div>
 
+        </motion.div>
+      </div>
+
+      {/* RIGHT SIDE - Form Panel */}
+      <div className="flex-1 h-full flex items-center justify-center p-4 sm:p-6 lg:p-8 relative overflow-hidden">
+        
+        {/* Soft Background Globs for Right Side */}
+        <div className="absolute top-10 right-10 w-72 h-72 bg-cyan-500/5 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-10 left-10 w-72 h-72 bg-purple-500/5 rounded-full blur-3xl pointer-events-none" />
+
+        {/* Login Form Wrapper */}
+        <motion.div
+          initial={{ opacity: 0, y: 15, scale: 0.96 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ duration: 0.5, ease: "easeOut" }}
+          className="w-full max-w-md glass-card p-6 rounded-3xl border border-white/10 relative z-10 max-h-[92vh] overflow-y-auto no-scrollbar"
+        >
+          {/* Header */}
+          <div className="text-center mb-6">
+            <div className="w-12 h-12 border border-cyan-500/20 bg-cyan-950/20 text-cyan-400 rounded-2xl flex items-center justify-center mx-auto mb-2.5 shadow-md shrink-0">
+              <span className="text-xl">👋</span>
+            </div>
+            <h2 className="text-xl font-black text-white uppercase tracking-tight">Welcome Back</h2>
+            <p className="text-[11px] text-slate-400 font-bold uppercase tracking-wider mt-0.5">Sign in to access your healthcare portal</p>
+          </div>
+
+          {/* Error Message */}
           <AnimatePresence>
             {error && (
-              <motion.p
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: "auto" }}
-                exit={{ opacity: 0, height: 0 }}
-                className="text-red-500 text-sm mb-4 bg-red-50 p-3 rounded-lg"
+              <motion.div
+                initial={{ opacity: 0, y: -5 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -5 }}
+                className="bg-rose-500/10 border border-rose-500/20 text-rose-455 text-xs p-3.5 rounded-xl mb-4 font-bold"
               >
                 {error}
-              </motion.p>
+              </motion.div>
             )}
           </AnimatePresence>
 
-          {/* Email Input */}
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.7 }}
-            className="mb-3 sm:mb-4"
-          >
-            <label className="text-sm font-semibold text-gray-700 mb-1 block">
-              Email Address
-            </label>
-            <div
-              className={`relative transition-all duration-300 ${
-                focusedField === "email" ? "scale-[1.02]" : ""
-              }`}
-            >
-              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
-                ✉️
-              </span>
-              <input
-                type="email"
-                name="email"
-                placeholder="Enter your email"
-                value={formData.email}
-                onChange={handleChange}
-                onFocus={() => setFocusedField("email")}
-                onBlur={() => setFocusedField(null)}
-                className="w-full pl-12 pr-4 py-2.5 sm:py-3.5 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all duration-300 bg-gray-50 focus:bg-white"
-                required
-              />
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Email Field */}
+            <div>
+              <label className="text-[9px] font-black text-slate-450 uppercase tracking-widest block mb-1.5">
+                Email Address
+              </label>
+              <div className="relative">
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm text-slate-450">✉️</span>
+                <input
+                  type="email"
+                  name="email"
+                  placeholder="name@hospital.com"
+                  value={formData.email}
+                  onChange={handleChange}
+                  className="w-full pl-11 pr-4 py-3 glass-input rounded-xl text-xs outline-none"
+                  required
+                />
+              </div>
             </div>
-          </motion.div>
 
-          {/* Password Input */}
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.8 }}
-            className="mb-3 sm:mb-4"
-          >
-            <label className="text-sm font-semibold text-gray-700 mb-1 block">
-              Password
-            </label>
-            <div
-              className={`relative transition-all duration-300 ${
-                focusedField === "password" ? "scale-[1.02]" : ""
-              }`}
-            >
-              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
-                🔒
-              </span>
-              <input
-                type="password"
-                name="password"
-                placeholder="Enter your password"
-                value={formData.password}
-                onChange={handleChange}
-                onFocus={() => setFocusedField("password")}
-                onBlur={() => setFocusedField(null)}
-                className="w-full pl-12 pr-4 py-2.5 sm:py-3.5 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all duration-300 bg-gray-50 focus:bg-white"
-                required
-              />
+            {/* Password Field */}
+            <div>
+              <label className="text-[9px] font-black text-slate-455 uppercase tracking-widest block mb-1.5">
+                Password
+              </label>
+              <div className="relative">
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm text-slate-455">🔒</span>
+                <input
+                  type="password"
+                  name="password"
+                  placeholder="••••••••"
+                  value={formData.password}
+                  onChange={handleChange}
+                  className="w-full pl-11 pr-4 py-3 glass-input rounded-xl text-xs outline-none"
+                  required
+                />
+              </div>
             </div>
-          </motion.div>
 
-          {/* Submit Button */}
-          <motion.button
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.9 }}
-            whileHover={{
-              scale: 1.02,
-              boxShadow: "0 20px 40px rgba(59, 130, 246, 0.3)",
-            }}
-            whileTap={{ scale: 0.98 }}
-            type="submit"
-            disabled={isLoading}
-            className="w-full bg-linear-to-r from-blue-600 via-indigo-600 to-purple-600 text-white py-3 sm:py-3.5 rounded-xl font-semibold text-base sm:text-lg shadow-lg shadow-blue-500/30 transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed relative overflow-hidden group"
-          >
-            <span className="relative z-10 flex items-center justify-center gap-2">
+            {/* Submit Button */}
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="w-full btn-teal-outline py-3 rounded-xl font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 disabled:opacity-60"
+            >
               {isLoading ? (
                 <>
-                  <motion.span
-                    animate={{ rotate: 360 }}
-                    transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                  >
-                    ⏳
-                  </motion.span>
-                  Signing in...
+                  <div className="hms-spinner w-4 h-4 border-2"></div>
+                  <span>Verifying...</span>
                 </>
               ) : (
                 <>
-                  Sign In
-                  <motion.span
-                    initial={{ x: 0 }}
-                    whileHover={{ x: 5 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    →
-                  </motion.span>
+                  <span>Sign In</span>
+                  <span>→</span>
                 </>
               )}
-            </span>
-            <div className="absolute inset-0 bg-linear-to-r from-indigo-600 via-purple-600 to-blue-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-          </motion.button>
+            </button>
+          </form>
 
-{/* Demo Access */}
+          {/* Quick Demo Access Segment */}
+          <div className="mt-6 border-t border-white/5 pt-5">
+            <p className="text-[9px] font-black text-slate-400 text-center uppercase tracking-widest mb-3">
+              Quick Demo Login
+            </p>
+            <div className="grid grid-cols-2 gap-3">
+              <button
+                type="button"
+                onClick={handleDemoAdminLogin}
+                className="bg-white/2 border border-white/10 hover:bg-white/5 text-cyan-400 hover:text-cyan-300 py-3 rounded-xl font-bold text-[10px] uppercase transition-colors flex items-center justify-center gap-1.5"
+              >
+                💼 Admin Portal
+              </button>
+              <button
+                type="button"
+                onClick={handleDemoPatientLogin}
+                className="bg-white/2 border border-white/10 hover:bg-white/5 text-cyan-400 hover:text-cyan-300 py-3 rounded-xl font-bold text-[10px] uppercase transition-colors flex items-center justify-center gap-1.5"
+              >
+                🏥 Patient Portal
+              </button>
+            </div>
+          </div>
 
-<motion.div
-  initial={{ opacity: 0 }}
-  animate={{ opacity: 1 }}
-  transition={{ delay: 1.1 }}
-  className="mt-4 border-t pt-4"
->
-
-  <div className="text-center mb-3">
-    <p className="text-sm font-semibold text-gray-700">
-      Quick Demo Access
-    </p>
-
-    <p className="text-xs text-gray-500 mt-1">
-      Explore HMS instantly with demo accounts
-    </p>
-  </div>
-
-  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-
-    <motion.button
-      whileHover={{ scale: 1.02 }}
-      whileTap={{ scale: 0.98 }}
-      onClick={handleDemoAdminLogin}
-      className="bg-linear-to-r from-indigo-500 to-purple-600 text-white py-2.5 sm:py-3 rounded-xl font-medium shadow-lg shadow-purple-500/20"
-    >
-      👨‍💼 Demo Admin
-    </motion.button>
-
-    <motion.button
-      whileHover={{ scale: 1.02 }}
-      whileTap={{ scale: 0.98 }}
-      onClick={handleDemoPatientLogin}
-      className="bg-linear-to-r from-blue-500 to-cyan-500 text-white py-2.5 sm:py-3 rounded-xl font-medium shadow-lg shadow-blue-500/20"
-    >
-      🏥 Demo Patient
-    </motion.button>
-
-  </div>
-
-</motion.div>
-
-          {/* Register Link */}
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 1 }}
-            className="text-sm mt-5 text-center text-gray-600"
-          >
+          {/* Navigation link to Register */}
+          <p className="text-[11px] mt-5 text-center text-slate-400 font-medium">
             Don't have an account?{" "}
-            <motion.span
-              whileHover={{ scale: 1.05 }}
-              className="text-blue-600 font-semibold cursor-pointer hover:text-indigo-600 transition-colors"
+            <span
               onClick={() => navigate("/register")}
+              className="text-cyan-400 font-bold hover:text-cyan-300 cursor-pointer transition-colors ml-1 uppercase tracking-wider"
             >
               Register Now
-            </motion.span>
-          </motion.p>
-        </motion.form>
+            </span>
+          </p>
+
+        </motion.div>
       </div>
+
     </div>
   );
 }

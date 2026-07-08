@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-// eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
 import {
   Users,
@@ -18,7 +17,7 @@ import {
 } from "lucide-react";
 import Chart from "react-apexcharts";
 import { useSelector } from "react-redux";
-
+import { useNavigate } from "react-router-dom";
 import { getPatients } from "../services/patientService";
 import { getDoctors } from "../services/doctorService";
 import { getAppointments } from "../services/appointmentService";
@@ -94,6 +93,26 @@ const patientReviews = [
 function Dashboard() {
   const { role } = useSelector((state) => state.auth);
   const isPatient = role === "PATIENT";
+  const navigate = useNavigate();
+
+  const [themeMode, setThemeMode] = useState(
+    document.documentElement.classList.contains("dark") ? "dark" : "light"
+  );
+
+  useEffect(() => {
+    const observer = new MutationObserver(() => {
+      setThemeMode(
+        document.documentElement.classList.contains("dark") ? "dark" : "light"
+      );
+    });
+
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+
+    return () => observer.disconnect();
+  }, []);
 
   const [stats, setStats] = useState({
     patients: 0,
@@ -121,13 +140,11 @@ function Dashboard() {
       fetchPatientData();
       return;
     }
-
     fetchAdminDoctorData();
   }, [isPatient]);
 
   const fetchAdminDoctorData = async () => {
     setIsLoading(true);
-
     try {
       const patientsRes = await getPatients();
       const doctorsRes = await getDoctors();
@@ -150,7 +167,8 @@ function Dashboard() {
         rejected,
       });
     } catch (err) {
-      toast.error(err);
+      console.log(err);
+      toast.error("Failed to load dashboard metrics");
     } finally {
       setIsLoading(false);
     }
@@ -158,7 +176,6 @@ function Dashboard() {
 
   const fetchPatientData = async () => {
     setIsLoading(true);
-
     try {
       const doctorsRes = await getDoctors();
       const doctors = doctorsRes.data || [];
@@ -254,27 +271,31 @@ function Dashboard() {
     }
   };
 
+  // Animations configuration
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.1,
-        delayChildren: 0.1,
+        staggerChildren: 0.05,
       },
     },
   };
 
   const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
+    hidden: { opacity: 0, y: 15 },
     visible: {
       opacity: 1,
       y: 0,
-      transition: { duration: 0.5, ease: "easeOut" },
+      transition: { type: "spring", stiffness: 100, damping: 15 },
     },
   };
 
-  // 📊 Bar Chart with matching theme
+  // Apex Charts Options adjusted for dark theme matching the reference
+  const chartColors = themeMode === "dark" 
+    ? ["#06b6d4", "#10b981", "#f43f5e"] 
+    : ["#0891b2", "#059669", "#e11d48"];
+
   const barOptions = {
     chart: {
       id: "appointments-bar",
@@ -283,26 +304,28 @@ function Dashboard() {
     },
     xaxis: {
       categories: ["Pending", "Approved", "Rejected"],
-      labels: { style: { colors: "#64748b" } },
+      labels: { style: { colors: themeMode === "dark" ? "#94a3b8" : "#64748b", fontFamily: "Outfit", fontWeight: 600 } },
+      axisBorder: { show: false },
+      axisTicks: { show: false }
     },
     yaxis: {
-      labels: { style: { colors: "#64748b" } },
+      labels: { style: { colors: themeMode === "dark" ? "#94a3b8" : "#64748b", fontFamily: "Outfit" } },
     },
     grid: {
-      borderColor: "#e2e8f0",
+      borderColor: themeMode === "dark" ? "rgba(255, 255, 255, 0.05)" : "rgba(0, 0, 0, 0.05)",
       strokeDashArray: 4,
     },
-    colors: ["#3b82f6", "#22c55e", "#ef4444"],
+    colors: chartColors,
     plotOptions: {
       bar: {
         borderRadius: 8,
-        columnWidth: "50%",
+        columnWidth: "40%",
         distributed: true,
       },
     },
     dataLabels: { enabled: false },
     legend: { show: false },
-    theme: { mode: "light" },
+    theme: { mode: themeMode },
   };
 
   const barSeries = [
@@ -312,19 +335,38 @@ function Dashboard() {
     },
   ];
 
-  // 🥧 Pie Chart with matching theme
   const pieOptions = {
     labels: ["Pending", "Approved", "Rejected"],
-    colors: ["#3b82f6", "#22c55e", "#ef4444"],
+    colors: chartColors,
     legend: {
       position: "bottom",
-      labels: { colors: "#64748b" },
+      fontFamily: "Outfit",
+      labels: { colors: themeMode === "dark" ? "#94a3b8" : "#64748b", useSeriesColors: false },
     },
     stroke: { width: 0 },
     dataLabels: {
-      style: { colors: ["#fff"] },
+      style: { colors: ["#fff"], fontFamily: "Outfit", fontWeight: 600 },
     },
-    theme: { mode: "light" },
+    plotOptions: {
+      borderWidth: 0,
+      pie: {
+        donut: {
+          size: "70%",
+          labels: {
+            show: true,
+            total: {
+              show: true,
+              label: "TOTAL",
+              fontFamily: "Outfit",
+              fontWeight: 700,
+              color: themeMode === "dark" ? "#06b6d4" : "#0891b2",
+              formatter: () => stats.pending + stats.approved + stats.rejected
+            }
+          }
+        }
+      }
+    },
+    theme: { mode: themeMode },
   };
 
   const pieSeries = [stats.pending, stats.approved, stats.rejected];
@@ -333,34 +375,34 @@ function Dashboard() {
     {
       title: "Hospital Branches",
       value: patientStats.totalBranches,
-      icon: <Building2 size={24} />,
-      gradient: "from-blue-500 to-indigo-600",
-      bgGlow: "shadow-blue-500/20",
-      subtitle: "Across the city",
+      icon: <Building2 size={20} />,
+      gradient: "from-cyan-500/20 to-cyan-700/25 border-cyan-500/20",
+      glowClass: "glow-cyan",
+      subtitle: "Across the city locations",
     },
     {
-      title: "Total Doctors",
+      title: "Active Doctors",
       value: patientStats.totalDoctors,
-      icon: <UserCheck size={24} />,
-      gradient: "from-emerald-500 to-teal-600",
-      bgGlow: "shadow-emerald-500/20",
-      subtitle: "Available for consultation",
+      icon: <UserCheck size={20} />,
+      gradient: "from-emerald-500/20 to-emerald-700/25 border-emerald-500/20",
+      glowClass: "glow-emerald",
+      subtitle: "Consulting specialists",
     },
     {
-      title: "Specialists",
+      title: "Primary Specialities",
       value: patientStats.totalSpecialists,
-      icon: <Stethoscope size={24} />,
-      gradient: "from-amber-500 to-orange-600",
-      bgGlow: "shadow-amber-500/20",
-      subtitle: "Expert treatment teams",
+      icon: <Stethoscope size={20} />,
+      gradient: "from-indigo-500/20 to-indigo-700/25 border-indigo-500/20",
+      glowClass: "glow-indigo",
+      subtitle: "Expert healthcare fields",
     },
     {
-      title: "Nursing Staff",
+      title: "Support Nurses",
       value: patientStats.totalNurses,
-      icon: <Users size={24} />,
-      gradient: "from-purple-500 to-pink-600",
-      bgGlow: "shadow-purple-500/20",
-      subtitle: "Dedicated care support",
+      icon: <Users size={20} />,
+      gradient: "from-purple-500/20 to-purple-700/25 border-purple-500/20",
+      glowClass: "glow-purple",
+      subtitle: "Full-time nursing staff",
     },
   ];
 
@@ -372,498 +414,437 @@ function Dashboard() {
     )
   );
 
-  const items = [
+  const adminStatsItems = [
     {
-      title: "Total Patients",
-      icon: <Users size={24} />,
+      title: "Total Registered Patients",
+      icon: <Users size={20} className="text-cyan-400" />,
       value: stats.patients,
-      gradient: "from-blue-500 to-indigo-600",
-      bgGlow: "shadow-blue-500/20",
+      gradient: "from-cyan-550/20 to-cyan-700/25 border-cyan-500/30",
+      glowClass: "glow-cyan",
       trend: "+12%",
-      trendUp: true,
     },
     {
-      title: "Appointments Today",
-      icon: <Calendar size={24} />,
+      title: "Appointments Scheduled",
+      icon: <Calendar size={20} className="text-purple-400" />,
       value: stats.todayAppointments,
-      gradient: "from-purple-500 to-pink-600",
-      bgGlow: "shadow-purple-500/20",
-      trend: "+5%",
-      trendUp: true,
+      gradient: "from-purple-550/20 to-purple-700/25 border-purple-500/30",
+      glowClass: "glow-purple",
+      trend: "+8%",
     },
     {
       title: "Available Doctors",
-      icon: <UserCheck size={24} />,
+      icon: <UserCheck size={20} className="text-emerald-400" />,
       value: stats.doctors,
-      gradient: "from-emerald-500 to-teal-600",
-      bgGlow: "shadow-emerald-500/20",
-      trend: "+2",
-      trendUp: true,
+      gradient: "from-emerald-550/20 to-emerald-700/25 border-emerald-500/30",
+      glowClass: "glow-emerald",
+      trend: "+2 new",
     },
     {
-      title: "Revenue (This Month)",
-      icon: <DollarSign size={24} />,
+      title: "Month Revenue Estimate",
+      icon: <DollarSign size={20} className="text-indigo-400" />,
       value: `₹${stats.revenue.toLocaleString()}`,
-      gradient: "from-amber-500 to-orange-600",
-      bgGlow: "shadow-amber-500/20",
-      trend: "+18%",
-      trendUp: true,
+      gradient: "from-indigo-550/20 to-indigo-700/25 border-indigo-500/30",
+      glowClass: "glow-indigo",
+      trend: "+15%",
     },
   ];
 
   const quickLinks = [
-    { icon: <Plus size={18} />, text: "New Appointment", color: "from-blue-500 to-indigo-600" },
-    { icon: <Users size={18} />, text: "Register Patient", color: "from-purple-500 to-pink-600" },
-    { icon: <FileText size={18} />, text: "Generate Invoice", color: "from-emerald-500 to-teal-600" },
+    { icon: <Plus size={16} />, text: "Book Appointment", path: "/appointments", color: "from-cyan-500/20 to-cyan-900"},
+    { icon: <Users size={16} />, text: "Patient Directory", path: "/patients", color: "from-purple-500/20 to-purple-700/25 border-purple-500/30 text-purple-400" },
+    { icon: <FileText size={16} />, text: "Digital Invoicing", path: "/billing", color: "from-emerald-500/20 to-emerald-700/25 border-emerald-500/30 text-emerald-400" },
   ];
 
   const recentActivities = [
-    { icon: "📅", text: "New appointment booked", time: "2 min ago", color: "bg-blue-100 text-blue-600" },
-    { icon: "👨‍⚕️", text: "Dr. Smith updated schedule", time: "15 min ago", color: "bg-indigo-100 text-indigo-600" },
-    { icon: "🧑‍🦱", text: "New patient registered", time: "1 hour ago", color: "bg-emerald-100 text-emerald-600" },
-    { icon: "💊", text: "Prescription generated", time: "2 hours ago", color: "bg-amber-100 text-amber-600" },
+    { icon: "📅", text: "New appointment request placed", time: "2 mins ago", color: "border-cyan-500/30 text-cyan-400" },
+    { icon: "👨‍⚕️", text: "Doctor availability calendar revised", time: "15 mins ago", color: "border-purple-500/30 text-purple-400" },
+    { icon: "🧑‍🦱", text: "New patient verification completed", time: "1 hour ago", color: "border-emerald-500/30 text-emerald-400" },
+    { icon: "💊", text: "Pharmacy invoice draft generated", time: "2 hours ago", color: "border-indigo-500/30 text-indigo-400" },
   ];
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-gray-50 to-gray-100 text-gray-800 p-4 md:p-6 overflow-hidden">
-      {/* Background Decorations */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 left-0 w-96 h-96 bg-indigo-500/5 rounded-full blur-3xl" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-150 h-150 bg-purple-500/5 rounded-full blur-3xl" />
-      </div>
+    <div className="p-5 md:p-8 space-y-8 select-none text-slate-200">
+      
+      {/* Welcome Banner / Header */}
+      <motion.div
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white/3 border border-white/10 backdrop-blur-xl rounded-3xl p-6 shadow-2xl"
+      >
+        <div>
+          <h1 className="text-2xl md:text-3xl font-black text-white tracking-tight uppercase">
+            {isPatient ? "Hospital Network Hub" : "HMS Administration Panel"}
+          </h1>
+          <p className="text-xs text-slate-400 mt-1.5 font-medium tracking-wide">
+            {isPatient 
+              ? "Access city branches, specialist directories, cured counts, and verified reviews." 
+              : "Overview of system status, patients flow, pending bookings, and hospital earnings."}
+          </p>
+        </div>
 
-      <div className="relative z-10">
-        {/* Header */}
+        <div className="flex items-center gap-2.5 bg-white/3 border border-white/10 px-4.5 py-2.5 rounded-2xl shadow-sm backdrop-blur-md">
+          <Clock size={16} className="text-cyan-400 animate-pulse" />
+          <span className="text-cyan-400 font-black text-xs uppercase tracking-widest">
+            {new Date().toLocaleDateString("en-IN", {
+              weekday: "short",
+              year: "numeric",
+              month: "short",
+              day: "numeric",
+            })}
+          </span>
+        </div>
+      </motion.div>
+
+      {/* PATIENT VIEW */}
+      {isPatient ? (
         <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="mb-8"
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+          className="space-y-6"
         >
-          <div className="flex items-center justify-between">
-            <div>
-              <div className="flex items-center gap-3 mb-2">
-                <div className="w-10 h-10 bg-linear-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/30">
-                  <Activity size={20} />
+          {/* Stats Cards Row */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {patientHighlightItems.map((item, idx) => (
+              <motion.div
+                key={idx}
+                variants={itemVariants}
+                whileHover={{ y: -4 }}
+                className={`glass-card rounded-3xl p-6 flex justify-between items-start relative overflow-hidden group transition-all border ${item.glowClass}`}
+              >
+                <div className="space-y-1 z-10">
+                  <span className="text-slate-400 text-[10px] font-black uppercase tracking-widest block">{item.title}</span>
+                  <span className="text-3xl font-black text-white block mt-1">
+                    {isLoading ? "..." : item.value}
+                  </span>
+                  <span className="text-[11px] text-slate-400 font-bold block mt-1">{item.subtitle}</span>
                 </div>
-                <span className="text-sm font-medium text-blue-700 bg-blue-100 px-3 py-1 rounded-full">
-                  🏥 HMS Dashboard
+                <div className={`w-10 h-10 rounded-xl border ${item.gradient} flex items-center justify-center text-white z-10`}>
+                  {item.icon}
+                </div>
+              </motion.div>
+            ))}
+          </div>
+
+          {/* Details & Branches Column */}
+          <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+            
+            {/* Hospital details */}
+            <div className="glass-card p-6 rounded-3xl xl:col-span-1 space-y-6">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-lg border border-cyan-500/20 text-cyan-400 flex items-center justify-center bg-cyan-950/10">
+                  <Building2 size={16} />
+                </div>
+                <div>
+                  <h3 className="font-bold text-white text-sm uppercase tracking-wider">Hospital Details</h3>
+                  <p className="text-[9px] text-slate-500 font-black uppercase tracking-widest">General Info</p>
+                </div>
+              </div>
+
+              <div className="space-y-4 text-xs leading-relaxed">
+                <div>
+                  <span className="text-slate-450 font-bold uppercase tracking-wider block text-[10px]">Entity Name</span>
+                  <span className="font-extrabold text-white text-sm mt-0.5 block">{hospitalInfo.name}</span>
+                </div>
+                <div>
+                  <span className="text-slate-455 font-bold uppercase tracking-wider block text-[10px]">About Care Network</span>
+                  <p className="text-slate-300 mt-1 font-medium leading-relaxed">{hospitalInfo.about}</p>
+                </div>
+                <div className="grid grid-cols-2 gap-3 pt-2">
+                  <div className="bg-white/3 border border-white/10 rounded-xl p-3">
+                    <span className="text-[9px] text-cyan-400 font-black uppercase tracking-widest block">Established</span>
+                    <span className="font-black text-cyan-300 text-sm mt-0.5 block">{hospitalInfo.established}</span>
+                  </div>
+                  <div className="bg-white/3 border border-white/10 rounded-xl p-3">
+                    <span className="text-[9px] text-emerald-400 font-black uppercase tracking-widest block">Emergency</span>
+                    <span className="font-black text-emerald-300 text-sm mt-0.5 block">{hospitalInfo.emergency}</span>
+                  </div>
+                </div>
+                <div className="pt-2 divide-y divide-white/5">
+                  <div className="py-2.5 flex justify-between font-medium">
+                    <span className="text-slate-400 font-bold uppercase tracking-wider text-[10px]">Accreditations</span>
+                    <span className="font-bold text-slate-200">{hospitalInfo.acaccreditation || hospitalInfo.accreditation}</span>
+                  </div>
+                  <div className="py-2.5 flex justify-between font-medium">
+                    <span className="text-slate-400 font-bold uppercase tracking-wider text-[10px]">Helpline</span>
+                    <span className="font-bold text-slate-200">{hospitalInfo.helpline}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Branches Card */}
+            <div className="glass-card p-6 rounded-3xl xl:col-span-2 space-y-6">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-lg border border-cyan-500/20 text-cyan-400 flex items-center justify-center bg-cyan-950/10">
+                  <MapPin size={16} />
+                </div>
+                <div>
+                  <h3 className="font-bold text-white text-sm uppercase tracking-wider">Branches & Availability</h3>
+                  <p className="text-[9px] text-slate-500 font-black uppercase tracking-widest">Network Locations</p>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                {(branchDetails.length ? branchDetails : branchTemplates).map((branch) => (
+                  <div
+                    key={branch.id}
+                    className="bg-white/2 border border-white/10 rounded-2xl p-5 hover:bg-white/5 transition-colors"
+                  >
+                    <div className="flex justify-between items-start gap-4">
+                      <div>
+                        <h4 className="font-bold text-white text-sm">{branch.name}</h4>
+                        <p className="text-xs text-slate-400 font-medium mt-0.5">{branch.location}</p>
+                      </div>
+                      <div className="text-right">
+                        <span className="text-[9px] text-cyan-400 font-black uppercase tracking-widest block">Beds Available</span>
+                        <span className="font-black text-white text-sm mt-0.5 block">{branch.beds}</span>
+                      </div>
+                    </div>
+
+                    <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-2.5">
+                      <div className="bg-white/3 border border-white/5 rounded-xl py-2 px-3 text-center">
+                        <span className="text-[9px] text-slate-450 block font-bold uppercase tracking-wider">Doctors</span>
+                        <span className="font-extrabold text-slate-250 text-xs mt-0.5 block">{branch.doctorCount}</span>
+                      </div>
+                      <div className="bg-white/3 border border-white/5 rounded-xl py-2 px-3 text-center">
+                        <span className="text-[9px] text-slate-450 block font-bold uppercase tracking-wider">Specialities</span>
+                        <span className="font-extrabold text-slate-250 text-xs mt-0.5 block">{branch.specialistCount}</span>
+                      </div>
+                      <div className="bg-white/3 border border-white/5 rounded-xl py-2 px-3 text-center">
+                        <span className="text-[9px] text-slate-450 block font-bold uppercase tracking-wider">Nurses</span>
+                        <span className="font-extrabold text-slate-255 text-xs mt-0.5 block">{branch.nurseCount}</span>
+                      </div>
+                      <div className="bg-white/3 border border-white/5 rounded-xl py-2 px-3 text-center">
+                        <span className="text-[9px] text-slate-450 block font-bold uppercase tracking-wider">Cured</span>
+                        <span className="font-black text-cyan-400 text-xs mt-0.5 block">{branch.diseasesCured}</span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+          </div>
+
+          {/* Feedback & Disease cloud */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            
+            {/* Condition Cloud */}
+            <div className="glass-card p-6 rounded-3xl space-y-6">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-lg border border-cyan-500/20 text-cyan-400 flex items-center justify-center bg-cyan-950/10">
+                  <Activity size={16} />
+                </div>
+                <div>
+                  <h3 className="font-bold text-white text-sm uppercase tracking-wider">Conditions Managed</h3>
+                  <p className="text-[9px] text-slate-500 font-black uppercase tracking-widest">Successfully Treated</p>
+                </div>
+              </div>
+
+              <div className="flex flex-wrap gap-2 pt-2">
+                {diseaseList.map((disease, idx) => (
+                  <span
+                    key={idx}
+                    className="px-4 py-2 bg-white/5 hover:bg-white/10 text-cyan-300 border border-white/10 rounded-full text-xs font-bold transition-colors cursor-default"
+                  >
+                    {disease}
+                  </span>
+                ))}
+              </div>
+
+              <div className="bg-white/3 border border-white/10 p-4 rounded-xl text-center">
+                <p className="text-xs text-slate-300 font-bold">
+                  Total recovery cases across network: <span className="font-black text-cyan-400">{patientStats.totalDiseasesCured}</span>
+                </p>
+              </div>
+            </div>
+
+            {/* Reviews Card */}
+            <div className="glass-card p-6 rounded-3xl space-y-6">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-lg border border-cyan-500/20 text-cyan-400 flex items-center justify-center bg-cyan-950/10">
+                  <Star size={16} />
+                </div>
+                <div>
+                  <h3 className="font-bold text-white text-sm uppercase tracking-wider">Patient Testimonials</h3>
+                  <p className="text-[9px] text-slate-500 font-black uppercase tracking-widest">Verified Reviews</p>
+                </div>
+              </div>
+
+              <div className="space-y-4 pt-2">
+                {patientReviews.map((review) => (
+                  <div key={review.id} className="p-4 rounded-xl border border-white/5 bg-white/2">
+                    <div className="flex justify-between items-center mb-1">
+                      <span className="font-bold text-white text-xs">{review.name}</span>
+                      <div className="flex gap-0.5 text-amber-400">
+                        {[...Array(review.rating)].map((_, i) => (
+                          <Star key={i} size={12} fill="currentColor" className="stroke-none" />
+                        ))}
+                      </div>
+                    </div>
+                    <p className="text-xs text-slate-350 leading-relaxed italic">"{review.comment}"</p>
+                  </div>
+                ))}
+              </div>
+
+              <div className="flex justify-between items-center bg-white/3 border border-white/10 p-4 rounded-xl">
+                <span className="text-xs font-bold text-slate-400">Aggregate Rating</span>
+                <span className="font-extrabold text-cyan-400 text-sm">
+                  ★ {patientStats.averageRating} / 5
                 </span>
               </div>
-              <h1 className="text-2xl md:text-4xl font-bold bg-linear-to-r from-gray-900 via-blue-800 to-indigo-700 bg-clip-text text-transparent">
-                {isPatient ? "Hospital Network Overview" : "Welcome Back!"}
-              </h1>
-              <p className="text-gray-600 mt-1">
-                {isPatient
-                  ? "Explore branches, specialist teams, treated diseases and patient feedback."
-                  : "Here's what's happening with your hospital today."}
-              </p>
             </div>
-            <motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.3 }}
-              className="hidden md:flex items-center gap-2 bg-white/80 backdrop-blur-sm border border-gray-100 px-4 py-2 rounded-xl shadow-sm"
-            >
-              <Clock size={16} className="text-blue-600" />
-              <span className="text-gray-600 text-sm">
-                {new Date().toLocaleDateString("en-US", {
-                  weekday: "long",
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                })}
-              </span>
-            </motion.div>
+
           </div>
         </motion.div>
-
-        {isPatient ? (
-          <>
-            <motion.div
-              variants={containerVariants}
-              initial="hidden"
-              animate="visible"
-              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8"
-            >
-              {patientHighlightItems.map((item, i) => (
-                <motion.div
-                  key={i}
-                  variants={itemVariants}
-                  whileHover={{ scale: 1.02, y: -5 }}
-                  className={`relative bg-white border border-gray-100 p-6 rounded-2xl shadow-xl shadow-blue-500/10 ${item.bgGlow} overflow-hidden group`}
-                >
-                  <div
-                    className={`absolute inset-0 bg-linear-to-br ${item.gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-500`}
-                  />
-
-                  <div className="relative z-10 flex justify-between items-start">
-                    <div>
-                      <p className="text-gray-500 text-sm font-medium mb-1">
-                        {item.title}
-                      </p>
-                      <h2 className="text-3xl font-bold text-gray-900 mb-1">
-                        {isLoading ? (
-                          <span className="inline-block w-16 h-8 bg-gray-200 rounded animate-pulse" />
-                        ) : (
-                          item.value
-                        )}
-                      </h2>
-                      <p className="text-xs text-gray-500">{item.subtitle}</p>
-                    </div>
-
-                    <div
-                      className={`p-3 rounded-xl bg-linear-to-br ${item.gradient} shadow-lg`}
-                    >
-                      {item.icon}
-                    </div>
-                  </div>
-                </motion.div>
-              ))}
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.35 }}
-              className="grid grid-cols-1 xl:grid-cols-3 gap-6 mb-8"
-            >
-              <div className="bg-white border border-gray-100 p-6 rounded-2xl shadow-xl shadow-blue-500/10 xl:col-span-1">
-                <div className="flex items-center gap-3 mb-5">
-                  <div className="w-9 h-9 rounded-lg bg-linear-to-br from-blue-500 to-indigo-600 text-white flex items-center justify-center">
-                    <Building2 size={18} />
-                  </div>
-                  <div>
-                    <h2 className="text-lg font-semibold text-gray-800">Hospital Details</h2>
-                    <p className="text-xs text-gray-500">Core information</p>
-                  </div>
-                </div>
-
-                <div className="space-y-4 text-sm">
-                  <div>
-                    <p className="text-gray-500">Hospital Name</p>
-                    <p className="font-semibold text-gray-800">{hospitalInfo.name}</p>
-                  </div>
-                  <div>
-                    <p className="text-gray-500">About</p>
-                    <p className="text-gray-700 leading-relaxed">{hospitalInfo.about}</p>
-                  </div>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="bg-blue-50 rounded-xl p-3">
-                      <p className="text-xs text-blue-700">Established</p>
-                      <p className="font-semibold text-blue-900">{hospitalInfo.established}</p>
-                    </div>
-                    <div className="bg-emerald-50 rounded-xl p-3">
-                      <p className="text-xs text-emerald-700">Emergency</p>
-                      <p className="font-semibold text-emerald-900">{hospitalInfo.emergency}</p>
-                    </div>
-                  </div>
-                  <div>
-                    <p className="text-gray-500">Accreditation</p>
-                    <p className="font-medium text-gray-800">{hospitalInfo.accreditation}</p>
-                  </div>
-                  <div>
-                    <p className="text-gray-500">Helpline</p>
-                    <p className="font-medium text-gray-800">{hospitalInfo.helpline}</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-white border border-gray-100 p-6 rounded-2xl shadow-xl shadow-blue-500/10 xl:col-span-2">
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="w-9 h-9 rounded-lg bg-linear-to-br from-indigo-500 to-purple-600 text-white flex items-center justify-center">
-                    <MapPin size={18} />
-                  </div>
-                  <div>
-                    <h2 className="text-lg font-semibold text-gray-800">Branch Overview</h2>
-                    <p className="text-xs text-gray-500">Facilities and care coverage</p>
-                  </div>
-                </div>
-
-                <div className="space-y-3">
-                  {(branchDetails.length ? branchDetails : branchTemplates).map((branch) => (
-                    <div
-                      key={branch.id}
-                      className="border border-gray-100 rounded-xl p-4 hover:bg-blue-50/60 transition-colors"
-                    >
-                      <div className="flex items-start justify-between gap-4">
-                        <div>
-                          <p className="font-semibold text-gray-800">{branch.name}</p>
-                          <p className="text-sm text-gray-500">{branch.location}</p>
-                        </div>
-                        <div className="text-right">
-                          <p className="text-sm text-gray-500">Beds</p>
-                          <p className="font-semibold text-gray-800">{branch.beds}</p>
-                        </div>
-                      </div>
-
-                      <div className="mt-3 grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
-                        <span className="px-2 py-1 rounded-lg bg-blue-100 text-blue-800">
-                          Doctors: {branch.doctorCount || branch.baseDoctors}
-                        </span>
-                        <span className="px-2 py-1 rounded-lg bg-emerald-100 text-emerald-800">
-                          Specialists: {branch.specialistCount || branch.baseSpecialists}
-                        </span>
-                        <span className="px-2 py-1 rounded-lg bg-amber-100 text-amber-800">
-                          Nurses: {branch.nurseCount || branch.baseNurses}
-                        </span>
-                        <span className="px-2 py-1 rounded-lg bg-purple-100 text-purple-800">
-                          Cured: {branch.diseasesCured || branch.baseDiseasesCured}
-                        </span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.45 }}
-              className="grid grid-cols-1 lg:grid-cols-2 gap-6"
-            >
-              <div className="bg-white border border-gray-100 p-6 rounded-2xl shadow-xl shadow-blue-500/10">
-                <div className="flex items-center gap-2 mb-6">
-                  <div className="w-8 h-8 bg-linear-to-br from-emerald-500 to-teal-600 rounded-lg flex items-center justify-center text-white">
-                    <Activity size={16} />
-                  </div>
-                  <div>
-                    <h2 className="text-lg font-semibold text-gray-800">Diseases Treated</h2>
-                    <p className="text-gray-500 text-xs">Conditions managed across all branches</p>
-                  </div>
-                </div>
-
-                <div className="flex flex-wrap gap-2">
-                  {diseaseList.map((disease) => (
-                    <span
-                      key={disease}
-                      className="px-3 py-1.5 rounded-full bg-blue-50 text-blue-700 text-sm font-medium border border-blue-100"
-                    >
-                      {disease}
-                    </span>
-                  ))}
-                </div>
-
-                <div className="mt-6 p-4 rounded-xl bg-emerald-50 border border-emerald-100">
-                  <p className="text-sm text-emerald-800">
-                    Total successful treatments: <span className="font-semibold">{patientStats.totalDiseasesCured}</span>
-                  </p>
-                </div>
-              </div>
-
-              <div className="bg-white border border-gray-100 p-6 rounded-2xl shadow-xl shadow-blue-500/10">
-                <div className="flex items-center gap-2 mb-6">
-                  <div className="w-8 h-8 bg-linear-to-br from-amber-500 to-orange-600 rounded-lg flex items-center justify-center text-white">
-                    <Star size={16} />
-                  </div>
-                  <div>
-                    <h2 className="text-lg font-semibold text-gray-800">Patient Reviews</h2>
-                    <p className="text-gray-500 text-xs">Positive feedback from recent visits</p>
-                  </div>
-                </div>
-
-                <div className="space-y-4">
-                  {patientReviews.map((review) => (
-                    <div key={review.id} className="p-4 rounded-xl border border-gray-100 bg-gray-50">
-                      <div className="flex items-center justify-between mb-2">
-                        <p className="font-medium text-gray-800">{review.name}</p>
-                        <div className="flex items-center gap-1 text-amber-500">
-                          {[...Array(review.rating)].map((_, starIndex) => (
-                            <Star key={starIndex} size={14} fill="currentColor" />
-                          ))}
-                        </div>
-                      </div>
-                      <p className="text-sm text-gray-600">{review.comment}</p>
-                    </div>
-                  ))}
-                </div>
-
-                <div className="mt-5 flex items-center justify-between rounded-xl bg-amber-50 border border-amber-100 p-3">
-                  <span className="text-sm text-amber-800">Average patient rating</span>
-                  <span className="font-semibold text-amber-900">
-                    {patientStats.averageRating}/5
+      ) : (
+        /* ADMIN & DOCTOR VIEW */
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+          className="space-y-6"
+        >
+          {/* Stats Row */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {adminStatsItems.map((item, idx) => (
+              <motion.div
+                key={idx}
+                variants={itemVariants}
+                whileHover={{ y: -4 }}
+                className={`glass-card rounded-3xl p-6 flex justify-between items-start relative overflow-hidden group transition-all border ${item.glowClass}`}
+              >
+                <div className="space-y-2.5 z-10">
+                  <span className="text-slate-400 text-[10px] font-black uppercase tracking-widest block">{item.title}</span>
+                  <span className="text-3xl font-black text-white block mt-1">
+                    {isLoading ? "..." : item.value}
                   </span>
+                  <div className="flex items-center gap-1.5 text-emerald-400 font-bold text-xs mt-1.5">
+                    <TrendingUp size={14} />
+                    <span>{item.trend}</span>
+                    <span className="text-slate-550 font-bold text-[9px] uppercase tracking-widest">vs prev</span>
+                  </div>
+                </div>
+                <div className={`w-10 h-10 rounded-xl border ${item.gradient} flex items-center justify-center text-white z-10`}>
+                  {item.icon}
+                </div>
+              </motion.div>
+            ))}
+          </div>
+
+          {/* Charts Row */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            
+            {/* Appointments Bar Chart */}
+            <div className="glass-card p-6 rounded-3xl space-y-6">
+              <div className="flex justify-between items-center">
+                <div>
+                  <h3 className="font-bold text-white text-sm uppercase tracking-wider">Appointment Bookings</h3>
+                  <p className="text-[9px] text-slate-500 font-black uppercase tracking-widest">Category Metrics</p>
+                </div>
+                <span className="text-[10px] font-black text-cyan-400 bg-cyan-950/20 border border-cyan-500/20 px-3 py-1 rounded-full uppercase tracking-widest">
+                  Monthly Log
+                </span>
+              </div>
+              <div className="pt-2">
+                <Chart options={barOptions} series={barSeries} type="bar" height={260} />
+              </div>
+            </div>
+
+            {/* Status Pie Chart */}
+            <div className="glass-card p-6 rounded-3xl space-y-6">
+              <div className="flex justify-between items-center">
+                <div>
+                  <h3 className="font-bold text-white text-sm uppercase tracking-wider">Status Distribution</h3>
+                  <p className="text-[9px] text-slate-500 font-black uppercase tracking-widest">Proportion Breakdown</p>
+                </div>
+                <span className="text-[10px] font-black text-cyan-400 bg-cyan-950/20 border border-cyan-500/20 px-3 py-1 rounded-full uppercase tracking-widest">
+                  Real-time
+                </span>
+              </div>
+              <div className="pt-2 flex justify-center">
+                <div className="w-full max-w-[320px]">
+                  <Chart options={pieOptions} series={pieSeries} type="donut" height={260} />
                 </div>
               </div>
-            </motion.div>
-          </>
-        ) : (
-          <>
-            {/* Stats Cards */}
-            <motion.div
-              variants={containerVariants}
-              initial="hidden"
-              animate="visible"
-              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8"
-            >
-              {items.map((item, i) => (
-                <motion.div
-                  key={i}
-                  variants={itemVariants}
-                  whileHover={{ scale: 1.02, y: -5 }}
-                  className={`relative bg-white border border-gray-100 p-6 rounded-2xl shadow-xl shadow-blue-500/10 ${item.bgGlow} overflow-hidden group`}
-                >
-                  {/* Gradient Glow */}
+            </div>
+
+          </div>
+
+          {/* Quick links & Activities */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            
+            {/* Quick Actions */}
+            <div className="glass-card p-6 rounded-3xl space-y-6">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-lg border border-cyan-500/20 text-cyan-400 flex items-center justify-center bg-cyan-950/10">
+                  <Plus size={16} />
+                </div>
+                <div>
+                  <h3 className="font-bold text-white text-sm uppercase tracking-wider">Administrative Actions</h3>
+                  <p className="text-[9px] text-slate-500 font-black uppercase tracking-widest">Task triggers</p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 gap-3 pt-2">
+                {quickLinks.map((link, idx) => (
+                  <motion.button
+                    key={idx}
+                    whileHover={{ x: 6 }}
+                    onClick={() => navigate(link.path)}
+                    className={`w-full flex items-center gap-3.5 bg-white/2 border border-white/5 p-4 rounded-xl transition-all group hover:bg-white/5 border hover:border-cyan-500/30`}
+                  >
+                    <div className={`p-2 rounded-lg border ${link.color} bg-cyan-950/20 shadow-md`}>
+                      {link.icon}
+                    </div>
+                    <span className="font-bold text-xs text-slate-250 group-hover:text-cyan-400 transition-colors uppercase tracking-wider">
+                      {link.text}
+                    </span>
+                    <span className="ml-auto text-slate-450 group-hover:text-cyan-400 transition-colors font-bold">
+                      →
+                    </span>
+                  </motion.button>
+                ))}
+              </div>
+            </div>
+
+            {/* Activities Timeline */}
+            <div className="glass-card p-6 rounded-3xl space-y-6">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-lg border border-cyan-500/20 text-cyan-400 flex items-center justify-center bg-cyan-950/10">
+                  <Activity size={16} />
+                </div>
+                <div>
+                  <h3 className="font-bold text-white text-sm uppercase tracking-wider">System Audit Stream</h3>
+                  <p className="text-[9px] text-slate-500 font-black uppercase tracking-widest">Latest updates</p>
+                </div>
+              </div>
+
+              <div className="space-y-4 pt-2">
+                {recentActivities.map((activity, idx) => (
                   <div
-                    className={`absolute inset-0 bg-linear-to-br ${item.gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-500`}
-                  />
-
-                  <div className="relative z-10 flex justify-between items-start">
-                    <div>
-                      <p className="text-gray-500 text-sm font-medium mb-1">
-                        {item.title}
+                    key={idx}
+                    className="flex items-center gap-4 p-3 rounded-xl hover:bg-white/5 border border-transparent hover:border-white/5 transition-colors"
+                  >
+                    <div className={`w-9 h-9 rounded-xl border ${activity.color} flex items-center justify-center font-bold text-sm shadow-sm shrink-0 bg-white/3`}>
+                      {activity.icon}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs font-bold text-slate-200 truncate">
+                        {activity.text}
                       </p>
-                      <h2 className="text-3xl font-bold text-gray-900 mb-2">
-                        {isLoading ? (
-                          <span className="inline-block w-16 h-8 bg-gray-200 rounded animate-pulse" />
-                        ) : (
-                          item.value
-                        )}
-                      </h2>
-                      <div className="flex items-center gap-1">
-                        <TrendingUp size={14} className="text-emerald-400" />
-                        <span className="text-emerald-400 text-xs font-medium">
-                          {item.trend}
-                        </span>
-                        <span className="text-gray-400 text-xs">vs last month</span>
-                      </div>
-                    </div>
-
-                    <div
-                      className={`p-3 rounded-xl bg-linear-to-br ${item.gradient} shadow-lg`}
-                    >
-                      {item.icon}
+                      <p className="text-[10px] text-slate-450 font-bold uppercase tracking-wider mt-0.5">{activity.time}</p>
                     </div>
                   </div>
-                </motion.div>
-              ))}
-            </motion.div>
-
-            {/* Charts Section */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4 }}
-              className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8"
-            >
-              {/* Bar Chart */}
-              <div className="bg-white border border-gray-100 p-6 rounded-2xl shadow-xl shadow-blue-500/10">
-                <div className="flex items-center justify-between mb-6">
-                  <div>
-                    <h2 className="text-lg font-semibold text-gray-800">
-                      Appointment Status
-                    </h2>
-                    <p className="text-gray-500 text-sm">Overview by status type</p>
-                  </div>
-                  <div className="flex items-center gap-2 bg-blue-50 px-3 py-1.5 rounded-lg">
-                    <span className="w-2 h-2 bg-blue-500 rounded-full" />
-                    <span className="text-xs text-blue-700">This Month</span>
-                  </div>
-                </div>
-                <Chart options={barOptions} series={barSeries} type="bar" height={280} />
+                ))}
               </div>
+            </div>
 
-              {/* Pie Chart */}
-              <div className="bg-white border border-gray-100 p-6 rounded-2xl shadow-xl shadow-blue-500/10">
-                <div className="flex items-center justify-between mb-6">
-                  <div>
-                    <h2 className="text-lg font-semibold text-gray-800">
-                      Status Distribution
-                    </h2>
-                    <p className="text-gray-500 text-sm">Percentage breakdown</p>
-                  </div>
-                  <div className="flex items-center gap-2 bg-emerald-50 px-3 py-1.5 rounded-lg">
-                    <span className="w-2 h-2 bg-emerald-500 rounded-full" />
-                    <span className="text-xs text-emerald-700">Live Data</span>
-                  </div>
-                </div>
-                <Chart options={pieOptions} series={pieSeries} type="donut" height={280} />
-              </div>
-            </motion.div>
+          </div>
+        </motion.div>
+      )}
 
-            {/* Bottom Section */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5 }}
-              className="grid grid-cols-1 lg:grid-cols-2 gap-6"
-            >
-              {/* Quick Links */}
-              <div className="bg-white border border-gray-100 p-6 rounded-2xl shadow-xl shadow-blue-500/10">
-                <div className="flex items-center gap-2 mb-6">
-                  <div className="w-8 h-8 bg-linear-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center">
-                    <Plus size={16} />
-                  </div>
-                  <div>
-                    <h2 className="text-lg font-semibold text-gray-800">Quick Actions</h2>
-                    <p className="text-gray-500 text-xs">Common tasks</p>
-                  </div>
-                </div>
-
-                <div className="space-y-3">
-                  {quickLinks.map((link, i) => (
-                    <motion.button
-                      key={i}
-                      whileHover={{ scale: 1.02, x: 5 }}
-                      whileTap={{ scale: 0.98 }}
-                      className="w-full flex items-center gap-3 bg-gray-50 hover:bg-blue-50 border border-gray-200 p-4 rounded-xl transition-all duration-300 group"
-                    >
-                      <div
-                        className={`p-2 rounded-lg bg-linear-to-br ${link.color} shadow-lg group-hover:shadow-xl transition-shadow`}
-                      >
-                        {link.icon}
-                      </div>
-                      <span className="font-medium text-gray-700 group-hover:text-blue-800 transition-colors">
-                        {link.text}
-                      </span>
-                      <span className="ml-auto text-gray-400 group-hover:text-blue-600 transition-colors">
-                        →
-                      </span>
-                    </motion.button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Recent Activity */}
-              <div className="bg-white border border-gray-100 p-6 rounded-2xl shadow-xl shadow-blue-500/10">
-                <div className="flex items-center gap-2 mb-6">
-                  <div className="w-8 h-8 bg-linear-to-br from-purple-500 to-pink-600 rounded-lg flex items-center justify-center">
-                    <Activity size={16} />
-                  </div>
-                  <div>
-                    <h2 className="text-lg font-semibold text-gray-800">Recent Activity</h2>
-                    <p className="text-gray-500 text-xs">Latest updates</p>
-                  </div>
-                </div>
-
-                <div className="space-y-4">
-                  {recentActivities.map((activity, i) => (
-                    <motion.div
-                      key={i}
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: 0.6 + i * 0.1 }}
-                      className="flex items-center gap-4 p-3 rounded-xl bg-gray-50 hover:bg-blue-50 transition-colors"
-                    >
-                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${activity.color}`}>
-                        <span className="text-lg">{activity.icon}</span>
-                      </div>
-                      <div className="flex-1">
-                        <p className="text-sm font-medium text-gray-700">
-                          {activity.text}
-                        </p>
-                        <p className="text-xs text-gray-500">{activity.time}</p>
-                      </div>
-                    </motion.div>
-                  ))}
-                </div>
-              </div>
-            </motion.div>
-          </>
-        )}
-      </div>
     </div>
   );
 }

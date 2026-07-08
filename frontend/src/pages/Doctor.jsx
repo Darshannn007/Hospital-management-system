@@ -9,7 +9,7 @@ import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { motion, AnimatePresence } from "framer-motion";
-import { IconStethoscope, IconUserPlus, IconEdit, IconTrash, IconCalendarPlus, IconSearch, IconBriefcase, IconSchool, IconFileInvoice } from "@tabler/icons-react";
+import { IconStethoscope, IconUserPlus, IconEdit, IconTrash, IconCalendarPlus, IconSearch, IconBriefcase, IconSchool } from "@tabler/icons-react";
 
 function Doctor() {
   const { role } = useSelector((state) => state.auth);
@@ -49,6 +49,11 @@ function Doctor() {
   };
 
   const handleSubmit = async () => {
+    if (!formData.name.trim() || !formData.specialization.trim()) {
+      toast.error("Name and Specialization are required");
+      return;
+    }
+
     try {
       if (editId) {
         await updateDoctor(editId, formData);
@@ -74,9 +79,15 @@ function Doctor() {
   };
 
   const handleDelete = async (id) => {
-    await deleteDoctor(id);
-    fetchDoctors();
-    toast.success("Doctor deleted! 🗑️");
+    if (!window.confirm("Are you sure you want to delete this doctor?")) return;
+    try {
+      await deleteDoctor(id);
+      fetchDoctors();
+      toast.success("Doctor deleted! 🗑️");
+    } catch (err) {
+      console.log(err);
+      toast.error("Failed to delete doctor");
+    }
   };
 
   const handleEdit = (doc) => {
@@ -107,14 +118,13 @@ function Doctor() {
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.1,
-        delayChildren: 0.1,
+        staggerChildren: 0.05,
       },
     },
   };
 
   const cardVariants = {
-    hidden: { opacity: 0, y: 30 },
+    hidden: { opacity: 0, y: 20 },
     visible: {
       opacity: 1,
       y: 0,
@@ -123,326 +133,269 @@ function Doctor() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 text-gray-800 p-4 md:p-6 overflow-hidden">
-      {/* Background Decorations */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 left-0 w-96 h-96 bg-indigo-500/5 rounded-full blur-3xl" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-purple-500/5 rounded-full blur-3xl" />
+    <div className="p-5 md:p-8 space-y-6 text-slate-200">
+      
+      {/* Header */}
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="mb-8"
+      >
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white/3 border border-white/10 backdrop-blur-xl rounded-3xl p-6 shadow-2xl">
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-black text-cyan-400 bg-cyan-950/20 border border-cyan-500/20 px-2.5 py-1 rounded-full uppercase tracking-widest">
+                Directory
+              </span>
+            </div>
+            <h1 className="text-2xl md:text-3xl font-black text-white tracking-tight mt-2 uppercase">
+              Doctors Registry
+            </h1>
+            <p className="text-xs text-slate-400 mt-1.5 font-medium tracking-wide">
+              Find and schedule appointments with our network medical specialists.
+            </p>
+          </div>
+
+          {role === "ADMIN" && (
+            <button
+              onClick={() => {
+                setShowForm(true);
+                setEditId(null);
+                setFormData({ name: "", specialization: "", experience: "", education: "" });
+              }}
+              className="btn-teal-outline px-6 py-3 rounded-xl font-bold text-xs shadow-md flex items-center gap-2 uppercase tracking-wider"
+            >
+              <IconUserPlus size={18} />
+              Add Doctor
+            </button>
+          )}
+        </div>
+      </motion.div>
+
+      {/* Search & Stats Bar */}
+      <div className="flex flex-col md:flex-row gap-4 items-stretch mb-8">
+        {/* Search */}
+        <div className="flex-1">
+          <div className="relative">
+            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-450">
+              <IconSearch size={18} />
+            </span>
+            <input
+              type="text"
+              placeholder="Search doctors by name or specialization..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-11 pr-4 py-3.5 glass-input rounded-xl text-xs outline-none"
+            />
+          </div>
+        </div>
+
+        {/* Stats counter widget */}
+        <div className="glass-card px-5 py-3 rounded-xl flex items-center gap-3.5 border border-white/10 shadow-sm">
+          <div className="w-9 h-9 bg-cyan-950/20 border border-cyan-500/20 text-cyan-400 rounded-lg flex items-center justify-center shadow-sm">
+            <IconStethoscope size={18} />
+          </div>
+          <div>
+            <span className="text-xl font-black text-white block leading-tight">{doctors.length}</span>
+            <span className="text-[9px] text-slate-500 font-bold uppercase tracking-widest block">Total Doctors</span>
+          </div>
+        </div>
       </div>
 
-      <div className="relative z-10">
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="mb-8"
-        >
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-            <div>
-              <div className="flex items-center gap-3 mb-2">
-                <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/30">
-                  <IconStethoscope size={20} className="text-white" />
-                </div>
-                <span className="text-sm font-medium text-blue-700 bg-blue-100 px-3 py-1 rounded-full">
-                  👨‍⚕️ Doctor Directory
-                </span>
-              </div>
-              <h1 className="text-2xl md:text-4xl font-bold bg-gradient-to-r from-gray-900 via-blue-800 to-indigo-700 bg-clip-text text-transparent">
-                Our Doctors
-              </h1>
-              <p className="text-gray-600 mt-1">
-                Find and book appointments with our expert doctors
-              </p>
-            </div>
-
-            {role === "ADMIN" && (
-              <motion.button
-                onClick={() => {
-                  setShowForm(true);
-                  setEditId(null);
-                  setFormData({ name: "", specialization: "", experience: "", education: "" });
-                }}
-                whileHover={{ scale: 1.02, boxShadow: "0 20px 40px rgba(59, 130, 246, 0.3)" }}
-                whileTap={{ scale: 0.98 }}
-                className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white px-6 py-3 rounded-xl font-semibold shadow-lg shadow-blue-500/30 transition-all duration-300 flex items-center gap-2"
-              >
-                <IconUserPlus size={20} />
-                Add Doctor
-              </motion.button>
-            )}
+      {/* Doctor Cards Grid */}
+      {loading ? (
+        <div className="flex flex-col items-center justify-center py-20">
+          <div className="hms-spinner mb-3"></div>
+          <p className="font-bold uppercase tracking-widest text-[9px] text-slate-500">Accessing Directory...</p>
+        </div>
+      ) : filteredDoctors.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-20">
+          <div className="w-16 h-16 bg-white/2 rounded-full flex items-center justify-center mb-4 border border-white/5">
+            <IconStethoscope size={30} className="text-slate-500" />
           </div>
-        </motion.div>
-
-        {/* Search & Stats Bar */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="mb-8 flex flex-col md:flex-row gap-4"
-        >
-          {/* Search */}
-          <div className="flex-1">
-            <motion.div whileHover={{ scale: 1.01 }} className="relative">
-              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
-                <IconSearch size={20} />
-              </span>
-              <input
-                type="text"
-                placeholder="Search doctors by name or specialization..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-12 pr-4 py-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all duration-300 bg-white"
-              />
-            </motion.div>
-          </div>
-
-          {/* Stats */}
-          <div className="flex gap-3">
-            <motion.div
-              whileHover={{ scale: 1.02 }}
-              className="bg-white border border-gray-100 px-5 py-3 rounded-xl shadow-lg shadow-blue-500/10 flex items-center gap-3"
+          <p className="text-xs text-slate-505 font-bold uppercase tracking-wider">No doctors found</p>
+          {role === "ADMIN" && (
+            <button
+              onClick={() => setShowForm(true)}
+              className="mt-4 text-cyan-400 font-bold hover:text-cyan-300 text-xs uppercase tracking-wider"
             >
-              <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center">
-                <IconStethoscope size={18} className="text-white" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold text-gray-900">{doctors.length}</p>
-                <p className="text-xs text-gray-500">Total Doctors</p>
-              </div>
-            </motion.div>
-          </div>
-        </motion.div>
-
-        {/* Doctor Cards */}
-        {loading ? (
-          <div className="flex flex-col items-center justify-center py-20">
+              + Add Doctor Record
+            </button>
+          )}
+        </div>
+      ) : (
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+        >
+          {filteredDoctors.map((doc) => (
             <motion.div
-              animate={{ rotate: 360 }}
-              transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-              className="text-5xl"
+              key={doc.id}
+              variants={cardVariants}
+              className="glass-card border border-white/10 rounded-3xl overflow-hidden group flex flex-col"
             >
-              ⏳
-            </motion.div>
-            <p className="text-gray-500 mt-4">Loading doctors...</p>
-          </div>
-        ) : filteredDoctors.length === 0 ? (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="flex flex-col items-center justify-center py-20"
-          >
-            <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-              <IconStethoscope size={40} className="text-gray-400" />
-            </div>
-            <p className="text-gray-500 text-lg">No doctors found</p>
-            {role === "ADMIN" && (
-              <motion.button
-                onClick={() => setShowForm(true)}
-                whileHover={{ scale: 1.05 }}
-                className="mt-4 text-blue-600 font-medium hover:text-indigo-600"
-              >
-                + Add your first doctor
-              </motion.button>
-            )}
-          </motion.div>
-        ) : (
-          <motion.div
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
-          >
-            {filteredDoctors.map((doc) => (
-              <motion.div
-                key={doc.id}
-                variants={cardVariants}
-                whileHover={{ y: -8, boxShadow: "0 25px 50px rgba(59, 130, 246, 0.15)" }}
-                className="bg-white border border-gray-100 rounded-2xl shadow-xl shadow-blue-500/10 overflow-hidden group"
-              >
-                {/* Card Header with Gradient */}
-                <div className="h-24 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 relative overflow-hidden">
-                  <div className="absolute inset-0 overflow-hidden">
-                    <motion.div
-                      animate={{ x: [0, 50, 0], opacity: [0.1, 0.2, 0.1] }}
-                      transition={{ duration: 5, repeat: Infinity }}
-                      className="absolute top-0 left-0 w-32 h-32 bg-white/10 rounded-full blur-2xl"
-                    />
-                  </div>
-                </div>
+              {/* Minimal Card Header with thin outline border */}
+              <div className="h-16 bg-white/2 border-b border-white/5 relative overflow-hidden" />
 
-                {/* Avatar */}
-                <div className="flex justify-center -mt-12 relative z-10">
-                  <motion.div
-                    whileHover={{ scale: 1.1 }}
-                    className="w-24 h-24 bg-gradient-to-br from-blue-500 to-indigo-600 text-white flex items-center justify-center rounded-2xl text-3xl font-bold shadow-xl shadow-blue-500/30 border-4 border-white"
-                  >
-                    {doc.name?.charAt(0)?.toUpperCase()}
-                  </motion.div>
+              {/* Avatar Icon */}
+              <div className="flex justify-center -mt-10 relative z-10">
+                <div className="w-20 h-20 bg-slate-900 border-4 border-slate-950 rounded-2xl flex items-center justify-center text-cyan-400 font-black text-2xl shadow-xl border border-cyan-500/20 bg-cyan-950/10">
+                  {doc.name?.charAt(0)?.toUpperCase()}
                 </div>
+              </div>
 
-                {/* Content */}
-                <div className="p-6 pt-4 text-center">
-                  <h3 className="text-xl font-bold text-gray-900 mb-1">
+              {/* Content Panel */}
+              <div className="p-6 pt-4 text-center flex-1 flex flex-col justify-between">
+                <div className="space-y-1 mb-4">
+                  <h3 className="text-lg font-black text-white">
                     Dr. {doc.name}
                   </h3>
-                  <p className="text-blue-600 font-medium mb-4">
+                  <p className="text-cyan-400 font-bold uppercase tracking-widest text-[10px]">
                     {doc.specialization}
                   </p>
-
-                  {/* Info Tags */}
-                  <div className="flex flex-wrap justify-center gap-2 mb-6">
-                    <span className="flex items-center gap-1.5 bg-blue-50 text-blue-700 px-3 py-1.5 rounded-lg text-sm">
-                      <IconSchool size={16} />
-                      {doc.education}
-                    </span>
-                    <span className="flex items-center gap-1.5 bg-indigo-50 text-indigo-700 px-3 py-1.5 rounded-lg text-sm">
-                      <IconBriefcase size={16} />
-                      {doc.experience}
-                    </span>
-                  </div>
-
-                  {/* Actions */}
-                  <div className="flex flex-col gap-3">
-                    {/* Book Button - All Roles */}
-                    <motion.button
-                      onClick={() => handleBook(doc)}
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      className="w-full bg-gradient-to-r from-green-500 to-emerald-600 text-white py-3 rounded-xl font-semibold shadow-lg shadow-green-500/20 flex items-center justify-center gap-2"
-                    >
-                      <IconCalendarPlus size={20} />
-                      Book Appointment
-                    </motion.button>
-
-                    {/* Admin Actions */}
-                    {role === "ADMIN" && (
-                      <div className="flex gap-2">
-                        <motion.button
-                          onClick={() => handleEdit(doc)}
-                          whileHover={{ scale: 1.05 }}
-                          whileTap={{ scale: 0.95 }}
-                          className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-blue-50 text-blue-600 rounded-xl font-medium hover:bg-blue-100 transition-colors"
-                        >
-                          <IconEdit size={18} />
-                          Edit
-                        </motion.button>
-                        <motion.button
-                          onClick={() => handleDelete(doc.id)}
-                          whileHover={{ scale: 1.05 }}
-                          whileTap={{ scale: 0.95 }}
-                          className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-red-50 text-red-600 rounded-xl font-medium hover:bg-red-100 transition-colors"
-                        >
-                          <IconTrash size={18} />
-                          Delete
-                        </motion.button>
-                      </div>
-                    )}
-                  </div>
                 </div>
-              </motion.div>
-            ))}
-          </motion.div>
-        )}
-      </div>
+
+                {/* Attributes Details Tags */}
+                <div className="flex flex-wrap justify-center gap-2 mb-6">
+                  <span className="flex items-center gap-1.5 bg-white/2 border border-white/5 text-slate-300 px-3 py-1.5 rounded-lg text-xs font-semibold">
+                    <IconSchool size={14} className="text-cyan-400" />
+                    {doc.education || "MD"}
+                  </span>
+                  <span className="flex items-center gap-1.5 bg-white/2 border border-white/5 text-slate-300 px-3 py-1.5 rounded-lg text-xs font-semibold">
+                    <IconBriefcase size={14} className="text-cyan-400" />
+                    {doc.experience || "5+ Yrs"}
+                  </span>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex flex-col gap-3">
+                  <button
+                    onClick={() => handleBook(doc)}
+                    className="w-full btn-teal-outline py-3 rounded-xl font-bold uppercase tracking-wider text-xs shadow-md flex items-center justify-center gap-2"
+                  >
+                    <IconCalendarPlus size={18} />
+                    Book Appointment
+                  </button>
+
+                  {role === "ADMIN" && (
+                    <div className="flex gap-2 pt-1.5">
+                      <button
+                        onClick={() => handleEdit(doc)}
+                        className="flex-1 flex items-center justify-center gap-1.5 py-2.5 bg-cyan-950/20 text-cyan-400 rounded-xl font-bold text-xs uppercase hover:bg-cyan-950/40 border border-cyan-500/20 transition-colors"
+                      >
+                        <IconEdit size={16} />
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => handleDelete(doc.id)}
+                        className="flex-1 flex items-center justify-center gap-1.5 py-2.5 bg-rose-950/20 text-rose-455 rounded-xl font-bold text-xs uppercase hover:bg-rose-950/40 border border-rose-500/20 transition-colors"
+                      >
+                        <IconTrash size={16} />
+                        Delete
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </motion.div>
+          ))}
+        </motion.div>
+      )}
 
       {/* Add/Edit Form Modal */}
       <AnimatePresence>
         {showForm && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+          <div
+            className="fixed inset-0 bg-slate-950/60 backdrop-blur-md flex items-center justify-center z-50 p-4"
             onClick={() => setShowForm(false)}
           >
             <motion.div
-              initial={{ opacity: 0, scale: 0.9, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              transition={{ duration: 0.3 }}
-              className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6"
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              transition={{ duration: 0.2 }}
+              className="glass-card rounded-3xl w-full max-w-sm p-6 border border-white/10 text-slate-200"
               onClick={(e) => e.stopPropagation()}
             >
               {/* Modal Header */}
               <div className="flex items-center gap-3 mb-6">
-                <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
-                  <IconStethoscope size={20} className="text-white" />
+                <div className="w-10 h-10 border border-cyan-500/20 rounded-xl flex items-center justify-center bg-cyan-950/10">
+                  <IconStethoscope size={20} className="text-cyan-400" />
                 </div>
                 <div>
-                  <h2 className="text-xl font-bold text-gray-900">
+                  <h2 className="text-base font-bold text-white uppercase tracking-wider">
                     {editId ? "Edit Doctor" : "Add New Doctor"}
                   </h2>
-                  <p className="text-sm text-gray-500">Fill in the doctor details</p>
+                  <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-0.5">Fill in the specialist details</p>
                 </div>
               </div>
 
               {/* Form Fields */}
               <div className="space-y-4">
                 <div>
-                  <label className="text-sm font-semibold text-gray-700 mb-2 block">Name</label>
+                  <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-1.5">Name</label>
                   <input
                     name="name"
                     value={formData.name}
                     onChange={handleChange}
                     placeholder="Dr. John Doe"
-                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all duration-300 bg-gray-50 focus:bg-white"
+                    className="w-full px-4 py-3 glass-input rounded-xl text-xs outline-none"
+                    required
                   />
                 </div>
                 <div>
-                  <label className="text-sm font-semibold text-gray-700 mb-2 block">Specialization</label>
+                  <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-1.5">Specialization</label>
                   <input
                     name="specialization"
                     value={formData.specialization}
                     onChange={handleChange}
                     placeholder="Cardiologist"
-                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all duration-300 bg-gray-50 focus:bg-white"
+                    className="w-full px-4 py-3 glass-input rounded-xl text-xs outline-none"
+                    required
                   />
                 </div>
                 <div>
-                  <label className="text-sm font-semibold text-gray-700 mb-2 block">Experience</label>
+                  <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-1.5">Experience</label>
                   <input
                     name="experience"
                     value={formData.experience}
                     onChange={handleChange}
                     placeholder="10+ years"
-                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all duration-300 bg-gray-50 focus:bg-white"
+                    className="w-full px-4 py-3 glass-input rounded-xl text-xs outline-none"
                   />
                 </div>
                 <div>
-                  <label className="text-sm font-semibold text-gray-700 mb-2 block">Education</label>
+                  <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-1.5">Education</label>
                   <input
                     name="education"
                     value={formData.education}
                     onChange={handleChange}
                     placeholder="MBBS, MD"
-                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all duration-300 bg-gray-50 focus:bg-white"
+                    className="w-full px-4 py-3 glass-input rounded-xl text-xs outline-none"
                   />
                 </div>
               </div>
 
               {/* Modal Actions */}
               <div className="flex gap-3 mt-6">
-                <motion.button
+                <button
                   onClick={() => setShowForm(false)}
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  className="flex-1 py-3 border-2 border-gray-200 text-gray-600 rounded-xl font-semibold hover:bg-gray-50 transition-colors"
+                  className="flex-1 py-3 bg-white/2 text-slate-400 rounded-xl font-bold text-xs uppercase hover:bg-white/5 border border-transparent transition-colors tracking-wider"
                 >
                   Cancel
-                </motion.button>
-                <motion.button
+                </button>
+                <button
                   onClick={handleSubmit}
-                  whileHover={{ scale: 1.02, boxShadow: "0 10px 30px rgba(59, 130, 246, 0.3)" }}
-                  whileTap={{ scale: 0.98 }}
-                  className="flex-1 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white py-3 rounded-xl font-semibold shadow-lg shadow-blue-500/30"
+                  className="flex-1 btn-teal-outline py-3 rounded-xl font-bold text-xs uppercase tracking-wider"
                 >
                   {editId ? "Update Doctor" : "Add Doctor"}
-                </motion.button>
+                </button>
               </div>
             </motion.div>
-          </motion.div>
+          </div>
         )}
       </AnimatePresence>
     </div>

@@ -1,9 +1,8 @@
 /* eslint-disable no-unused-vars */
-import { memo, useMemo } from "react";
+import { memo, useMemo, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../features/authSlice";
-
 import {
   IconLayoutDashboard,
   IconStethoscopeOff,
@@ -16,200 +15,98 @@ import {
   IconFileInvoice,
   IconMedicineSyrup,
 } from "@tabler/icons-react";
-
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 
 function Sidebar({ onClose }) {
-
-  const { role } = useSelector((state) => state.auth);
-
+  const { role, user } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [showProfile, setShowProfile] = useState(false);
 
-  // LOGOUT FUNCTION
   const handleLogout = () => {
-
     dispatch(logout());
-
     navigate("/");
-
+    if (onClose) onClose();
   };
 
-  // FLOATING BG ANIMATION
-  const floatingAnimation = useMemo(() => ({
-    y: [-8, 8, -8],
-    transition: {
-      duration: 4,
-      repeat: Infinity,
-      ease: "easeInOut",
-    },
-  }), []);
-
-  // NAV ITEM ANIMATION
-  const navItemVariants = useMemo(() => ({
-    hidden: { opacity: 0, x: -20 },
-
-    visible: (i) => ({
-      opacity: 1,
-      x: 0,
-
-      transition: {
-        delay: 0.3 + i * 0.1,
-        duration: 0.4,
-      },
-    }),
-  }), []);
-
-  // NAV ITEM COMPONENT
   const NavItem = ({ to, icon: Icon, label }) => (
-
-    <div>
-
-      <NavLink
-        to={to}
-        className={({ isActive }) =>
-          `group relative flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all duration-300 ${
-            isActive
-              ? "bg-white/20 text-white shadow-lg backdrop-blur-sm"
-              : "text-blue-100 hover:bg-white/10 hover:text-white"
-          }`
-        }
-      >
-
-        {({ isActive }) => (
-          <>
-
-            <motion.div
-              whileHover={{ scale: 1.1, rotate: 5 }}
-              transition={{ duration: 0.2 }}
-              className={`p-2 rounded-lg ${
-                isActive
-                  ? "bg-white/20"
-                  : "bg-white/5 group-hover:bg-white/10"
-              }`}
-            >
-              <Icon size={20} />
-            </motion.div>
-
-            <span className="font-medium">
-              {label}
-            </span>
-
-            {isActive && (
-
-              <motion.div
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                className="ml-auto"
-              >
-                <IconChevronRight size={16} />
-              </motion.div>
-
-            )}
-
-            {!isActive && (
-
-              <motion.div
-                initial={{ width: 0 }}
-                whileHover={{ width: "100%" }}
-                className="absolute bottom-0 left-0 h-0.5 bg-white/50 rounded-full"
-              />
-
-            )}
-
-          </>
-        )}
-
-      </NavLink>
-
-    </div>
-  );
-
-  let navIndex = 0;
-
-  return (
-
-    <motion.div
-      initial={{ x: -100, opacity: 0 }}
-      animate={{ x: 0, opacity: 1 }}
-      transition={{ duration: 0.6, ease: "easeOut" }}
-      className="relative w-72 h-screen bg-linear-to-br from-blue-600 via-indigo-700 to-purple-800 text-white flex flex-col p-5 shadow-2xl"
+    <NavLink
+      to={to}
+      onClick={onClose}
+      className={({ isActive }) =>
+        `group relative flex items-center gap-3.5 px-4.5 py-3 rounded-xl transition-all duration-350 border ${
+          isActive
+            ? "active-nav-outline text-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.12)]"
+            : "border-transparent text-slate-400 hover:text-slate-100 hover:bg-white/5"
+        }`
+      }
     >
-
-      {/* Animated Background */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-
-        <motion.div
-          animate={floatingAnimation}
-          className="absolute -top-10 -left-10 w-40 h-40 bg-white/10 rounded-full blur-3xl"
-        />
-
-        <motion.div
-          animate={{ ...floatingAnimation, y: [10, -10, 10] }}
-          className="absolute top-1/3 -right-10 w-32 h-32 bg-blue-400/10 rounded-full blur-2xl"
-        />
-
-        <motion.div
-          animate={{ ...floatingAnimation, y: [-5, 15, -5] }}
-          className="absolute bottom-20 left-10 w-24 h-24 bg-purple-400/10 rounded-full blur-2xl"
-        />
-
-      </div>
-
-      {/* TOP */}
-      <div className="relative z-10 flex flex-col flex-1 min-h-0">
-
-        {/* LOGO */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2, duration: 0.5 }}
-          className="mb-8"
-        >
-
-          <div className="flex items-center gap-3 mb-2">
-
-            <motion.div
-              whileHover={{ scale: 1.1, rotate: 10 }}
-              className="w-12 h-12 bg-white/10 backdrop-blur-sm rounded-xl flex items-center justify-center shadow-lg"
-            >
-              <span className="text-2xl">🏥</span>
-            </motion.div>
-
-            <div>
-              <h2 className="text-xl font-bold text-white">
-                HMS
-              </h2>
-
-              <p className="text-xs text-blue-200">
-                Healthcare System
-              </p>
-            </div>
-
+      {({ isActive }) => (
+        <>
+          <div
+            className={`transition-colors ${
+              isActive
+                ? "text-cyan-400 animate-pulse"
+                : "text-slate-400 group-hover:text-slate-100"
+            }`}
+          >
+            <Icon size={18} />
           </div>
 
-          <motion.div
-            initial={{ scaleX: 0 }}
-            animate={{ scaleX: 1 }}
-            transition={{ delay: 0.5, duration: 0.6 }}
-            className="h-px bg-linear-to-r from-transparent via-white/30 to-transparent"
-          />
+          <span className="font-bold text-xs tracking-wider uppercase">
+            {label}
+          </span>
 
-        </motion.div>
+          {isActive && (
+            <motion.div
+              layoutId="sidebarActiveIndicator"
+              className="ml-auto text-cyan-400"
+              transition={{ type: "spring", stiffness: 300, damping: 30 }}
+            >
+              <IconChevronRight size={14} className="stroke-[3]" />
+            </motion.div>
+          )}
+        </>
+      )}
+    </NavLink>
+  );
 
-        {/* MENU LABEL */}
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.4 }}
-          className="text-xs uppercase tracking-wider text-blue-200/70 mb-4 px-2 font-medium"
-        >
-          Menu
-        </motion.p>
+  return (
+    <div className="relative w-75 h-screen glass-sidebar text-slate-200 flex flex-col p-5 shadow-2xl overflow-hidden select-none shrink-0 z-30">
+      
+      {/* Dynamic backdrop glows peaking through the glass sidebar */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-20">
+        <div className="absolute -top-12 -left-12 w-48 h-48 bg-cyan-500 rounded-full blur-3xl" />
+        <div className="absolute bottom-20 -right-12 w-36 h-36 bg-teal-500 rounded-full blur-3xl" />
+      </div>
 
-        {/* NAVIGATION */}
-        <nav className="relative space-y-2 flex-1 pr-2 overflow-y-auto sidebar-scrollbar">
+      {/* Sidebar Content */}
+      <div className="relative z-10 flex flex-col flex-1 min-h-0">
+        {/* Header Branding */}
+        <div className="mb-6 pt-1">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-10 h-10 border border-cyan-500/30 rounded-xl flex items-center justify-center shadow-lg shadow-cyan-500/10">
+              <span className="text-xl">🏥</span>
+            </div>
+            <div>
+              <h2 className="text-sm font-black tracking-widest uppercase teal-gradient-text">
+                HMS
+              </h2>
+              <p className="text-[9px] text-cyan-400 font-bold uppercase tracking-widest mt-0.5">
+                Hospital Node
+              </p>
+            </div>
+          </div>
+          <div className="h-px bg-white/10" />
+        </div>
 
+        <p className="text-[10px] uppercase tracking-widest text-slate-500 mb-3.5 px-2.5 font-bold">
+          Navigation
+        </p>
+
+        {/* Navigation items list */}
+        <nav className="space-y-1.5 flex-1 pr-1 overflow-y-auto sidebar-scrollbar">
+          
           <NavItem
             to="/dashboard"
             icon={IconLayoutDashboard}
@@ -219,160 +116,174 @@ function Sidebar({ onClose }) {
           {/* ADMIN */}
           {role === "ADMIN" && (
             <>
-
               <NavItem
                 to="/availability"
                 icon={IconStethoscopeOff}
-                label="Doctor Availability"
+                label="Doc Availability"
               />
-
               <NavItem
                 to="/patients"
                 icon={IconUsers}
-                label="Patients"
+                label="Patients Registry"
               />
-
               <NavItem
                 to="/doctors"
                 icon={IconStethoscope}
-                label="Doctors"
+                label="Doctors Directory"
               />
-
               <NavItem
                 to="/billing"
                 icon={IconFileInvoice}
-                label="Billing"
+                label="Billing Ledger"
               />
-
               <NavItem
                 to="/pharmacy"
                 icon={IconMedicineSyrup}
-                label="Pharmacy"
+                label="Pharmacy Stocks"
               />
-
             </>
           )}
 
           {/* PATIENT */}
           {role === "PATIENT" && (
             <>
-
               <NavItem
                 to="/doctors"
                 icon={IconStethoscope}
-                label="Doctors"
+                label="Find Doctors"
               />
-
               <NavItem
                 to="/billing"
                 icon={IconFileInvoice}
                 label="My Invoices"
               />
-
+              <NavItem
+                to="/appointments"
+                icon={IconCalendar}
+                label="My Bookings"
+              />
             </>
           )}
 
           {/* DOCTOR */}
           {role === "DOCTOR" && (
-
             <NavItem
               to="/appointments"
               icon={IconCalendar}
-              label="My Appointments"
+              label="My Schedule"
             />
-
           )}
 
-          {/* COMMON */}
-          <NavItem
-            to="/appointments"
-            icon={IconCalendar}
-            label="Appointments"
-          />
+          {/* Common fallback */}
+          {role !== "PATIENT" && (
+            <NavItem
+              to="/appointments"
+              icon={IconCalendar}
+              label="Appointments"
+            />
+          )}
 
         </nav>
       </div>
 
-      {/* BOTTOM */}
-      <motion.div
-  initial={{ opacity: 0, y: 20 }}
-  animate={{ opacity: 1, y: 0 }}
-  transition={{ delay: 0.8, duration: 0.5 }}
-   className="relative z-10 pt-4 mt-4 border-t border-white/10"
->
-
-        {/* DIVIDER */}
-        <div className="h-px bg-linear-to-r from-transparent via-white/20 to-transparent mb-4" />
-
-        {/* USER CARD */}
-        <motion.div
-          whileHover={{ scale: 1.02 }}
-          className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/10 mb-4"
-        >
-
-          <div className="flex items-center gap-3">
-
-            <motion.div
-              whileHover={{ scale: 1.1 }}
-              className="relative"
-            >
-
-              <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center shadow-lg">
-                <IconUser size={20} />
-              </div>
-
-              <motion.div
-                animate={{ scale: [1, 1.2, 1] }}
-                transition={{ duration: 2, repeat: Infinity }}
-                className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-400 rounded-full border-2 border-indigo-500"
-              />
-
-            </motion.div>
-
-            <div className="flex-1">
-
-              <p className="text-sm font-semibold text-white">
-                Darshan
-              </p>
-
-              <p className="text-xs text-blue-200 flex items-center gap-1">
-
-                <span className="w-1.5 h-1.5 rounded-full bg-green-400"></span>
-
-                {role}
-
-              </p>
-
-            </div>
-
-          </div>
-
-        </motion.div>
-
-        {/* LOGOUT BUTTON */}
+      {/* User Section at bottom */}
+      <div className="relative z-10 pt-4 border-t border-white/10">
+        
+        {/* Clickable Profile Card */}
         <motion.button
-          onClick={handleLogout}
-          whileHover={{ scale: 1.02, x: 5 }}
+          whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
-          className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-blue-200 hover:text-white hover:bg-white/10 transition-all duration-300 group"
+          onClick={() => setShowProfile(true)}
+          className="w-full bg-white/5 border border-white/5 rounded-2xl p-3.5 mb-3.5 cursor-pointer text-left block"
         >
-
-          <motion.div
-            whileHover={{ rotate: -10 }}
-            className="p-2 rounded-lg bg-white/5 group-hover:bg-white/10 transition-colors"
-          >
-            <IconLogout size={18} />
-          </motion.div>
-
-          <span className="font-medium">
-            Logout
-          </span>
-
+          <div className="flex items-center gap-3">
+            <div className="relative shrink-0">
+              <div className="w-8 h-8 rounded-lg border border-cyan-500/20 text-cyan-400 flex items-center justify-center font-bold text-xs bg-cyan-950/20 shadow-sm">
+                <IconUser size={15} />
+              </div>
+              <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-cyan-400 rounded-full border-2 border-slate-950 shadow-[0_0_8px_rgba(6,182,212,0.6)] animate-pulse" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-xs font-bold text-slate-100 truncate">Darshan</p>
+              <p className="text-[9px] text-cyan-400 font-bold uppercase tracking-wider mt-0.5">{role}</p>
+            </div>
+          </div>
         </motion.button>
 
-      </motion.div>
+        {/* Logout trigger */}
+        <button
+          onClick={handleLogout}
+          className="w-full flex items-center gap-3 px-4.5 py-3 rounded-xl text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 transition-all duration-300 group border border-transparent"
+        >
+          <IconLogout size={16} className="text-slate-400 group-hover:text-rose-400 transition-colors" />
+          <span className="font-bold text-xs tracking-wider uppercase">Logout Session</span>
+        </button>
 
-    </motion.div>
+      </div>
+
+      {/* Glassmorphic User Profile Modal */}
+      <AnimatePresence>
+        {showProfile && (
+          <div 
+            className="fixed inset-0 bg-slate-955/60 backdrop-blur-md flex items-center justify-center z-50 p-4"
+            onClick={() => setShowProfile(false)}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              transition={{ duration: 0.2 }}
+              className="glass-card rounded-3xl w-full max-w-sm p-6 border border-white/10 text-slate-200"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Modal Header */}
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-12 h-12 border border-cyan-500/20 rounded-xl flex items-center justify-center bg-cyan-950/10 text-cyan-400 font-bold text-lg shadow-sm">
+                  👤
+                </div>
+                <div>
+                  <h2 className="text-base font-bold text-white uppercase tracking-wider">User Profile</h2>
+                  <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-0.5">HMS Registry ID</p>
+                </div>
+              </div>
+
+              {/* Profile Info */}
+              <div className="space-y-4 text-xs">
+                <div className="border-b border-white/5 pb-2.5">
+                  <span className="text-[9px] font-bold text-slate-500 uppercase tracking-widest block">Account Name</span>
+                  <span className="font-extrabold text-white text-sm mt-0.5 block">Darshan</span>
+                </div>
+                <div className="border-b border-white/5 pb-2.5">
+                  <span className="text-[9px] font-bold text-slate-500 uppercase tracking-widest block">Email Address</span>
+                  <span className="font-extrabold text-slate-300 text-xs mt-0.5 block">{user?.email || "admin@gmail.com"}</span>
+                </div>
+                <div className="border-b border-white/5 pb-2.5">
+                  <span className="text-[9px] font-bold text-slate-500 uppercase tracking-widest block">Assigned Role</span>
+                  <span className="font-bold text-cyan-400 text-[10px] uppercase tracking-wider mt-0.5 inline-block px-2 py-0.5 rounded bg-cyan-950/20 border border-cyan-500/20">
+                    {role}
+                  </span>
+                </div>
+                <div>
+                  <span className="text-[9px] font-bold text-slate-500 uppercase tracking-widest block">Permissions Status</span>
+                  <span className="font-bold text-emerald-450 text-[10px] uppercase tracking-wider mt-0.5 inline-block px-2 py-0.5 rounded bg-emerald-950/20 border border-emerald-500/20">
+                    Full Administrator Access
+                  </span>
+                </div>
+              </div>
+
+              {/* Close Button */}
+              <button
+                onClick={() => setShowProfile(false)}
+                className="w-full mt-6 btn-teal-outline py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider"
+              >
+                Close Profile
+              </button>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+    </div>
   );
 }
 

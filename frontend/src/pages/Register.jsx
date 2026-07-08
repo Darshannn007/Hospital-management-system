@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { register } from "../services/authServices";
 import { motion, AnimatePresence } from "framer-motion";
@@ -11,6 +11,18 @@ function Register() {
   const [role, setRole] = useState("PATIENT");
   const [isLoading, setIsLoading] = useState(false);
   const [focusedField, setFocusedField] = useState(null);
+
+  useEffect(() => {
+    // Force dark theme on register page
+    document.documentElement.classList.add("dark");
+
+    return () => {
+      const savedTheme = localStorage.getItem("theme") || "dark";
+      if (savedTheme === "light") {
+        document.documentElement.classList.remove("dark");
+      }
+    };
+  }, []);
 
   const [formData, setFormData] = useState({
     email: "",
@@ -50,9 +62,9 @@ function Register() {
         name: formData.name,
         age: role === "PATIENT" ? Number(formData.age) : null,
         gender: role === "PATIENT" ? formData.gender : null,
-        phone:formData.phone,
+        phone: formData.phone,
         education: role === "DOCTOR" ? formData.education : null,
-        specialization: role === "DOCTOR" ? formData.specialization:null,
+        specialization: role === "DOCTOR" ? formData.specialization : null,
         experience: role === "DOCTOR" ? formData.experience : null,
       });
 
@@ -66,74 +78,45 @@ function Register() {
     }
   };
 
+  // Animations configuration
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.1,
-        delayChildren: 0.2,
+        staggerChildren: 0.08,
+        delayChildren: 0.05,
       },
     },
   };
 
   const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
+    hidden: { opacity: 0, y: 12 },
     visible: {
       opacity: 1,
       y: 0,
-      transition: { duration: 0.5, ease: "easeOut" },
+      transition: { duration: 0.4, ease: "easeOut" },
     },
   };
-
-  const floatingAnimation = {
-    y: [-10, 10, -10],
-    transition: {
-      duration: 4,
-      repeat: Infinity,
-      ease: "easeInOut",
-    },
-  };
-
-  const inputClass = (fieldName) =>
-    `w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all duration-300 bg-gray-50 focus:bg-white ${
-      focusedField === fieldName ? "scale-[1.02]" : ""
-    }`;
 
   const benefits = [
-    { icon: "🏥", text: "Access quality healthcare" },
-    { icon: "📋", text: "Manage appointments easily" },
-    { icon: "💊", text: "Track prescriptions" },
-    { icon: "🔒", text: "Secure & private data" },
+    { icon: "🏥", text: "Direct portal access to your health stats" },
+    { icon: "📅", text: "Instant appointment booking with specialists" },
+    { icon: "💊", text: "Download digital prescriptions & invoice receipts" },
+    { icon: "🔒", text: "Fully secure HIPAA-compliant records" },
   ];
 
   return (
-    <div className="min-h-dvh w-full flex flex-col lg:flex-row overflow-x-hidden">
-      {/* LEFT SIDE - Animated Background (Hidden on mobile) */}
-      <motion.div
-        initial={{ x: -100, opacity: 0 }}
-        animate={{ x: 0, opacity: 1 }}
-        transition={{ duration: 0.8, ease: "easeOut" }}
-        className="hidden lg:flex relative w-full lg:w-1/2 bg-linear-to-br from-indigo-600 via-purple-700 to-blue-800 text-white flex-col justify-center px-8 lg:px-16 overflow-hidden"
-      >
-        {/* Animated Background Elements */}
-        <div className="absolute inset-0 overflow-hidden">
-          <motion.div
-            animate={floatingAnimation}
-            className="absolute top-20 left-10 w-32 h-32 bg-white/10 rounded-full blur-xl"
-          />
-          <motion.div
-            animate={{ ...floatingAnimation, y: [10, -10, 10] }}
-            className="absolute bottom-32 right-20 w-48 h-48 bg-purple-400/10 rounded-full blur-2xl"
-          />
-          <motion.div
-            animate={{ ...floatingAnimation, y: [-5, 15, -5] }}
-            className="absolute top-1/2 left-1/3 w-24 h-24 bg-blue-400/10 rounded-full blur-xl"
-          />
-          <motion.div
-            animate={{ ...floatingAnimation, y: [15, -5, 15] }}
-            className="absolute top-1/4 right-10 w-20 h-20 bg-indigo-300/10 rounded-full blur-lg"
-          />
+    <div className="h-screen w-full flex flex-col lg:flex-row bg-transparent overflow-hidden text-slate-200 select-none">
+      
+      {/* LEFT SIDE - Info Panel (Hidden on mobile/tablet) */}
+      <div className="hidden lg:flex relative w-1/2 h-full flex-col justify-center px-12 xl:px-20 overflow-hidden border-r border-white/5 shrink-0">
+        
+        {/* Abstract Glowing Aura Background */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-40">
+          <div className="absolute -top-24 -left-24 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl animate-blob-float" />
+          <div className="absolute top-1/3 -right-24 w-80 h-80 bg-indigo-500/10 rounded-full blur-3xl animate-blob-float [animation-delay:2s]" />
+          <div className="absolute -bottom-24 left-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl animate-blob-float [animation-delay:4s]" />
         </div>
 
         {/* Content */}
@@ -141,242 +124,210 @@ function Register() {
           variants={containerVariants}
           initial="hidden"
           animate="visible"
-          className="relative z-10"
+          className="relative z-10 space-y-6"
         >
           {/* Logo/Badge */}
           <motion.div
             variants={itemVariants}
-            className="mb-6 inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full"
+            className="inline-flex items-center gap-3 bg-white/3 backdrop-blur-md px-4 py-2 rounded-full border border-white/10 shadow-sm w-fit"
           >
-            <span className="text-2xl">🏥</span>
-            <span className="text-sm font-medium tracking-wide">HMS v2.0</span>
+            <span className="text-lg">🏥</span>
+            <span className="text-[10px] font-black tracking-widest uppercase text-cyan-400">HMS v2.0</span>
           </motion.div>
 
-          <motion.h1
-            variants={itemVariants}
-            className="text-5xl font-bold mb-4 bg-linear-to-r from-white to-purple-200 bg-clip-text text-transparent"
-          >
-            Join Our Healthcare Network
-          </motion.h1>
-
-          <motion.p
-            variants={itemVariants}
-            className="text-lg mb-8 text-purple-100 font-light max-w-md"
-          >
-            Create your account and get access to comprehensive healthcare
-            management tools.
-          </motion.p>
-
-          {/* Benefits List */}
-          <div className="space-y-4">
-            {benefits.map((benefit, i) => (
-              <motion.div
-                key={benefit.text}
-                initial={{ opacity: 0, x: -30 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.6 + i * 0.1, duration: 0.5 }}
-                whileHover={{ x: 10, transition: { duration: 0.2 } }}
-                className="flex items-center gap-3 bg-white/5 backdrop-blur-sm px-4 py-3 rounded-xl w-fit cursor-default"
-              >
-                <span className="text-xl">{benefit.icon}</span>
-                <span className="text-purple-50">{benefit.text}</span>
-              </motion.div>
-            ))}
+          <div className="space-y-3">
+            <motion.h1
+              variants={itemVariants}
+              className="text-4xl xl:text-5xl font-black leading-tight text-white uppercase tracking-tight"
+            >
+              Join Our Patient & <br />
+              <span className="teal-gradient-text">Doctor Network</span>
+            </motion.h1>
+            
+            <motion.p
+              variants={itemVariants}
+              className="text-xs text-slate-400 font-medium leading-relaxed max-w-sm"
+            >
+              Create your account to start managing appointments, digital prescriptions, and inventory logs.
+            </motion.p>
           </div>
 
-          {/* Stats */}
-          <motion.div
-            variants={itemVariants}
-            className="mt-12 flex gap-8"
-          >
-            <div className="text-center">
-              <div className="text-3xl font-bold">10K+</div>
-              <div className="text-purple-200 text-sm">Active Users</div>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl font-bold">500+</div>
-              <div className="text-purple-200 text-sm">Doctors</div>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl font-bold">24/7</div>
-              <div className="text-purple-200 text-sm">Support</div>
+          {/* Benefits Grid */}
+          <motion.div variants={itemVariants} className="pt-4 space-y-3">
+            <h3 className="text-[10px] font-black uppercase tracking-widest text-cyan-455">Benefits</h3>
+            <div className="grid grid-cols-1 gap-2.5 max-w-md">
+              {benefits.map((benefit, idx) => (
+                <motion.div
+                  key={idx}
+                  whileHover={{ x: 6 }}
+                  className="flex items-center gap-4 bg-white/2 border border-white/5 px-4 py-3 rounded-2xl cursor-default transition-all duration-300"
+                >
+                  <span className="text-lg bg-white/5 p-1.5 rounded-xl border border-white/5 shrink-0">{benefit.icon}</span>
+                  <span className="text-xs font-bold text-slate-350 tracking-wide">{benefit.text}</span>
+                </motion.div>
+              ))}
             </div>
           </motion.div>
+
         </motion.div>
-      </motion.div>
+      </div>
 
-      {/* RIGHT SIDE (FORM) */}
-      <div className="w-full lg:w-1/2 min-h-dvh flex items-start lg:items-center justify-center bg-linear-to-br from-gray-50 to-gray-100 relative px-3 sm:px-4 py-4 sm:py-6 lg:px-0 lg:py-0 overflow-x-hidden">
-        {/* Brand Name */}
-        <motion.h1
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5, duration: 0.6 }}
-          className="absolute top-4 right-4 lg:top-6 lg:right-8 text-lg lg:text-2xl font-bold text-gray-300 tracking-widest select-none"
-        >
-          Darshan Desale
-        </motion.h1>
+      {/* RIGHT SIDE - Form Panel */}
+      <div className="flex-1 h-full flex items-center justify-center p-4 sm:p-6 lg:p-8 relative overflow-hidden">
+        
+        {/* Soft Background Globs */}
+        <div className="absolute top-10 right-10 w-72 h-72 bg-cyan-500/5 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-10 left-10 w-72 h-72 bg-purple-500/5 rounded-full blur-3xl pointer-events-none" />
 
-        <motion.form
-          onSubmit={handleSubmit}
-          initial={{ opacity: 0, y: 30, scale: 0.95 }}
+        {/* Register Form Card */}
+        <motion.div
+          initial={{ opacity: 0, y: 15, scale: 0.96 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
-          transition={{ duration: 0.6, delay: 0.3, ease: "easeOut" }}
-          className="bg-white p-4 sm:p-6 lg:p-8 rounded-3xl shadow-2xl shadow-purple-500/10 w-full max-w-97.5 sm:max-w-107.5 border border-gray-100 max-h-[calc(100dvh-1rem)] lg:max-h-[90vh] overflow-y-auto scrollbar-hide"
-          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+          transition={{ duration: 0.5, ease: "easeOut" }}
+          className="w-full max-w-lg glass-card p-6 rounded-3xl border border-white/10 relative z-10 max-h-[92vh] overflow-y-auto no-scrollbar"
         >
-          {/* Form Header */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.5 }}
-            className="text-center mb-5 sm:mb-6"
-          >
-            <motion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ delay: 0.6, type: "spring", stiffness: 200 }}
-              className="w-14 h-14 bg-linear-to-br from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-lg shadow-purple-500/30"
-            >
-              <span className="text-2xl">✨</span>
-            </motion.div>
-            <h2 className="text-2xl font-bold text-gray-800 mb-1">
-              Create Account
-            </h2>
-            <p className="text-gray-500 text-sm">
-              Join us and start your journey
-            </p>
-          </motion.div>
+          {/* Header */}
+          <div className="text-center mb-4">
+            <div className="w-12 h-12 border border-cyan-500/20 bg-cyan-950/20 text-cyan-400 rounded-2xl flex items-center justify-center mx-auto mb-2.5 shadow-md shrink-0">
+              <span className="text-xl">✨</span>
+            </div>
+            <h2 className="text-xl font-black text-white uppercase tracking-tight">Create Account</h2>
+            <p className="text-[11px] text-slate-400 font-bold uppercase tracking-wider mt-0.5">Get started by creating your account</p>
+          </div>
 
-          {/* Role Toggle */}
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.65 }}
-            className="mb-4 sm:mb-5"
-          >
-            <label className="text-sm font-semibold text-gray-700 mb-2 block">
-              I am a
+          {/* Role Toggle Selector */}
+          <div className="mb-4">
+            <label className="text-[9px] font-black text-slate-450 uppercase tracking-widest block mb-1.5">
+              Select Your Role
             </label>
-            <div className="flex gap-2 p-1 bg-gray-100 rounded-xl">
-              <motion.button
+            <div className="flex gap-2 p-1 bg-white/2 border border-white/5 rounded-2xl">
+              <button
                 type="button"
                 onClick={() => setRole("PATIENT")}
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                className={`flex-1 py-2.5 sm:py-3 px-3 sm:px-4 rounded-lg font-medium transition-all duration-300 flex items-center justify-center gap-2 ${
+                className={`flex-1 py-2.5 px-4 rounded-xl font-bold text-xs uppercase tracking-wider transition-all duration-300 flex items-center justify-center gap-2 border ${
                   role === "PATIENT"
-                    ? "bg-linear-to-r from-blue-500 to-indigo-600 text-white shadow-lg shadow-blue-500/30"
-                    : "text-gray-600 hover:bg-gray-200"
+                    ? "bg-cyan-950/20 text-cyan-400 border-cyan-500/20 shadow-md"
+                    : "text-slate-455 hover:text-slate-200 border-transparent"
                 }`}
               >
                 <span>🧑‍🦱</span> Patient
-              </motion.button>
+              </button>
 
-              <motion.button
+              <button
                 type="button"
                 onClick={() => setRole("DOCTOR")}
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                className={`flex-1 py-2.5 sm:py-3 px-3 sm:px-4 rounded-lg font-medium transition-all duration-300 flex items-center justify-center gap-2 ${
+                className={`flex-1 py-2.5 px-4 rounded-xl font-bold text-xs uppercase tracking-wider transition-all duration-300 flex items-center justify-center gap-2 border ${
                   role === "DOCTOR"
-                    ? "bg-linear-to-r from-purple-500 to-indigo-600 text-white shadow-lg shadow-purple-500/30"
-                    : "text-gray-600 hover:bg-gray-200"
+                    ? "bg-cyan-950/20 text-cyan-400 border-cyan-500/20 shadow-md"
+                    : "text-slate-455 hover:text-slate-200 border-transparent"
                 }`}
               >
                 <span>👨‍⚕️</span> Doctor
-              </motion.button>
+              </button>
             </div>
-          </motion.div>
+          </div>
 
-          {/* Common Fields */}
-          <div className="space-y-3 sm:space-y-4">
-            {/* Email */}
-            <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.7 }}
-            >
+          {/* Registration Form */}
+          <form onSubmit={handleSubmit} className="space-y-3.5">
+            
+            {/* Row 1: Full Name */}
+            <div>
+              <label className="text-[9px] font-black text-slate-450 uppercase tracking-widest block mb-1">
+                Full Name
+              </label>
               <div className="relative">
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
-                  ✉️
-                </span>
-                <input
-                  type="email"
-                  name="email"
-                  placeholder="Email Address"
-                  onChange={handleChange}
-                  onFocus={() => setFocusedField("email")}
-                  onBlur={() => setFocusedField(null)}
-                  className={inputClass("email")}
-                  required
-                />
-              </div>
-            </motion.div>
-
-            {/* Password Row */}
-            <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.75 }}
-              className="grid grid-cols-1 sm:grid-cols-2 gap-3"
-            >
-              <div className="relative">
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
-                  🔒
-                </span>
-                <input
-                  type="password"
-                  name="password"
-                  placeholder="Password"
-                  onChange={handleChange}
-                  onFocus={() => setFocusedField("password")}
-                  onBlur={() => setFocusedField(null)}
-                  className={inputClass("password")}
-                  required
-                />
-              </div>
-              <div className="relative">
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
-                  🔐
-                </span>
-                <input
-                  type="password"
-                  name="confirmPassword"
-                  placeholder="Confirm"
-                  onChange={handleChange}
-                  onFocus={() => setFocusedField("confirmPassword")}
-                  onBlur={() => setFocusedField(null)}
-                  className={inputClass("confirmPassword")}
-                  required
-                />
-              </div>
-            </motion.div>
-
-            {/* Full Name */}
-            <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.8 }}
-            >
-              <div className="relative">
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
-                  👤
-                </span>
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm text-slate-450">👤</span>
                 <input
                   type="text"
                   name="name"
-                  placeholder="Full Name"
+                  placeholder="John Doe"
+                  value={formData.name}
                   onChange={handleChange}
-                  onFocus={() => setFocusedField("name")}
-                  onBlur={() => setFocusedField(null)}
-                  className={inputClass("name")}
+                  className="w-full pl-11 pr-4 py-3 glass-input rounded-xl text-xs outline-none"
                   required
                 />
               </div>
-            </motion.div>
+            </div>
 
-            {/* Patient Fields */}
+            {/* Row 2: Email & Phone */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+              <div>
+                <label className="text-[9px] font-black text-slate-450 uppercase tracking-widest block mb-1">
+                  Email Address
+                </label>
+                <div className="relative">
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm text-slate-450">✉️</span>
+                  <input
+                    type="email"
+                    name="email"
+                    placeholder="name@hospital.com"
+                    value={formData.email}
+                    onChange={handleChange}
+                    className="w-full pl-11 pr-4 py-3 glass-input rounded-xl text-xs outline-none"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="text-[9px] font-black text-slate-450 uppercase tracking-widest block mb-1">
+                  Phone Number
+                </label>
+                <div className="relative">
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm text-slate-450">📱</span>
+                  <input
+                    type="text"
+                    name="phone"
+                    placeholder="+91 99999 88888"
+                    value={formData.phone}
+                    onChange={handleChange}
+                    className="w-full pl-11 pr-4 py-3 glass-input rounded-xl text-xs outline-none"
+                    required
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Row 3: Password & Confirm Password */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+              <div>
+                <label className="text-[9px] font-black text-slate-450 uppercase tracking-widest block mb-1">
+                  Password
+                </label>
+                <div className="relative">
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm text-slate-450">🔒</span>
+                  <input
+                    type="password"
+                    name="password"
+                    placeholder="••••••••"
+                    value={formData.password}
+                    onChange={handleChange}
+                    className="w-full pl-11 pr-4 py-3 glass-input rounded-xl text-xs outline-none"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="text-[9px] font-black text-slate-455 uppercase tracking-widest block mb-1">
+                  Confirm Password
+                </label>
+                <div className="relative">
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm text-slate-455">🔐</span>
+                  <input
+                    type="password"
+                    name="confirmPassword"
+                    placeholder="••••••••"
+                    value={formData.confirmPassword}
+                    onChange={handleChange}
+                    className="w-full pl-11 pr-4 py-3 glass-input rounded-xl text-xs outline-none"
+                    required
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Dynamic Role Fields */}
             <AnimatePresence mode="wait">
               {role === "PATIENT" && (
                 <motion.div
@@ -384,199 +335,153 @@ function Register() {
                   initial={{ opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: "auto" }}
                   exit={{ opacity: 0, height: 0 }}
-                  transition={{ duration: 0.3 }}
-                  className="space-y-3 sm:space-y-4"
+                  transition={{ duration: 0.2 }}
+                  className="space-y-3.5"
                 >
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div className="relative">
-                      <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
-                        🎂
-                      </span>
-                      <input
-                        type="number"
-                        name="age"
-                        placeholder="Age"
-                        onChange={handleChange}
-                        onFocus={() => setFocusedField("age")}
-                        onBlur={() => setFocusedField(null)}
-                        className={inputClass("age")}
-                        required
-                      />
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                    <div>
+                      <label className="text-[9px] font-black text-slate-450 uppercase tracking-widest block mb-1">
+                        Age
+                      </label>
+                      <div className="relative">
+                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm text-slate-450">🎂</span>
+                        <input
+                          type="number"
+                          name="age"
+                          placeholder="25"
+                          value={formData.age}
+                          onChange={handleChange}
+                          className="w-full pl-11 pr-4 py-3 glass-input rounded-xl text-xs outline-none"
+                          required
+                        />
+                      </div>
                     </div>
-                    <div className="relative">
-                      <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 z-10">
-                        ⚧️
-                      </span>
-                      <select
-                        name="gender"
-                        onChange={handleChange}
-                        onFocus={() => setFocusedField("gender")}
-                        onBlur={() => setFocusedField(null)}
-                        className={`${inputClass("gender")} appearance-none cursor-pointer`}
-                        required
-                      >
-                        <option value="">Gender</option>
-                        <option value="MALE">Male</option>
-                        <option value="FEMALE">Female</option>
-                      </select>
+
+                    <div>
+                      <label className="text-[9px] font-black text-slate-450 uppercase tracking-widest block mb-1">
+                        Gender
+                      </label>
+                      <div className="relative">
+                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm z-10 text-slate-455">⚧️</span>
+                        <select
+                          name="gender"
+                          value={formData.gender}
+                          onChange={handleChange}
+                          className="w-full pl-11 pr-8 py-3 bg-slate-900/80 border border-white/12 rounded-xl text-xs outline-none text-slate-200 cursor-pointer appearance-none focus:border-cyan-500"
+                          required
+                        >
+                          <option value="" className="bg-slate-900 text-slate-400">Select Gender</option>
+                          <option value="Male" className="bg-slate-900 text-slate-200">Male</option>
+                          <option value="Female" className="bg-slate-900 text-slate-200">Female</option>
+                        </select>
+                      </div>
                     </div>
-                  </div>
-                  <div className="relative">
-                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
-                      📱
-                    </span>
-                    <input
-                      type="text"
-                      name="phone"
-                      placeholder="Phone Number"
-                      onChange={handleChange}
-                      onFocus={() => setFocusedField("phone")}
-                      onBlur={() => setFocusedField(null)}
-                      className={inputClass("phone")}
-                      required
-                    />
                   </div>
                 </motion.div>
               )}
 
-              {/* Doctor Fields */}
               {role === "DOCTOR" && (
                 <motion.div
                   key="doctor-fields"
                   initial={{ opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: "auto" }}
                   exit={{ opacity: 0, height: 0 }}
-                  transition={{ duration: 0.3 }}
-                  className="space-y-3 sm:space-y-4"
+                  transition={{ duration: 0.2 }}
+                  className="space-y-3.5"
                 >
-                  <div className="relative">
-                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
-                      🎓
-                    </span>
-                    <input
-                      type="text"
-                      name="education"
-                      placeholder="Education (e.g., MBBS, MD)"
-                      onChange={handleChange}
-                      onFocus={() => setFocusedField("education")}
-                      onBlur={() => setFocusedField(null)}
-                      className={inputClass("education")}
-                      required
-                    />
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                    <div>
+                      <label className="text-[9px] font-black text-slate-450 uppercase tracking-widest block mb-1">
+                        Education
+                      </label>
+                      <div className="relative">
+                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm text-slate-455">🎓</span>
+                        <input
+                          type="text"
+                          name="education"
+                          placeholder="MBBS, MD Cardiology"
+                          value={formData.education}
+                          onChange={handleChange}
+                          className="w-full pl-11 pr-4 py-3 glass-input rounded-xl text-xs outline-none"
+                          required
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="text-[9px] font-black text-slate-455 uppercase tracking-widest block mb-1">
+                        Specialization
+                      </label>
+                      <div className="relative">
+                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm text-slate-455">🩺</span>
+                        <input
+                          type="text"
+                          name="specialization"
+                          placeholder="Cardiologist"
+                          value={formData.specialization}
+                          onChange={handleChange}
+                          className="w-full pl-11 pr-4 py-3 glass-input rounded-xl text-xs outline-none"
+                          required
+                        />
+                      </div>
+                    </div>
                   </div>
-                  <div className="relative">
-                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
-                      🩺
-                    </span>
-                    <input
-                      type="text"
-                      name="specialization"
-                      placeholder="Specialization"
-                      onChange={handleChange}
-                      onFocus={() => setFocusedField("specialization")}
-                      onBlur={() => setFocusedField(null)}
-                      className={inputClass("specialization")}
-                      required
-                    />
-                  </div>
-                  <div className="relative">
-                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
-                      📅
-                    </span>
-                    <input
-                      type="text"
-                      name="experience"
-                      placeholder="Years of Experience"
-                      onChange={handleChange}
-                      onFocus={() => setFocusedField("experience")}
-                      onBlur={() => setFocusedField(null)}
-                      className={inputClass("experience")}
-                      required
-                    />
-                  </div>
-                  <div className="relative">
-                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
-                      📱
-                    </span>
-                    <input
-                      type="text"
-                      name="phone"
-                      placeholder="Phone Number"
-                      onChange={handleChange}
-                      onFocus={() => setFocusedField("phone")}
-                      onBlur={() => setFocusedField(null)}
-                      className={inputClass("phone")}
-                      required
-                    />
+
+                  <div>
+                    <label className="text-[9px] font-black text-slate-455 uppercase tracking-widest block mb-1">
+                      Experience (Years)
+                    </label>
+                    <div className="relative">
+                      <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm text-slate-455">📅</span>
+                      <input
+                        type="text"
+                        name="experience"
+                        placeholder="8 years"
+                        value={formData.experience}
+                        onChange={handleChange}
+                        className="w-full pl-11 pr-4 py-3 glass-input rounded-xl text-xs outline-none"
+                        required
+                      />
+                    </div>
                   </div>
                 </motion.div>
               )}
             </AnimatePresence>
-          </div>
 
-          {/* Submit Button */}
-          <motion.button
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.9 }}
-            whileHover={{
-              scale: 1.02,
-              boxShadow: "0 20px 40px rgba(139, 92, 246, 0.3)",
-            }}
-            whileTap={{ scale: 0.98 }}
-            type="submit"
-            disabled={isLoading}
-            className="w-full mt-5 bg-linear-to-r from-indigo-600 via-purple-600 to-blue-600 text-white py-3.5 sm:py-4 rounded-xl font-semibold text-lg shadow-lg shadow-purple-500/30 transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed relative overflow-hidden group"
-          >
-            <span className="relative z-10 flex items-center justify-center gap-2">
+            {/* Register Submit Button */}
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="w-full btn-teal-outline py-3 rounded-xl font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 mt-2 disabled:opacity-60"
+            >
               {isLoading ? (
                 <>
-                  <motion.span
-                    animate={{ rotate: 360 }}
-                    transition={{
-                      duration: 1,
-                      repeat: Infinity,
-                      ease: "linear",
-                    }}
-                  >
-                    ⏳
-                  </motion.span>
-                  Creating Account...
+                  <div className="hms-spinner w-4 h-4 border-2"></div>
+                  <span>Processing...</span>
                 </>
               ) : (
                 <>
-                  Create Account
-                  <motion.span
-                    initial={{ x: 0 }}
-                    whileHover={{ x: 5 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    🚀
-                  </motion.span>
+                  <span>Create Account</span>
+                  <span>🚀</span>
                 </>
               )}
-            </span>
-            <div className="absolute inset-0 bg-linear-to-r from-purple-600 via-blue-600 to-indigo-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-          </motion.button>
+            </button>
+          </form>
 
-          {/* Login Link */}
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 1 }}
-            className="text-sm mt-4 text-center text-gray-600"
-          >
+          {/* Navigation link to Login */}
+          <p className="text-[11px] mt-4 text-center text-slate-400 font-medium">
             Already have an account?{" "}
-            <motion.span
-              whileHover={{ scale: 1.05 }}
-              className="text-indigo-600 font-semibold cursor-pointer hover:text-purple-600 transition-colors"
+            <span
               onClick={() => navigate("/")}
+              className="text-cyan-400 font-bold hover:text-cyan-300 cursor-pointer transition-colors ml-1 uppercase tracking-wider"
             >
               Sign In
-            </motion.span>
-          </motion.p>
-        </motion.form>
+            </span>
+          </p>
+
+        </motion.div>
       </div>
+
     </div>
   );
 }

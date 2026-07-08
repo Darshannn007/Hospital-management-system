@@ -1,7 +1,15 @@
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { toast } from "react-hot-toast";
-import { IconCalendar } from "@tabler/icons-react";
+import { 
+  IconCalendar, 
+  IconFileInvoice, 
+  IconUpload, 
+  IconDownload, 
+  IconRefresh, 
+  IconCheck, 
+  IconClock 
+} from "@tabler/icons-react";
 import {
   downloadMyInvoice,
   getAdminInvoices,
@@ -32,7 +40,6 @@ const getPaymentStatus = (invoice) => {
   if (rawStatus === PAYMENT_STATUS.DONE || rawStatus === "PAID") {
     return PAYMENT_STATUS.DONE;
   }
-
   return PAYMENT_STATUS.PENDING;
 };
 
@@ -48,22 +55,18 @@ const normalizeInvoices = (payload) => {
 
 const formatDate = (value) => {
   if (!value) return "-";
-
   const parsed = new Date(value);
   if (Number.isNaN(parsed.getTime())) {
     return value;
   }
-
   return parsed.toLocaleDateString("en-IN");
 };
 
 const formatAmount = (value) => {
   const amount = Number(value);
-
   if (Number.isNaN(amount)) {
     return value || "₹0";
   }
-
   return new Intl.NumberFormat("en-IN", {
     style: "currency",
     currency: "INR",
@@ -73,12 +76,10 @@ const formatAmount = (value) => {
 
 const getFilenameFromDisposition = (contentDisposition) => {
   if (!contentDisposition) return null;
-
   const utf8Match = contentDisposition.match(/filename\*=UTF-8''([^;]+)/i);
   if (utf8Match?.[1]) {
     return decodeURIComponent(utf8Match[1]);
   }
-
   const quotedMatch = contentDisposition.match(/filename="?([^";]+)"?/i);
   return quotedMatch?.[1] || null;
 };
@@ -103,7 +104,7 @@ const Billing = () => {
       setInvoices(normalizeInvoices(res.data));
     } catch (err) {
       console.log(err);
-      toast.error("invoices not found");
+      toast.error("Invoices registry inaccessible");
       setInvoices([]);
     } finally {
       setLoading(false);
@@ -117,7 +118,7 @@ const Billing = () => {
       setInvoices(normalizeInvoices(res.data));
     } catch (err) {
       console.log(err);
-      toast.error("Unable to load invoices");
+      toast.error("Unable to load invoices ledger");
       setInvoices([]);
     } finally {
       setLoading(false);
@@ -129,12 +130,10 @@ const Billing = () => {
       fetchMyInvoices();
       return;
     }
-
     if (role === "ADMIN") {
       fetchAdminInvoices();
       return;
     }
-
     setLoading(false);
   }, [role]);
 
@@ -142,12 +141,11 @@ const Billing = () => {
     e.preventDefault();
 
     if (!adminForm.patientId.trim()) {
-      toast.error("Patient ID required");
+      toast.error("Patient ID is required");
       return;
     }
-
     if (!adminForm.invoiceFile) {
-      toast.error("Invoice file required");
+      toast.error("Invoice PDF file is required");
       return;
     }
 
@@ -159,14 +157,12 @@ const Billing = () => {
         invoiceFile: adminForm.invoiceFile,
       });
 
-      toast.success("Invoice uploaded successfully");
-
+      toast.success("Invoice PDF uploaded successfully! ✅");
       setAdminForm({
         patientId: "",
         paymentStatus: PAYMENT_STATUS.PENDING,
         invoiceFile: null,
       });
-
       fetchAdminInvoices();
     } catch (err) {
       console.log(err);
@@ -178,20 +174,19 @@ const Billing = () => {
 
   const handleAdminStatusUpdate = async (invoice, status) => {
     const invoiceId = invoice.id || invoice.invoiceId;
-
     if (!invoiceId) {
-      toast.error("Invalid invoice");
+      toast.error("Invalid invoice selection");
       return;
     }
 
     try {
       setUpdatingId(invoiceId);
       await updateInvoicePaymentStatus(invoiceId, toBackendPaymentStatus(status));
-      toast.success(`Payment status marked ${status}`);
+      toast.success(`Payment marked as ${status} ✅`);
       fetchAdminInvoices();
     } catch (err) {
       console.log(err);
-      toast.error("Payment status update failed");
+      toast.error("Payment status modification failed");
     } finally {
       setUpdatingId(null);
     }
@@ -199,9 +194,8 @@ const Billing = () => {
 
   const handleDownload = async (invoice) => {
     const invoiceId = invoice.id || invoice.invoiceId;
-
     if (!invoiceId) {
-      toast.error("Invalid invoice");
+      toast.error("Invalid invoice selection");
       return;
     }
 
@@ -211,7 +205,6 @@ const Billing = () => {
 
       const contentType = res.headers?.["content-type"] || "application/pdf";
       const blob = new Blob([res.data], { type: contentType });
-
       let fileName = getFilenameFromDisposition(res.headers?.["content-disposition"]);
 
       if (!fileName) {
@@ -229,276 +222,271 @@ const Billing = () => {
       link.remove();
       window.URL.revokeObjectURL(url);
 
-      toast.success("Invoice downloaded");
+      toast.success("Invoice downloaded successfully! 📥");
     } catch (err) {
       console.log(err);
-      toast.error("Error occurred while downloading invoice");
+      toast.error("Error occurred while downloading invoice PDF");
     } finally {
       setDownloadingId(null);
     }
   };
 
+  // ADMIN SCREEN LAYOUT
   if (role === "ADMIN") {
     return (
-      <div className="min-h-screen bg-linear-to-br from-gray-50 to-gray-100 text-gray-800 p-4 md:p-6 overflow-hidden">
-        <div className="fixed inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-0 right-0 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl" />
-          <div className="absolute bottom-0 left-0 w-96 h-96 bg-indigo-500/5 rounded-full blur-3xl" />
-        </div>
-
-        <div className="relative z-10 space-y-6">
-          <div className="mb-2">
-            <div className="flex items-center gap-3 mb-2">
-              <div className="w-10 h-10 bg-linear-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/30">
-                <IconCalendar size={20} className="text-white" />
-              </div>
-              <span className="text-sm font-medium text-blue-700 bg-blue-100 px-3 py-1 rounded-full">
-                💰 Billing Management
+      <div className="p-5 md:p-8 space-y-6 text-slate-200">
+        
+        {/* Header Section */}
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white/3 border border-white/10 backdrop-blur-xl rounded-3xl p-6 shadow-2xl">
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-black text-cyan-400 bg-cyan-950/20 border border-cyan-500/20 px-2.5 py-1 rounded-full uppercase tracking-widest">
+                Ledger
               </span>
             </div>
-            <h1 className="text-2xl md:text-4xl font-bold bg-linear-to-r from-gray-900 via-blue-800 to-indigo-700 bg-clip-text text-transparent">
-              Admin Billing
+            <h1 className="text-2xl md:text-3xl font-black text-white tracking-tight mt-2 uppercase">
+              Admin Billing Ledger
             </h1>
-            <p className="text-gray-600 mt-1">
-              Upload invoices by Patient ID and manually manage payment status.
+            <p className="text-xs text-slate-300 mt-1.5 font-medium tracking-wide">
+              Upload patient invoices and manually audit billing payment streams.
+            </p>
+          </div>
+        </div>
+
+        {/* Upload Segment Form */}
+        <div className="glass-card rounded-3xl p-6 shadow-sm space-y-5 border border-white/10">
+          <div>
+            <h3 className="font-bold text-white text-sm uppercase tracking-wider">Upload Patient Invoice</h3>
+            <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-0.5">
+              Draft files to Patients Registry profile
             </p>
           </div>
 
-          <div className="bg-white border border-gray-100 rounded-2xl shadow-xl shadow-blue-500/10 p-6">
-            <h2 className="text-lg font-semibold text-gray-800 mb-4">Upload Invoice For Patient</h2>
-
-            <form onSubmit={handleUploadForPatient} className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
-              <div>
-                <label className="text-sm font-semibold text-gray-700 mb-2 block">Patient ID</label>
-                <input
-                  type="text"
-                  value={adminForm.patientId}
-                  onChange={(e) =>
-                    setAdminForm((prev) => ({
-                      ...prev,
-                      patientId: e.target.value,
-                    }))
-                  }
-                  placeholder="Enter patient ID"
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all duration-300 bg-gray-50 focus:bg-white"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="text-sm font-semibold text-gray-700 mb-2 block">Payment Status</label>
-                <select
-                  value={adminForm.paymentStatus}
-                  onChange={(e) =>
-                    setAdminForm((prev) => ({
-                      ...prev,
-                      paymentStatus: e.target.value,
-                    }))
-                  }
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all duration-300 bg-gray-50 focus:bg-white"
-                >
-                  <option value={PAYMENT_STATUS.PENDING}>PENDING</option>
-                  <option value={PAYMENT_STATUS.DONE}>DONE</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="text-sm font-semibold text-gray-700 mb-2 block">Invoice File</label>
-                <input
-                  type="file"
-                  accept=".pdf"
-                  onChange={(e) =>
-                    setAdminForm((prev) => ({
-                      ...prev,
-                      invoiceFile: e.target.files?.[0] || null,
-                    }))
-                  }
-                  className="w-full px-3 py-2.5 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all duration-300 bg-gray-50 focus:bg-white"
-                  required
-                />
-              </div>
-
-              <button
-                type="submit"
-                disabled={uploading}
-                className="px-5 py-3 rounded-xl text-sm font-semibold bg-linear-to-r from-blue-600 via-indigo-600 to-purple-600 text-white shadow-md shadow-blue-500/20 hover:shadow-lg transition-all disabled:opacity-60 disabled:cursor-not-allowed"
-              >
-                {uploading ? "Uploading..." : "Upload Invoice"}
-              </button>
-            </form>
-          </div>
-
-          <div className="bg-white border border-gray-100 rounded-2xl shadow-xl shadow-blue-500/10 overflow-hidden">
-            <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between gap-3">
-              <div>
-                <h2 className="text-lg font-semibold text-gray-800">All Invoice Records</h2>
-                <p className="text-gray-500 text-xs">Total {invoices.length} invoice(s)</p>
-              </div>
-              <button
-                onClick={fetchAdminInvoices}
-                className="px-4 py-2 rounded-lg text-sm font-medium bg-blue-100 text-blue-700 hover:bg-blue-200 transition-colors"
-              >
-                Refresh
-              </button>
-            </div>
-
-            <div className="overflow-x-auto">
-              <table className="w-full min-w-full">
-                <thead>
-                  <tr className="bg-linear-to-r from-gray-50 to-gray-100">
-                    <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Invoice No</th>
-                    <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Patient ID</th>
-                    <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Date</th>
-                    <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Amount</th>
-                    <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Payment Status</th>
-                    <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Action</th>
-                  </tr>
-                </thead>
-
-                <tbody>
-                  {loading ? (
-                    <tr>
-                      <td colSpan="6" className="text-center py-12 text-gray-500">
-                        Loading invoices...
-                      </td>
-                    </tr>
-                  ) : invoices.length === 0 ? (
-                    <tr>
-                      <td colSpan="6" className="text-center py-12 text-gray-500">
-                        No invoices available.
-                      </td>
-                    </tr>
-                  ) : (
-                    invoices.map((invoice, index) => {
-                      const invoiceId = invoice.id || invoice.invoiceId || `admin-row-${index}`;
-                      const paymentStatus = getPaymentStatus(invoice);
-
-                      return (
-                        <tr
-                          key={invoiceId}
-                          className="border-b border-gray-50 hover:bg-blue-50/40 transition-colors"
-                        >
-                          <td className="px-6 py-4 font-medium text-gray-900">{getInvoiceNumber(invoice)}</td>
-                          <td className="px-6 py-4 text-gray-700">{getPatientIdFromInvoice(invoice)}</td>
-                          <td className="px-6 py-4 text-gray-700">{formatDate(getInvoiceDate(invoice))}</td>
-                          <td className="px-6 py-4 text-gray-700">{formatAmount(getInvoiceAmount(invoice))}</td>
-                          <td className="px-6 py-4">
-                            <span
-                              className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                                paymentStatus === PAYMENT_STATUS.DONE
-                                  ? "bg-green-100 text-green-700"
-                                  : "bg-amber-100 text-amber-700"
-                              }`}
-                            >
-                              {paymentStatus}
-                            </span>
-                          </td>
-                          <td className="px-6 py-4">
-                            <div className="flex items-center gap-2">
-                              <button
-                                onClick={() => handleAdminStatusUpdate(invoice, PAYMENT_STATUS.DONE)}
-                                disabled={updatingId === (invoice.id || invoice.invoiceId)}
-                                className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-green-100 text-green-700 hover:bg-green-200 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
-                              >
-                                Mark Done
-                              </button>
-                              <button
-                                onClick={() => handleAdminStatusUpdate(invoice, PAYMENT_STATUS.PENDING)}
-                                disabled={updatingId === (invoice.id || invoice.invoiceId)}
-                                className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-amber-100 text-amber-700 hover:bg-amber-200 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
-                              >
-                                Mark Pending
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      );
-                    })
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (role !== "PATIENT") {
-    return (
-      <div className="min-h-screen bg-linear-to-br from-gray-50 to-gray-100 text-gray-800 p-4 md:p-6 overflow-hidden">
-        <div className="relative z-10 bg-white border border-gray-100 rounded-2xl shadow-xl shadow-blue-500/10 p-6">
-          <h1 className="text-2xl md:text-3xl font-bold bg-linear-to-r from-gray-900 via-blue-800 to-indigo-700 bg-clip-text text-transparent">
-            Billing
-          </h1>
-          <p className="text-gray-600 mt-2">
-            Patient invoices download feature enabled.
-          </p>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="min-h-screen bg-linear-to-br from-gray-50 to-gray-100 text-gray-800 p-4 md:p-6 overflow-hidden">
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 left-0 w-96 h-96 bg-indigo-500/5 rounded-full blur-3xl" />
-      </div>
-
-      <div className="relative z-10">
-        <div className="mb-8">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="w-10 h-10 bg-linear-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/30">
-              <IconCalendar size={20} className="text-white" />
-            </div>
-            <span className="text-sm font-medium text-blue-700 bg-blue-100 px-3 py-1 rounded-full">
-              🧾 My Billing
-            </span>
-          </div>
-          <h1 className="text-2xl md:text-4xl font-bold bg-linear-to-r from-gray-900 via-blue-800 to-indigo-700 bg-clip-text text-transparent">
-            My Invoices
-          </h1>
-          <p className="text-gray-600 mt-1">You can download your invoices from here.</p>
-        </div>
-
-        <div className="bg-white border border-gray-100 rounded-2xl shadow-xl shadow-blue-500/10 overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between gap-3">
+          <form onSubmit={handleUploadForPatient} className="grid grid-cols-1 md:grid-cols-4 gap-5 items-end">
             <div>
-              <h2 className="text-lg font-semibold text-gray-800">Invoice Records</h2>
-              <p className="text-gray-500 text-xs">Total {invoices.length} invoice(s)</p>
+              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-1.5">Patient ID</label>
+              <input
+                type="text"
+                value={adminForm.patientId}
+                onChange={(e) =>
+                  setAdminForm((prev) => ({
+                    ...prev,
+                    patientId: e.target.value,
+                  }))
+                }
+                placeholder="Enter patient ID"
+                className="w-full px-4 py-3 glass-input rounded-xl text-xs outline-none"
+                required
+              />
+            </div>
+
+            <div>
+              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-1.5">Payment Status</label>
+              <select
+                value={adminForm.paymentStatus}
+                onChange={(e) =>
+                  setAdminForm((prev) => ({
+                    ...prev,
+                    paymentStatus: e.target.value,
+                  }))
+                }
+                className="w-full px-4 py-3 bg-slate-900/80 border border-white/12 rounded-xl text-xs outline-none text-slate-200 cursor-pointer focus:border-cyan-500"
+              >
+                <option value={PAYMENT_STATUS.PENDING} className="bg-slate-900 text-slate-200">PENDING</option>
+                <option value={PAYMENT_STATUS.DONE} className="bg-slate-900 text-slate-200">DONE</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-1.5">Invoice PDF File</label>
+              <input
+                type="file"
+                accept=".pdf"
+                onChange={(e) =>
+                  setAdminForm((prev) => ({
+                    ...prev,
+                    invoiceFile: e.target.files?.[0] || null,
+                  }))
+                }
+                className="w-full px-3 py-2 border border-dashed border-white/20 rounded-xl focus:outline-none focus:border-cyan-500 transition-colors text-xs text-slate-400 bg-white/2 cursor-pointer"
+                required
+              />
+            </div>
+
+            <button
+              type="submit"
+              disabled={uploading}
+              className="w-full btn-teal-outline px-5 py-3 rounded-xl font-bold text-xs shadow-md uppercase tracking-wider h-[42px] disabled:opacity-60"
+            >
+              <IconUpload size={15} className="inline mr-1" />
+              {uploading ? "Uploading..." : "Upload Invoice"}
+            </button>
+          </form>
+        </div>
+
+        {/* Invoice List Table */}
+        <div className="glass-card rounded-3xl shadow-sm overflow-hidden border border-white/10">
+          <div className="px-6 py-4 border-b border-white/5 flex items-center justify-between gap-3">
+            <div>
+              <h3 className="font-bold text-white text-sm uppercase tracking-wider">All Ledger Invoices</h3>
+              <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-0.5">
+                Audit list of {invoices.length} registers
+              </p>
             </div>
             <button
-              onClick={fetchMyInvoices}
-              className="px-4 py-2 rounded-lg text-sm font-medium bg-blue-100 text-blue-700 hover:bg-blue-200 transition-colors"
+              onClick={fetchAdminInvoices}
+              className="p-2 bg-cyan-950/20 hover:bg-cyan-950/45 border border-cyan-500/20 text-cyan-400 rounded-xl transition-colors"
+              title="Refresh ledger"
             >
-              Refresh
+              <IconRefresh size={16} />
             </button>
           </div>
 
           <div className="overflow-x-auto">
-            <table className="w-full min-w-full">
+            <table className="w-full min-w-[760px]">
               <thead>
-                <tr className="bg-linear-to-r from-gray-50 to-gray-100">
-                  <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Invoice No</th>
-                  <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Date</th>
-                  <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Amount</th>
-                  <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Status</th>
-                  <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Action</th>
+                <tr className="bg-white/2 border-b border-white/5 text-slate-350">
+                  <th className="px-6 py-3.5 text-left text-[10px] font-bold uppercase tracking-widest">Invoice Code</th>
+                  <th className="px-6 py-3.5 text-left text-[10px] font-bold uppercase tracking-widest">Patient Code</th>
+                  <th className="px-6 py-3.5 text-left text-[10px] font-bold uppercase tracking-widest">Billing Date</th>
+                  <th className="px-6 py-3.5 text-left text-[10px] font-bold uppercase tracking-widest">Total Value</th>
+                  <th className="px-6 py-3.5 text-left text-[10px] font-bold uppercase tracking-widest">Status Badge</th>
+                  <th className="px-6 py-3.5 text-left text-[10px] font-bold uppercase tracking-widest">Audit Controls</th>
                 </tr>
               </thead>
 
-              <tbody>
+              <tbody className="divide-y divide-white/5 text-slate-300">
                 {loading ? (
                   <tr>
-                    <td colSpan="5" className="text-center py-12 text-gray-500">
-                      Loading invoices...
+                    <td colSpan="6" className="text-center py-12">
+                      <div className="hms-spinner mx-auto mb-3"></div>
+                      <p className="font-bold uppercase tracking-widest text-[9px] text-slate-400">Loading Invoices...</p>
                     </td>
                   </tr>
                 ) : invoices.length === 0 ? (
                   <tr>
-                    <td colSpan="5" className="text-center py-12 text-gray-500">
-                      No invoices are available for your account.
+                    <td colSpan="6" className="text-center py-12 text-slate-450 text-xs font-bold uppercase tracking-widest">
+                      No invoices uploaded
+                    </td>
+                  </tr>
+                ) : (
+                  invoices.map((invoice, index) => {
+                    const invoiceId = invoice.id || invoice.invoiceId || `admin-row-${index}`;
+                    const paymentStatus = getPaymentStatus(invoice);
+
+                    return (
+                      <tr key={invoiceId} className="hover:bg-white/2 transition-colors">
+                        <td className="px-6 py-4 font-bold text-xs text-white">{getInvoiceNumber(invoice)}</td>
+                        <td className="px-6 py-4 text-xs text-slate-200 font-semibold">{getPatientIdFromInvoice(invoice)}</td>
+                        <td className="px-6 py-4 text-xs text-slate-350">{formatDate(getInvoiceDate(invoice))}</td>
+                        <td className="px-6 py-4 text-xs text-white font-bold">{formatAmount(getInvoiceAmount(invoice))}</td>
+                        <td className="px-6 py-4">
+                          <span
+                            className={`px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider inline-flex items-center gap-1 border ${
+                              paymentStatus === PAYMENT_STATUS.DONE
+                                ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
+                                : "bg-amber-500/10 text-amber-400 border border-amber-500/20"
+                            }`}
+                          >
+                            {paymentStatus === PAYMENT_STATUS.DONE ? <IconCheck size={10} /> : <IconClock size={10} />}
+                            {paymentStatus}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="flex items-center gap-2">
+                            <button
+                              onClick={() => handleAdminStatusUpdate(invoice, PAYMENT_STATUS.DONE)}
+                              disabled={updatingId === (invoice.id || invoice.invoiceId)}
+                              className="px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider bg-emerald-950/20 text-emerald-400 hover:bg-emerald-950/40 border border-emerald-500/20 transition-colors disabled:opacity-60"
+                            >
+                              Paid
+                            </button>
+                            <button
+                              onClick={() => handleAdminStatusUpdate(invoice, PAYMENT_STATUS.PENDING)}
+                              disabled={updatingId === (invoice.id || invoice.invoiceId)}
+                              className="px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider bg-amber-950/20 text-amber-400 hover:bg-amber-950/40 border border-amber-500/20 transition-colors disabled:opacity-60"
+                            >
+                              Pending
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    );
+  }
+
+  // PATIENT SCREEN LAYOUT
+  if (role === "PATIENT") {
+    return (
+      <div className="p-5 md:p-8 space-y-6 text-slate-200">
+        
+        {/* Header Section */}
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white/3 border border-white/10 backdrop-blur-xl rounded-3xl p-6 shadow-2xl">
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-black text-cyan-400 bg-cyan-950/20 border border-cyan-500/20 px-2.5 py-1 rounded-full uppercase tracking-widest">
+                Finance
+              </span>
+            </div>
+            <h1 className="text-2xl md:text-3xl font-black text-white tracking-tight mt-2 uppercase">
+              My Invoices
+            </h1>
+            <p className="text-xs text-slate-300 mt-1.5 font-medium tracking-wide">
+              Download clinical invoice receipts and review pending settlements.
+            </p>
+          </div>
+        </div>
+
+        {/* Invoice table list */}
+        <div className="glass-card rounded-3xl shadow-sm overflow-hidden border border-white/10">
+          <div className="px-6 py-4 border-b border-white/5 flex items-center justify-between gap-3">
+            <div>
+              <h3 className="font-bold text-white text-sm uppercase tracking-wider">Invoice List</h3>
+              <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-0.5">
+                Total {invoices.length} invoice(s) registered
+              </p>
+            </div>
+            <button
+              onClick={fetchMyInvoices}
+              className="p-2 bg-cyan-950/20 hover:bg-cyan-950/45 border border-cyan-500/20 text-cyan-400 rounded-xl transition-colors"
+              title="Refresh invoices"
+            >
+              <IconRefresh size={16} />
+            </button>
+          </div>
+
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[640px]">
+              <thead>
+                <tr className="bg-white/2 border-b border-white/5 text-slate-350">
+                  <th className="px-6 py-3.5 text-left text-[10px] font-bold uppercase tracking-widest">Invoice Code</th>
+                  <th className="px-6 py-3.5 text-left text-[10px] font-bold uppercase tracking-widest">Billing Date</th>
+                  <th className="px-6 py-3.5 text-left text-[10px] font-bold uppercase tracking-widest">Total Value</th>
+                  <th className="px-6 py-3.5 text-left text-[10px] font-bold uppercase tracking-widest">Payment Status</th>
+                  <th className="px-6 py-3.5 text-left text-[10px] font-bold uppercase tracking-widest">Action</th>
+                </tr>
+              </thead>
+
+              <tbody className="divide-y divide-white/5 text-slate-300">
+                {loading ? (
+                  <tr>
+                    <td colSpan="5" className="text-center py-12">
+                      <div className="hms-spinner mx-auto mb-3"></div>
+                      <p className="font-bold uppercase tracking-widest text-[9px] text-slate-400">Loading Invoices...</p>
+                    </td>
+                  </tr>
+                ) : invoices.length === 0 ? (
+                  <tr>
+                    <td colSpan="5" className="text-center py-12 text-slate-450 text-xs font-bold uppercase tracking-widest">
+                      No invoices available on your profile
                     </td>
                   </tr>
                 ) : (
@@ -507,21 +495,19 @@ const Billing = () => {
                     const status = getPaymentStatus(invoice);
 
                     return (
-                      <tr
-                        key={invoiceId}
-                        className="border-b border-gray-50 hover:bg-blue-50/40 transition-colors"
-                      >
-                        <td className="px-6 py-4 font-medium text-gray-900">{getInvoiceNumber(invoice)}</td>
-                        <td className="px-6 py-4 text-gray-700">{formatDate(getInvoiceDate(invoice))}</td>
-                        <td className="px-6 py-4 text-gray-700">{formatAmount(getInvoiceAmount(invoice))}</td>
+                      <tr key={invoiceId} className="hover:bg-white/2 transition-colors">
+                        <td className="px-6 py-4 font-bold text-xs text-white">{getInvoiceNumber(invoice)}</td>
+                        <td className="px-6 py-4 text-xs text-slate-350">{formatDate(getInvoiceDate(invoice))}</td>
+                        <td className="px-6 py-4 text-xs text-white font-bold">{formatAmount(getInvoiceAmount(invoice))}</td>
                         <td className="px-6 py-4">
                           <span
-                            className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                            className={`px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider inline-flex items-center gap-1 border ${
                               status === PAYMENT_STATUS.DONE
-                                ? "bg-green-100 text-green-700"
-                                : "bg-amber-100 text-amber-700"
+                                ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
+                                : "bg-amber-500/10 text-amber-400 border border-amber-500/20"
                             }`}
                           >
+                            {status === PAYMENT_STATUS.DONE ? <IconCheck size={10} /> : <IconClock size={10} />}
                             {status}
                           </span>
                         </td>
@@ -529,11 +515,10 @@ const Billing = () => {
                           <button
                             onClick={() => handleDownload(invoice)}
                             disabled={downloadingId === (invoice.id || invoice.invoiceId)}
-                            className="px-4 py-2 rounded-lg text-sm font-medium bg-linear-to-r from-blue-600 via-indigo-600 to-purple-600 text-white shadow-md shadow-blue-500/20 hover:shadow-lg transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+                            className="btn-teal-outline px-4 py-2.5 rounded-xl font-bold text-[10px] uppercase tracking-wider shadow-md flex items-center justify-center gap-1.5 disabled:opacity-60"
                           >
-                            {downloadingId === (invoice.id || invoice.invoiceId)
-                              ? "Downloading..."
-                              : "Download Invoice"}
+                            <IconDownload size={12} />
+                            {downloadingId === (invoice.id || invoice.invoiceId) ? "Downloading..." : "Download"}
                           </button>
                         </td>
                       </tr>
@@ -544,6 +529,19 @@ const Billing = () => {
             </table>
           </div>
         </div>
+
+      </div>
+    );
+  }
+
+  // FALLBACK FOR DOCTOR/OTHER ROLES
+  return (
+    <div className="p-5 md:p-8 space-y-6 text-slate-200">
+      <div className="glass-card rounded-3xl p-6 space-y-4 border border-white/10">
+        <h1 className="text-xl font-black text-white uppercase tracking-tight">Invoice Ledger</h1>
+        <p className="text-xs text-slate-400 font-medium leading-relaxed">
+          Invoices downloading features are currently restricted for Doctor profiles. Patient profiles have direct download access.
+        </p>
       </div>
     </div>
   );
