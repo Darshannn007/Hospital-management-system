@@ -132,7 +132,7 @@ function Register() {
             className="inline-flex items-center gap-3 bg-white/3 backdrop-blur-md px-4 py-2 rounded-full border border-white/10 shadow-sm w-fit"
           >
             <span className="text-lg">🏥</span>
-            <span className="text-[10px] font-black tracking-widest uppercase text-cyan-400">HMS v2.0</span>
+            <span className="text-[10px] font-black tracking-widest uppercase text-cyan-400">HMS v2.0 Enterprise</span>
           </motion.div>
 
           <div className="space-y-3">
@@ -173,7 +173,7 @@ function Register() {
       </div>
 
       {/* RIGHT SIDE - Form Panel */}
-      <div className="flex-1 h-full flex items-center justify-center p-4 sm:p-6 lg:p-8 relative overflow-hidden">
+      <div className="flex-1 h-full flex items-center justify-center p-3 sm:p-6 lg:p-8 relative overflow-hidden">
         
         {/* Soft Background Globs */}
         <div className="absolute top-10 right-10 w-72 h-72 bg-cyan-500/5 rounded-full blur-3xl pointer-events-none" />
@@ -184,27 +184,27 @@ function Register() {
           initial={{ opacity: 0, y: 15, scale: 0.96 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ duration: 0.5, ease: "easeOut" }}
-          className="w-full max-w-lg glass-card p-6 rounded-3xl border border-white/10 relative z-10 max-h-[92vh] overflow-y-auto no-scrollbar"
+          className="w-full max-w-lg glass-card p-4 sm:p-6 rounded-3xl border border-white/10 relative z-10 max-h-[96vh] overflow-y-auto no-scrollbar"
         >
           {/* Header */}
-          <div className="text-center mb-4">
-            <div className="w-12 h-12 border border-cyan-500/20 bg-cyan-950/20 text-cyan-400 rounded-2xl flex items-center justify-center mx-auto mb-2.5 shadow-md shrink-0">
+          <div className="text-center mb-2.5 sm:mb-4">
+            <div className="hidden sm:flex w-12 h-12 border border-cyan-500/20 bg-cyan-950/20 text-cyan-400 rounded-2xl items-center justify-center mx-auto mb-2.5 shadow-md shrink-0">
               <span className="text-xl">✨</span>
             </div>
-            <h2 className="text-xl font-black text-white uppercase tracking-tight">Create Account</h2>
-            <p className="text-[11px] text-slate-400 font-bold uppercase tracking-wider mt-0.5">Get started by creating your account</p>
+            <h2 className="text-lg sm:text-xl font-black text-white uppercase tracking-tight">Create Account</h2>
+            <p className="text-[9px] sm:text-[11px] text-slate-400 font-bold uppercase tracking-wider mt-0.5">Get started by creating your account</p>
           </div>
 
           {/* Role Toggle Selector */}
-          <div className="mb-4">
-            <label className="text-[9px] font-black text-slate-450 uppercase tracking-widest block mb-1.5">
+          <div className="mb-3 sm:mb-4">
+            <label className="text-[9px] font-black text-slate-450 uppercase tracking-widest block mb-1">
               Select Your Role
             </label>
             <div className="flex gap-2 p-1 bg-white/2 border border-white/5 rounded-2xl">
               <button
                 type="button"
                 onClick={() => setRole("PATIENT")}
-                className={`flex-1 py-2.5 px-4 rounded-xl font-bold text-xs uppercase tracking-wider transition-all duration-300 flex items-center justify-center gap-2 border ${
+                className={`flex-1 py-1.5 sm:py-2.5 px-3 sm:px-4 rounded-xl font-bold text-[10px] sm:text-xs uppercase tracking-wider transition-all duration-300 flex items-center justify-center gap-1.5 border ${
                   role === "PATIENT"
                     ? "bg-cyan-950/20 text-cyan-400 border-cyan-500/20 shadow-md"
                     : "text-slate-455 hover:text-slate-200 border-transparent"
@@ -216,7 +216,7 @@ function Register() {
               <button
                 type="button"
                 onClick={() => setRole("DOCTOR")}
-                className={`flex-1 py-2.5 px-4 rounded-xl font-bold text-xs uppercase tracking-wider transition-all duration-300 flex items-center justify-center gap-2 border ${
+                className={`flex-1 py-1.5 sm:py-2.5 px-3 sm:px-4 rounded-xl font-bold text-[10px] sm:text-xs uppercase tracking-wider transition-all duration-300 flex items-center justify-center gap-1.5 border ${
                   role === "DOCTOR"
                     ? "bg-cyan-950/20 text-cyan-400 border-cyan-500/20 shadow-md"
                     : "text-slate-455 hover:text-slate-200 border-transparent"
@@ -228,7 +228,7 @@ function Register() {
           </div>
 
           {/* Registration Form */}
-          <form onSubmit={handleSubmit} className="space-y-3.5">
+          <form onSubmit={handleSubmit} className="space-y-2.5 sm:space-y-3.5">
             
             {/* Row 1: Full Name */}
             <div>
@@ -236,34 +236,34 @@ function Register() {
                 Full Name
               </label>
               <div className="relative">
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm text-slate-450">👤</span>
+                <span className="hidden sm:block absolute left-4 top-1/2 -translate-y-1/2 text-sm text-slate-450">👤</span>
                 <input
                   type="text"
                   name="name"
                   placeholder="John Doe"
                   value={formData.name}
                   onChange={handleChange}
-                  className="w-full pl-11 pr-4 py-3 glass-input rounded-xl text-xs outline-none"
+                  className="w-full pl-3 sm:pl-11 pr-3 py-2 sm:py-3 glass-input rounded-xl text-xs outline-none font-bold"
                   required
                 />
               </div>
             </div>
 
             {/* Row 2: Email & Phone */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+            <div className="grid grid-cols-2 gap-2 sm:gap-3.5">
               <div>
                 <label className="text-[9px] font-black text-slate-450 uppercase tracking-widest block mb-1">
                   Email Address
                 </label>
                 <div className="relative">
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm text-slate-450">✉️</span>
+                  <span className="hidden sm:block absolute left-4 top-1/2 -translate-y-1/2 text-sm text-slate-450">✉️</span>
                   <input
                     type="email"
                     name="email"
                     placeholder="name@hospital.com"
                     value={formData.email}
                     onChange={handleChange}
-                    className="w-full pl-11 pr-4 py-3 glass-input rounded-xl text-xs outline-none"
+                    className="w-full pl-3 sm:pl-11 pr-3 py-2 sm:py-3 glass-input rounded-xl text-xs outline-none"
                     required
                   />
                 </div>
@@ -274,14 +274,14 @@ function Register() {
                   Phone Number
                 </label>
                 <div className="relative">
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm text-slate-450">📱</span>
+                  <span className="hidden sm:block absolute left-4 top-1/2 -translate-y-1/2 text-sm text-slate-450">📱</span>
                   <input
                     type="text"
                     name="phone"
                     placeholder="+91 99999 88888"
                     value={formData.phone}
                     onChange={handleChange}
-                    className="w-full pl-11 pr-4 py-3 glass-input rounded-xl text-xs outline-none"
+                    className="w-full pl-3 sm:pl-11 pr-3 py-2 sm:py-3 glass-input rounded-xl text-xs outline-none"
                     required
                   />
                 </div>
@@ -289,20 +289,20 @@ function Register() {
             </div>
 
             {/* Row 3: Password & Confirm Password */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+            <div className="grid grid-cols-2 gap-2 sm:gap-3.5">
               <div>
                 <label className="text-[9px] font-black text-slate-450 uppercase tracking-widest block mb-1">
                   Password
                 </label>
                 <div className="relative">
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm text-slate-450">🔒</span>
+                  <span className="hidden sm:block absolute left-4 top-1/2 -translate-y-1/2 text-sm text-slate-450">🔒</span>
                   <input
                     type="password"
                     name="password"
                     placeholder="••••••••"
                     value={formData.password}
                     onChange={handleChange}
-                    className="w-full pl-11 pr-4 py-3 glass-input rounded-xl text-xs outline-none"
+                    className="w-full pl-3 sm:pl-11 pr-3 py-2 sm:py-3 glass-input rounded-xl text-xs outline-none"
                     required
                   />
                 </div>
@@ -313,14 +313,14 @@ function Register() {
                   Confirm Password
                 </label>
                 <div className="relative">
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm text-slate-455">🔐</span>
+                  <span className="hidden sm:block absolute left-4 top-1/2 -translate-y-1/2 text-sm text-slate-455">🔐</span>
                   <input
                     type="password"
                     name="confirmPassword"
                     placeholder="••••••••"
                     value={formData.confirmPassword}
                     onChange={handleChange}
-                    className="w-full pl-11 pr-4 py-3 glass-input rounded-xl text-xs outline-none"
+                    className="w-full pl-3 sm:pl-11 pr-3 py-2 sm:py-3 glass-input rounded-xl text-xs outline-none"
                     required
                   />
                 </div>
@@ -336,22 +336,22 @@ function Register() {
                   animate={{ opacity: 1, height: "auto" }}
                   exit={{ opacity: 0, height: 0 }}
                   transition={{ duration: 0.2 }}
-                  className="space-y-3.5"
+                  className="space-y-2.5 sm:space-y-3.5"
                 >
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                  <div className="grid grid-cols-2 gap-2 sm:gap-3.5">
                     <div>
                       <label className="text-[9px] font-black text-slate-450 uppercase tracking-widest block mb-1">
                         Age
                       </label>
                       <div className="relative">
-                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm text-slate-450">🎂</span>
+                        <span className="hidden sm:block absolute left-4 top-1/2 -translate-y-1/2 text-sm text-slate-450">🎂</span>
                         <input
                           type="number"
                           name="age"
                           placeholder="25"
                           value={formData.age}
                           onChange={handleChange}
-                          className="w-full pl-11 pr-4 py-3 glass-input rounded-xl text-xs outline-none"
+                          className="w-full pl-3 sm:pl-11 pr-3 py-2 sm:py-3 glass-input rounded-xl text-xs outline-none font-bold"
                           required
                         />
                       </div>
@@ -362,15 +362,15 @@ function Register() {
                         Gender
                       </label>
                       <div className="relative">
-                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm z-10 text-slate-455">⚧️</span>
+                        <span className="hidden sm:block absolute left-4 top-1/2 -translate-y-1/2 text-sm z-10 text-slate-455">⚧️</span>
                         <select
                           name="gender"
                           value={formData.gender}
                           onChange={handleChange}
-                          className="w-full pl-11 pr-8 py-3 bg-slate-900/80 border border-white/12 rounded-xl text-xs outline-none text-slate-200 cursor-pointer appearance-none focus:border-cyan-500"
+                          className="w-full pl-3 sm:pl-11 pr-8 py-2 sm:py-3 bg-slate-900/80 border border-white/12 rounded-xl text-xs outline-none text-slate-200 cursor-pointer appearance-none focus:border-cyan-500 font-bold"
                           required
                         >
-                          <option value="" className="bg-slate-900 text-slate-400">Select Gender</option>
+                          <option value="" className="bg-slate-900 text-slate-400">Gender</option>
                           <option value="Male" className="bg-slate-900 text-slate-200">Male</option>
                           <option value="Female" className="bg-slate-900 text-slate-200">Female</option>
                         </select>
@@ -387,22 +387,22 @@ function Register() {
                   animate={{ opacity: 1, height: "auto" }}
                   exit={{ opacity: 0, height: 0 }}
                   transition={{ duration: 0.2 }}
-                  className="space-y-3.5"
+                  className="space-y-2.5 sm:space-y-3.5"
                 >
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                  <div className="grid grid-cols-2 gap-2 sm:gap-3.5">
                     <div>
                       <label className="text-[9px] font-black text-slate-450 uppercase tracking-widest block mb-1">
                         Education
                       </label>
                       <div className="relative">
-                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm text-slate-455">🎓</span>
+                        <span className="hidden sm:block absolute left-4 top-1/2 -translate-y-1/2 text-sm text-slate-455">🎓</span>
                         <input
                           type="text"
                           name="education"
                           placeholder="MBBS, MD Cardiology"
                           value={formData.education}
                           onChange={handleChange}
-                          className="w-full pl-11 pr-4 py-3 glass-input rounded-xl text-xs outline-none"
+                          className="w-full pl-3 sm:pl-11 pr-3 py-2 sm:py-3 glass-input rounded-xl text-xs outline-none font-bold"
                           required
                         />
                       </div>
@@ -413,14 +413,14 @@ function Register() {
                         Specialization
                       </label>
                       <div className="relative">
-                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm text-slate-455">🩺</span>
+                        <span className="hidden sm:block absolute left-4 top-1/2 -translate-y-1/2 text-sm text-slate-455">🩺</span>
                         <input
                           type="text"
                           name="specialization"
                           placeholder="Cardiologist"
                           value={formData.specialization}
                           onChange={handleChange}
-                          className="w-full pl-11 pr-4 py-3 glass-input rounded-xl text-xs outline-none"
+                          className="w-full pl-3 sm:pl-11 pr-3 py-2 sm:py-3 glass-input rounded-xl text-xs outline-none font-bold"
                           required
                         />
                       </div>
@@ -432,14 +432,14 @@ function Register() {
                       Experience (Years)
                     </label>
                     <div className="relative">
-                      <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm text-slate-455">📅</span>
+                      <span className="hidden sm:block absolute left-4 top-1/2 -translate-y-1/2 text-sm text-slate-455">📅</span>
                       <input
                         type="text"
                         name="experience"
                         placeholder="8 years"
                         value={formData.experience}
                         onChange={handleChange}
-                        className="w-full pl-11 pr-4 py-3 glass-input rounded-xl text-xs outline-none"
+                        className="w-full pl-3 sm:pl-11 pr-3 py-2 sm:py-3 glass-input rounded-xl text-xs outline-none font-bold"
                         required
                       />
                     </div>
@@ -452,7 +452,7 @@ function Register() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full btn-teal-outline py-3 rounded-xl font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 mt-2 disabled:opacity-60"
+              className="w-full btn-teal-outline py-2 sm:py-3 rounded-xl font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 mt-1 sm:mt-2 disabled:opacity-60"
             >
               {isLoading ? (
                 <>
@@ -469,7 +469,7 @@ function Register() {
           </form>
 
           {/* Navigation link to Login */}
-          <p className="text-[11px] mt-4 text-center text-slate-400 font-medium">
+          <p className="text-[11px] mt-3.5 sm:mt-4 text-center text-slate-400 font-medium">
             Already have an account?{" "}
             <span
               onClick={() => navigate("/")}
