@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "https://hospital-management-system-production-ee9f.up.railway.app/api",
+  baseURL: "http://localhost:8080/api",
 });
 
 //AUTO TOKEN ATTACH
