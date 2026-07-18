@@ -130,12 +130,12 @@ function MainLayout() {
             </motion.button>
 
             {/* Global Search box */}
-            <div className="hidden md:flex items-center gap-2.5 bg-white/3 backdrop-blur-md px-4 py-2 rounded-xl border border-white/10 w-64 focus-within:w-72 focus-within:bg-white/6 focus-within:border-cyan-500/30 focus-within:ring-4 focus-within:ring-cyan-500/5 transition-all duration-300">
-              <IconSearch size={16} className="text-slate-400" />
+            <div className="hidden md:flex items-center gap-2.5 bg-white/3 backdrop-blur-md px-4 py-2 rounded-xl border border-white/10 w-64 focus-within:w-72 focus-within:bg-white/6 focus-within:border-cyan-900/30 focus-within:ring-4 focus-within:ring-cyan-500 transition-all duration-300">
+              <IconSearch size={16} className="text-slate-900" />
               <input 
                 type="text" 
                 placeholder="Search patient, doctor, invoice..." 
-                className="bg-transparent text-slate-100 dark:text-white placeholder-slate-400 text-xs outline-none w-full"
+                className="bg-transparent search-input text-xs outline-none text-cyan-500 w-full"
               />
             </div>
           </div>

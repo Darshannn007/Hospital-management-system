@@ -1,94 +1,94 @@
 @import "tailwindcss";
 
 :root {
-  /* ☀️ Light Theme (Off-white / Soft Slate) */
-  --bg-color: #f8fafc;
-  --bg-mesh-1: rgba(99, 102, 241, 0.05); /* indigo */
-  --bg-mesh-2: rgba(6, 182, 212, 0.05); /* cyan */
-  --bg-mesh-3: rgba(168, 85, 247, 0.05); /* purple */
+  /* ☀️ Light Theme (Clean Minimal Clinical Teal) */
+  --bg-color: #f3f6f9;
+  --bg-mesh-1: rgba(13, 148, 136, 0.03); /* teal */
+  --bg-mesh-2: rgba(14, 165, 233, 0.03); /* sky */
+  --bg-mesh-3: rgba(16, 185, 129, 0.02); /* emerald */
   
-  --card-bg: rgba(255, 255, 255, 0.65);
-  --card-border: rgba(148, 163, 184, 0.16);
+  --card-bg: rgba(255, 255, 255, 0.88);
+  --card-border: rgba(13, 148, 136, 0.08);
   
-  --sidebar-bg: rgba(255, 255, 255, 0.82);
-  --sidebar-border: rgba(148, 163, 184, 0.12);
+  --sidebar-bg: rgba(255, 255, 255, 0.95);
+  --sidebar-border: rgba(13, 148, 136, 0.06);
   --sidebar-text: #475569;
   --sidebar-text-hover: #0f172a;
   
-  --input-bg: rgba(255, 255, 255, 0.85);
-  --input-border: rgba(203, 213, 225, 0.7);
-  --text-placeholder: #64748b; /* High contrast placeholder for light mode */
+  --input-bg: #ffffff;
+  --input-border: rgba(13, 148, 136, 0.15);
+  --text-placeholder: #64748b;
   
-  --text-main: #0f172a; /* Dark Slate headers */
+  --text-main: #0f172a; /* Slate-900 */
   --text-muted: #475569; /* Slate-600 */
-  --text-accent: #0891b2; /* Cyan-600 */
-  --divider-color: rgba(148, 163, 184, 0.1);
-  --active-nav-bg: rgba(6, 182, 212, 0.08);
-  --active-nav-border: rgba(6, 182, 212, 0.4);
-  --table-header-bg: rgba(241, 245, 249, 0.85);
-  --table-row-hover: rgba(148, 163, 184, 0.03);
+  --text-accent: #0d9488; /* Teal-600 (Clinical accent) */
+  --divider-color: rgba(13, 148, 136, 0.06);
+  --active-nav-bg: rgba(13, 148, 136, 0.04);
+  --active-nav-border: rgba(13, 148, 136, 0.4);
+  --table-header-bg: rgba(241, 245, 249, 0.95);
+  --table-row-hover: rgba(13, 148, 136, 0.02);
 
   /* Badge colors - Light Mode */
-  --badge-blue-bg: rgba(59, 130, 246, 0.1);
-  --badge-blue-text: #1d4ed8; /* blue-700 */
-  --badge-blue-border: rgba(59, 130, 246, 0.2);
+  --badge-blue-bg: rgba(14, 165, 233, 0.1);
+  --badge-blue-text: #0284c7;
+  --badge-blue-border: rgba(14, 165, 233, 0.15);
 
   --badge-emerald-bg: rgba(16, 185, 129, 0.1);
-  --badge-emerald-text: #047857; /* emerald-700 */
-  --badge-emerald-border: rgba(16, 185, 129, 0.2);
+  --badge-emerald-text: #059669;
+  --badge-emerald-border: rgba(16, 185, 129, 0.15);
 
-  --badge-rose-bg: rgba(244, 63, 94, 0.1);
-  --badge-rose-text: #be123c; /* rose-700 */
-  --badge-rose-border: rgba(244, 63, 94, 0.2);
+  --badge-rose-bg: rgba(244, 63, 94, 0.15);
+  --badge-rose-text: #e11d48;
+  --badge-rose-border: rgba(244, 63, 94, 0.15);
 
-  --badge-amber-bg: rgba(245, 158, 11, 0.1);
-  --badge-amber-text: #b45309; /* amber-700 */
+  --badge-amber-bg: rgba(245, 158, 11, 0.15);
+  --badge-amber-text: #d97706;
   --badge-amber-border: rgba(245, 158, 11, 0.2);
 }
 
 .dark {
-  /* 🌙 Dark Theme (Deep Teal Midnight) */
-  --bg-color: #03131a;
-  --bg-mesh-1: rgba(13, 92, 117, 0.3);
-  --bg-mesh-2: rgba(6, 40, 52, 0.4);
-  --bg-mesh-3: rgba(3, 21, 28, 0.8);
+  /* 🌙 Dark Theme (Cosmic Midnight & Purple-Cyan Glow) */
+  --bg-color: #070812;
+  --bg-mesh-1: rgba(124, 77, 255, 0.16);
+  --bg-mesh-2: rgba(38, 198, 218, 0.14);
+  --bg-mesh-3: rgba(139, 92, 246, 0.08);
   
-  --card-bg: rgba(13, 27, 34, 0.45);
-  --card-border: rgba(255, 255, 255, 0.07);
+  --card-bg: rgba(13, 14, 28, 0.65);
+  --card-border: rgba(124, 77, 255, 0.2);
   
-  --sidebar-bg: rgba(3, 15, 20, 0.88);
-  --sidebar-border: rgba(255, 255, 255, 0.06);
+  --sidebar-bg: rgba(8, 9, 20, 0.92);
+  --sidebar-border: rgba(124, 77, 255, 0.15);
   --sidebar-text: #cbd5e1;
   --sidebar-text-hover: #ffffff;
   
   --input-bg: rgba(255, 255, 255, 0.02);
-  --input-border: rgba(255, 255, 255, 0.12);
-  --text-placeholder: #94a3b8; /* High contrast placeholder for dark mode */
+  --input-border: rgba(124, 77, 255, 0.18);
+  --text-placeholder: #8b5cf6;
   
-  --text-main: #ffffff; /* White headers */
-  --text-muted: #cbd5e1; /* Slate-300 */
-  --text-accent: #06b6d4; /* Aquamarine cyan */
+  --text-main: #ffffff;
+  --text-muted: #cbd5e1;
+  --text-accent: #06b6d4;
   --divider-color: rgba(255, 255, 255, 0.08);
-  --active-nav-bg: rgba(6, 182, 212, 0.06);
-  --active-nav-border: rgba(6, 182, 212, 0.4);
-  --table-header-bg: rgba(255, 255, 255, 0.02);
+  --active-nav-bg: rgba(124, 77, 255, 0.08);
+  --active-nav-border: rgba(124, 77, 255, 0.6);
+  --table-header-bg: rgba(255, 255, 255, 0.03);
   --table-row-hover: rgba(255, 255, 255, 0.02);
 
   /* Badge colors - Dark Mode */
-  --badge-blue-bg: rgba(59, 130, 246, 0.1);
-  --badge-blue-text: #60a5fa; /* blue-400 */
-  --badge-blue-border: rgba(59, 130, 246, 0.2);
+  --badge-blue-bg: rgba(124, 77, 255, 0.1);
+  --badge-blue-text: #a78bfa;
+  --badge-blue-border: rgba(124, 77, 255, 0.2);
 
-  --badge-emerald-bg: rgba(16, 185, 129, 0.1);
-  --badge-emerald-text: #34d399; /* emerald-400 */
+  --badge-emerald-bg: rgba(16, 185, 129, 0.15);
+  --badge-emerald-text: #34d399;
   --badge-emerald-border: rgba(16, 185, 129, 0.2);
 
-  --badge-rose-bg: rgba(244, 63, 94, 0.1);
-  --badge-rose-text: #fb7185; /* rose-400 */
+  --badge-rose-bg: rgba(244, 63, 94, 0.15);
+  --badge-rose-text: #fb7185;
   --badge-rose-border: rgba(244, 63, 94, 0.2);
 
-  --badge-amber-bg: rgba(245, 158, 11, 0.1);
-  --badge-amber-text: #fbbf24; /* amber-400 */
+  --badge-amber-bg: rgba(245, 158, 11, 0.15);
+  --badge-amber-text: #fbbf24;
   --badge-amber-border: rgba(245, 158, 11, 0.2);
 }
 
@@ -106,23 +106,23 @@ body {
 /* Master Outlined Glass Card */
 .glass-card {
   background: var(--card-bg);
-  backdrop-filter: blur(24px) saturate(120%);
-  -webkit-backdrop-filter: blur(24px) saturate(120%);
+  backdrop-filter: blur(24px) saturate(130%);
+  -webkit-backdrop-filter: blur(24px) saturate(130%);
   border: 1px solid var(--card-border);
-  box-shadow: 0 15px 40px -15px rgba(0, 0, 0, 0.05),
+  box-shadow: 0 15px 40px -15px rgba(0, 0, 0, 0.45),
               inset 0 1px 0px 0 rgba(255, 255, 255, 0.05);
   transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .dark .glass-card {
-  box-shadow: 0 15px 40px -15px rgba(0, 0, 0, 0.5),
+  box-shadow: 0 15px 40px -15px rgba(0, 0, 0, 0.65),
               inset 0 1px 0px 0 rgba(255, 255, 255, 0.05);
 }
 
 .glass-card:hover {
   transform: translateY(-2px);
   border-color: var(--active-nav-border);
-  box-shadow: 0 25px 50px -12px rgba(6, 182, 212, 0.1),
+  box-shadow: 0 25px 50px -12px rgba(124, 77, 255, 0.18),
               inset 0 1px 0px 0 rgba(255, 255, 255, 0.08);
 }
 
@@ -137,31 +137,26 @@ body {
 
 /* 
    Global Input Value Color Enforcement:
-   Enforces text value color to match active theme rules on ALL input fields.
+   Enforces text value color to match active theme rules on standard input fields.
 */
-input, select, textarea {
-  color: var(--text-main) !important;
-}
 
-/* 
-   Global Background & Border rules:
-   Restricted to standard input fields (excluding transparent ones like search bar).
-*/
-input:not(.bg-transparent), select, textarea:not(.bg-transparent) {
+input:not(.bg-transparent), select, textarea:not(.bg-transparent), .glass-input {
   background-color: var(--input-bg) !important;
   border: 1px solid var(--input-border) !important;
+  color: var(--text-main) !important;
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  transition: all 0.4s ease;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-input:not(.bg-transparent):focus, select:focus, textarea:not(.bg-transparent):focus {
-  border-color: #06b6d4 !important;
-  box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.15) !important;
+input:not(.bg-transparent):focus, select:focus, textarea:not(.bg-transparent):focus, .glass-input:focus {
+  border-color: var(--active-nav-border) !important;
+  box-shadow: 0 0 0 3px rgba(124, 77, 255, 0.15) !important;
+  background-color: rgba(255, 255, 255, 0.05) !important;
 }
 
 /* Standardized Placeholders Contrast Override */
-input::placeholder, textarea::placeholder {
+input:not(.bg-transparent)::placeholder, textarea:not(.bg-transparent)::placeholder, .glass-input::placeholder {
   color: var(--text-placeholder) !important;
   opacity: 0.95 !important;
 }
@@ -169,6 +164,22 @@ input::placeholder, textarea::placeholder {
 select option {
   background-color: var(--bg-color) !important;
   color: var(--text-main) !important;
+}
+
+/* Bulletproof Navbar Search Input */
+.search-input {
+  color: #0f172a !important; /* Slate-900 in light mode */
+}
+.dark .search-input {
+  color: #ffffff !important; /* White in dark mode */
+}
+.search-input::placeholder {
+  color: #475569 !important; /* Slate-600 placeholder (high contrast in light mode) */
+  opacity: 1 !important;
+}
+.dark .search-input::placeholder {
+  color: #cbd5e1 !important; /* Slate-300 placeholder (high contrast in dark mode) */
+  opacity: 1 !important;
 }
 
 /* Divider line */
@@ -293,33 +304,33 @@ html:not(.dark) .text-slate-350 {
 html:not(.dark) .text-cyan-300,
 html:not(.dark) .text-cyan-400,
 html:not(.dark) .text-cyan-455 {
-  color: #0891b2 !important; /* Cyan-600 */
+  color: #0d9488 !important; /* Teal-600 */
 }
 
 html:not(.dark) .text-emerald-300,
 html:not(.dark) .text-emerald-400 {
-  color: #047857 !important; /* Emerald-700 */
+  color: #059669 !important; /* Emerald-600 */
 }
 
 html:not(.dark) .text-purple-300,
 html:not(.dark) .text-purple-400 {
-  color: #7e22ce !important; /* Purple-700 */
+  color: #0d9488 !important; /* Teal-600 */
 }
 
 html:not(.dark) .text-indigo-300,
 html:not(.dark) .text-indigo-400 {
-  color: #4338ca !important; /* Indigo-700 */
+  color: #0f766e !important; /* Teal-700 */
 }
 
 html:not(.dark) .text-rose-300,
 html:not(.dark) .text-rose-400,
 html:not(.dark) .text-rose-455 {
-  color: #be123c !important; /* Rose-700 */
+  color: #e11d48 !important; /* Rose-600 */
 }
 
 html:not(.dark) .text-amber-300,
 html:not(.dark) .text-amber-400 {
-  color: #b45309 !important; /* Amber-700 */
+  color: #d97706 !important; /* Amber-600 */
 }
 
 html:not(.dark) .bg-white\/2 {
