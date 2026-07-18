@@ -84,9 +84,9 @@ function MainLayout() {
       
       {/* 🚀 Dynamic Floating Backdrop Blobs (Mesh Animation in Aquamarine/Teal) */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none z-0 opacity-40">
-        <div className="absolute top-[5%] right-[10%] w-[550px] h-[550px] bg-cyan-950/40 rounded-full blur-3xl animate-blob-float" />
-        <div className="absolute bottom-[5%] left-[5%] w-[600px] h-[600px] bg-teal-950/40 rounded-full blur-3xl animate-blob-float [animation-delay:3s]" />
-        <div className="absolute top-[35%] left-[30%] w-[500px] h-[500px] bg-indigo-950/30 rounded-full blur-3xl animate-blob-float [animation-delay:6s]" />
+        <div className="absolute top-[5%] right-[10%] w-137.5 bg-cyan-950/40 rounded-full blur-3xl animate-blob-float" />
+        <div className="absolute bottom-[5%] left-[5%] w-150 bg-teal-950/40 rounded-full blur-3xl animate-blob-float [animation-delay:3s]" />
+        <div className="absolute top-[35%] left-[30%] w-125 bg-indigo-950/30 rounded-full blur-3xl animate-blob-float [animation-delay:6s]" />
       </div>
 
       {/* 🚀 Sidebar Navigation Wrapper */}
@@ -151,11 +151,19 @@ function MainLayout() {
               className="p-2.5 bg-white/3 text-slate-350 hover:text-slate-100 hover:bg-white/5 rounded-xl border border-white/10 transition-colors"
               title={theme === "dark" ? "Switch to Light Theme" : "Switch to Dark Theme"}
             >
-              {theme === "dark" ? (
-                <IconSun size={18} className="text-cyan-400" />
-              ) : (
-                <IconMoon size={18} className="text-slate-700" />
-              )}
+              <motion.div
+                key={theme}
+                initial={{ rotate: -120, scale: 0.7, opacity: 0 }}
+                animate={{ rotate: 0, scale: 1, opacity: 1 }}
+                transition={{ duration: 0.3, ease: "easeOut" }}
+                className="flex items-center justify-center"
+              >
+                {theme === "dark" ? (
+                  <IconSun size={18} className="text-cyan-400" />
+                ) : (
+                  <IconMoon size={18} className="text-slate-700" />
+                )}
+              </motion.div>
             </motion.button>
 
             {/* Notifications */}

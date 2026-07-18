@@ -294,7 +294,7 @@ function Dashboard() {
   // Apex Charts Options adjusted for dark theme matching the reference
   const chartColors = themeMode === "dark" 
     ? ["#06b6d4", "#10b981", "#f43f5e"] 
-    : ["#0891b2", "#059669", "#e11d48"];
+    : ["#0d9488", "#059669", "#e11d48"];
 
   const barOptions = {
     chart: {
@@ -316,6 +316,21 @@ function Dashboard() {
       strokeDashArray: 4,
     },
     colors: chartColors,
+    fill: {
+      type: "gradient",
+      gradient: {
+        shade: themeMode === "dark" ? "dark" : "light",
+        type: "vertical",
+        shadeIntensity: 0.35,
+        gradientToColors: themeMode === "dark" 
+          ? ["#0891b2", "#047857", "#be123c"]
+          : ["#0284c7", "#059669", "#f43f5e"],
+        inverseColors: false,
+        opacityFrom: 0.9,
+        opacityTo: 0.5,
+        stops: [0, 100]
+      }
+    },
     plotOptions: {
       bar: {
         borderRadius: 8,
@@ -338,6 +353,19 @@ function Dashboard() {
   const pieOptions = {
     labels: ["Pending", "Approved", "Rejected"],
     colors: chartColors,
+    fill: {
+      type: "gradient",
+      gradient: {
+        shade: themeMode === "dark" ? "dark" : "light",
+        type: "diagonal1",
+        shadeIntensity: 0.25,
+        gradientToColors: themeMode === "dark" 
+          ? ["#0891b2", "#059669", "#fb7185"]
+          : ["#38bdf8", "#34d399", "#fda4af"],
+        opacityFrom: 0.95,
+        opacityTo: 0.75,
+      }
+    },
     legend: {
       position: "bottom",
       fontFamily: "Outfit",
@@ -359,7 +387,7 @@ function Dashboard() {
               label: "TOTAL",
               fontFamily: "Outfit",
               fontWeight: 700,
-              color: themeMode === "dark" ? "#06b6d4" : "#0891b2",
+              color: themeMode === "dark" ? "#06b6d4" : "#0d9488",
               formatter: () => stats.pending + stats.approved + stats.rejected
             }
           }
@@ -505,25 +533,38 @@ function Dashboard() {
         >
           {/* Stats Cards Row */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {patientHighlightItems.map((item, idx) => (
-              <motion.div
-                key={idx}
-                variants={itemVariants}
-                whileHover={{ y: -4 }}
-                className={`glass-card rounded-3xl p-6 flex justify-between items-start relative overflow-hidden group transition-all border ${item.glowClass}`}
-              >
-                <div className="space-y-1 z-10">
-                  <span className="text-slate-400 text-[10px] font-black uppercase tracking-widest block">{item.title}</span>
-                  <span className="text-3xl font-black text-white block mt-1">
-                    {isLoading ? "..." : item.value}
-                  </span>
-                  <span className="text-[11px] text-slate-400 font-bold block mt-1">{item.subtitle}</span>
+            {isLoading ? (
+              Array.from({ length: 4 }).map((_, idx) => (
+                <div key={idx} className="skeleton-card p-6 flex justify-between items-start relative overflow-hidden">
+                  <div className="space-y-2.5 w-2/3">
+                    <div className="skeleton-box w-24 h-3.5 block"></div>
+                    <div className="skeleton-box w-16 h-8 block mt-1.5"></div>
+                    <div className="skeleton-box w-28 h-3 block mt-2"></div>
+                  </div>
+                  <div className="skeleton-box w-10 h-10 rounded-xl"></div>
                 </div>
-                <div className={`w-10 h-10 rounded-xl border ${item.gradient} flex items-center justify-center text-white z-10`}>
-                  {item.icon}
-                </div>
-              </motion.div>
-            ))}
+              ))
+            ) : (
+              patientHighlightItems.map((item, idx) => (
+                <motion.div
+                  key={idx}
+                  variants={itemVariants}
+                  whileHover={{ y: -4 }}
+                  className={`glass-card rounded-3xl p-6 flex justify-between items-start relative overflow-hidden group transition-all border ${item.glowClass}`}
+                >
+                  <div className="space-y-1 z-10">
+                    <span className="text-slate-400 text-[10px] font-black uppercase tracking-widest block">{item.title}</span>
+                    <span className="text-3xl font-black text-white block mt-1">
+                      {item.value}
+                    </span>
+                    <span className="text-[11px] text-slate-400 font-bold block mt-1">{item.subtitle}</span>
+                  </div>
+                  <div className={`w-10 h-10 rounded-xl border ${item.gradient} flex items-center justify-center text-white z-10`}>
+                    {item.icon}
+                  </div>
+                </motion.div>
+              ))
+            )}
           </div>
 
           {/* Details & Branches Column */}
@@ -708,29 +749,42 @@ function Dashboard() {
         >
           {/* Stats Row */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {adminStatsItems.map((item, idx) => (
-              <motion.div
-                key={idx}
-                variants={itemVariants}
-                whileHover={{ y: -4 }}
-                className={`glass-card rounded-3xl p-6 flex justify-between items-start relative overflow-hidden group transition-all border ${item.glowClass}`}
-              >
-                <div className="space-y-2.5 z-10">
-                  <span className="text-slate-400 text-[10px] font-black uppercase tracking-widest block">{item.title}</span>
-                  <span className="text-3xl font-black text-white block mt-1">
-                    {isLoading ? "..." : item.value}
-                  </span>
-                  <div className="flex items-center gap-1.5 text-emerald-400 font-bold text-xs mt-1.5">
-                    <TrendingUp size={14} />
-                    <span>{item.trend}</span>
-                    <span className="text-slate-550 font-bold text-[9px] uppercase tracking-widest">vs prev</span>
+            {isLoading ? (
+              Array.from({ length: 4 }).map((_, idx) => (
+                <div key={idx} className="skeleton-card p-6 flex justify-between items-start relative overflow-hidden">
+                  <div className="space-y-2.5 w-2/3">
+                    <div className="skeleton-box w-28 h-3.5 block"></div>
+                    <div className="skeleton-box w-16 h-8 block mt-1.5"></div>
+                    <div className="skeleton-box w-24 h-3 block mt-2"></div>
                   </div>
+                  <div className="skeleton-box w-10 h-10 rounded-xl"></div>
                 </div>
-                <div className={`w-10 h-10 rounded-xl border ${item.gradient} flex items-center justify-center text-white z-10`}>
-                  {item.icon}
-                </div>
-              </motion.div>
-            ))}
+              ))
+            ) : (
+              adminStatsItems.map((item, idx) => (
+                <motion.div
+                  key={idx}
+                  variants={itemVariants}
+                  whileHover={{ y: -4 }}
+                  className={`glass-card rounded-3xl p-6 flex justify-between items-start relative overflow-hidden group transition-all border ${item.glowClass}`}
+                >
+                  <div className="space-y-2.5 z-10">
+                    <span className="text-slate-400 text-[10px] font-black uppercase tracking-widest block">{item.title}</span>
+                    <span className="text-3xl font-black text-white block mt-1">
+                      {item.value}
+                    </span>
+                    <div className="flex items-center gap-1.5 text-emerald-400 font-bold text-xs mt-1.5">
+                      <TrendingUp size={14} />
+                      <span>{item.trend}</span>
+                      <span className="text-slate-550 font-bold text-[9px] uppercase tracking-widest">vs prev</span>
+                    </div>
+                  </div>
+                  <div className={`w-10 h-10 rounded-xl border ${item.gradient} flex items-center justify-center text-white z-10`}>
+                    {item.icon}
+                  </div>
+                </motion.div>
+              ))
+            )}
           </div>
 
           {/* Charts Row */}

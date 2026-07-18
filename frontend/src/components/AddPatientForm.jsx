@@ -49,9 +49,10 @@ function AddPatientForm({ onClose, editPatient }) {
   return (
     <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-4 z-50">
       <motion.form
-        initial={{ scale: 0.95, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        exit={{ scale: 0.95, opacity: 0 }}
+        initial={{ scale: 0.85, y: 15, opacity: 0 }}
+        animate={{ scale: 1, y: 0, opacity: 1 }}
+        exit={{ scale: 0.85, y: 15, opacity: 0 }}
+        transition={{ type: "spring", stiffness: 220, damping: 20 }}
         onSubmit={handleSubmit}
         className="glass-card p-6 rounded-3xl w-full max-w-sm space-y-5 text-slate-200"
       >

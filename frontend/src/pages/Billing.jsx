@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { toast } from "react-hot-toast";
+import { motion, AnimatePresence } from "framer-motion";
 import { 
   IconCalendar, 
   IconFileInvoice, 
@@ -96,6 +97,7 @@ const Billing = () => {
     paymentStatus: PAYMENT_STATUS.PENDING,
     invoiceFile: null,
   });
+  const [selectedPrintInvoice, setSelectedPrintInvoice] = useState(null);
 
   const fetchMyInvoices = async () => {
     setLoading(true);
@@ -230,6 +232,117 @@ const Billing = () => {
       setDownloadingId(null);
     }
   };
+
+  const printModal = selectedPrintInvoice && (
+    <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 z-50 no-print">
+      <motion.div
+        initial={{ scale: 0.85, y: 15, opacity: 0 }}
+        animate={{ scale: 1, y: 0, opacity: 1 }}
+        exit={{ scale: 0.85, y: 15, opacity: 0 }}
+        transition={{ type: "spring", stiffness: 220, damping: 20 }}
+        className="glass-card p-6 rounded-3xl w-full max-w-lg space-y-6 text-slate-200 print-area max-h-[90vh] overflow-y-auto relative"
+      >
+        
+        {/* Close Button (Hidden on Print) */}
+        <button
+          onClick={() => setSelectedPrintInvoice(null)}
+          className="absolute top-4 right-4 p-2 hover:bg-white/5 rounded-xl border border-transparent hover:border-white/5 transition-colors no-print"
+        >
+          ✕
+        </button>
+
+        {/* Receipt Header */}
+        <div className="flex justify-between items-start border-b border-white/5 pb-4">
+          <div>
+            <h2 className="text-xl font-black text-white uppercase tracking-tight">Care Health Network</h2>
+            <p className="text-[9px] text-cyan-400 font-bold uppercase tracking-widest mt-0.5">Clinical Invoice Receipt</p>
+            <p className="text-[10px] text-slate-400 font-medium mt-2 leading-relaxed">
+              12/A, Medical Square, Health City<br/>
+              Phone: +91 1800-456-7890
+            </p>
+          </div>
+          <div className="text-right">
+            <span className="bg-cyan-950/20 border border-cyan-500/20 text-cyan-400 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest no-print inline-block">
+              Official
+            </span>
+            <p className="text-xs text-white font-bold mt-3 uppercase tracking-wider">{getInvoiceNumber(selectedPrintInvoice)}</p>
+            <p className="text-[10px] text-slate-400 font-bold mt-1 uppercase tracking-widest">Date: {formatDate(getInvoiceDate(selectedPrintInvoice))}</p>
+          </div>
+        </div>
+
+        {/* Billing Details */}
+        <div className="grid grid-cols-2 gap-4 text-xs">
+          <div>
+            <span className="text-[10px] text-slate-400 font-bold uppercase tracking-widest block mb-1">Billed To:</span>
+            <p className="font-extrabold text-white">Patient Record</p>
+            <p className="text-slate-300 font-medium mt-0.5">ID: {getPatientIdFromInvoice(selectedPrintInvoice)}</p>
+          </div>
+          <div className="text-right">
+            <span className="text-[10px] text-slate-400 font-bold uppercase tracking-widest block mb-1">Payment Status:</span>
+            <span className={`px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider inline-flex items-center gap-1 border ${
+              getPaymentStatus(selectedPrintInvoice) === PAYMENT_STATUS.DONE
+                ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
+                : "bg-amber-500/10 text-amber-400 border border-amber-500/20"
+            }`}>
+              {getPaymentStatus(selectedPrintInvoice)}
+            </span>
+          </div>
+        </div>
+
+        {/* Services Summary Table */}
+        <div className="border border-white/5 rounded-2xl overflow-hidden">
+          <table className="w-full text-xs">
+            <thead>
+              <tr className="bg-white/3 border-b border-white/5 text-slate-350 text-[10px] font-bold uppercase tracking-widest">
+                <th className="px-4 py-2.5 text-left">Description</th>
+                <th className="px-4 py-2.5 text-right">Charges</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-white/5 text-slate-300 font-medium">
+              <tr>
+                <td className="px-4 py-3">Consultation & General Services</td>
+                <td className="px-4 py-3 text-right">{formatAmount(getInvoiceAmount(selectedPrintInvoice) * 0.4)}</td>
+              </tr>
+              <tr>
+                <td className="px-4 py-3">Diagnostics & Lab Reports</td>
+                <td className="px-4 py-3 text-right">{formatAmount(getInvoiceAmount(selectedPrintInvoice) * 0.35)}</td>
+              </tr>
+              <tr>
+                <td className="px-4 py-3">Pharmacy & Medical Supplies</td>
+                <td className="px-4 py-3 text-right">{formatAmount(getInvoiceAmount(selectedPrintInvoice) * 0.25)}</td>
+              </tr>
+              <tr className="bg-white/2 font-bold text-white">
+                <td className="px-4 py-3 text-[10px] uppercase tracking-widest">Total Payable</td>
+                <td className="px-4 py-3 text-right text-sm">{formatAmount(getInvoiceAmount(selectedPrintInvoice))}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        {/* Invoice Footer */}
+        <div className="text-center space-y-2 border-t border-white/5 pt-4">
+          <p className="text-[10px] text-slate-400 font-medium italic">
+            "Thank you for choosing Care Health Network. This is a secure computer-generated billing statement."
+          </p>
+          <div className="flex justify-end gap-3 pt-2 no-print">
+            <button
+              onClick={() => setSelectedPrintInvoice(null)}
+              className="px-4 py-2.5 rounded-xl text-xs font-bold text-slate-400 hover:bg-white/5 transition-colors uppercase tracking-wider"
+            >
+              Close
+            </button>
+            <button
+              onClick={() => window.print()}
+              className="px-5 py-2.5 btn-teal-outline rounded-xl text-xs font-bold uppercase tracking-wider"
+            >
+              Print / Save PDF
+            </button>
+          </div>
+        </div>
+
+      </motion.div>
+    </div>
+  );
 
   // ADMIN SCREEN LAYOUT
   if (role === "ADMIN") {
@@ -408,6 +521,12 @@ const Billing = () => {
                             >
                               Pending
                             </button>
+                            <button
+                              onClick={() => setSelectedPrintInvoice(invoice)}
+                              className="px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider bg-cyan-950/20 text-cyan-400 hover:bg-cyan-950/40 border border-cyan-500/20 transition-colors"
+                            >
+                              Print
+                            </button>
                           </div>
                         </td>
                       </tr>
@@ -419,6 +538,9 @@ const Billing = () => {
           </div>
         </div>
 
+        <AnimatePresence>
+          {printModal}
+        </AnimatePresence>
       </div>
     );
   }
@@ -512,14 +634,22 @@ const Billing = () => {
                           </span>
                         </td>
                         <td className="px-6 py-4">
-                          <button
-                            onClick={() => handleDownload(invoice)}
-                            disabled={downloadingId === (invoice.id || invoice.invoiceId)}
-                            className="btn-teal-outline px-4 py-2.5 rounded-xl font-bold text-[10px] uppercase tracking-wider shadow-md flex items-center justify-center gap-1.5 disabled:opacity-60"
-                          >
-                            <IconDownload size={12} />
-                            {downloadingId === (invoice.id || invoice.invoiceId) ? "Downloading..." : "Download"}
-                          </button>
+                          <div className="flex items-center gap-2">
+                            <button
+                              onClick={() => handleDownload(invoice)}
+                              disabled={downloadingId === (invoice.id || invoice.invoiceId)}
+                              className="btn-teal-outline px-3 py-2 rounded-xl font-bold text-[10px] uppercase tracking-wider shadow-md flex items-center justify-center gap-1.5 disabled:opacity-60"
+                            >
+                              <IconDownload size={12} />
+                              {downloadingId === (invoice.id || invoice.invoiceId) ? "..." : "Download"}
+                            </button>
+                            <button
+                              onClick={() => setSelectedPrintInvoice(invoice)}
+                              className="btn-teal-outline px-3 py-2 rounded-xl font-bold text-[10px] uppercase tracking-wider shadow-md flex items-center justify-center gap-1.5"
+                            >
+                              Print
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     );
@@ -530,6 +660,9 @@ const Billing = () => {
           </div>
         </div>
 
+        <AnimatePresence>
+          {printModal}
+        </AnimatePresence>
       </div>
     );
   }
