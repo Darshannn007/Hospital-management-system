@@ -22,6 +22,8 @@ import { getPatients } from "../services/patientService";
 import { getDoctors } from "../services/doctorService";
 import { getAppointments } from "../services/appointmentService";
 import toast from "react-hot-toast";
+import CountUp from "../components/CountUp";
+import TiltCard from "../components/TiltCard";
 
 const hospitalInfo = {
   name: "CityCare Multispeciality Hospital",
@@ -491,16 +493,24 @@ function Dashboard() {
   ];
 
   return (
-    <div className="p-5 md:p-8 space-y-8 select-none text-slate-200">
+    <div className="p-5 md:p-8 space-y-8 select-none text-slate-200 relative overflow-hidden">
       
+      {/* 🔮 Background Floating Ambient Aura Orbs */}
+      <div className="absolute -top-32 -left-32 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none animate-aura-1"></div>
+      <div className="absolute top-1/2 -right-32 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none animate-aura-2"></div>
+
       {/* Welcome Banner / Header */}
       <motion.div
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
-        className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white/3 border border-white/10 backdrop-blur-xl rounded-3xl p-6 shadow-2xl"
+        className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white/3 border border-white/10 backdrop-blur-xl rounded-3xl p-6 shadow-2xl relative z-10"
       >
         <div>
-          <h1 className="text-2xl md:text-3xl font-black text-white tracking-tight uppercase">
+          <div className="flex items-center gap-2 mb-1">
+            <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 radar-pulse-dot inline-block"></span>
+            <span className="text-[10px] font-black text-emerald-400 uppercase tracking-widest">System Operational</span>
+          </div>
+          <h1 className="text-2xl md:text-3xl font-black tracking-tight uppercase shimmer-text">
             {isPatient ? "Hospital Network Hub" : "HMS Administration Panel"}
           </h1>
           <p className="text-xs text-slate-400 mt-1.5 font-medium tracking-wide">
@@ -529,7 +539,7 @@ function Dashboard() {
           variants={containerVariants}
           initial="hidden"
           animate="visible"
-          className="space-y-6"
+          className="space-y-6 relative z-10"
         >
           {/* Stats Cards Row */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -546,23 +556,18 @@ function Dashboard() {
               ))
             ) : (
               patientHighlightItems.map((item, idx) => (
-                <motion.div
-                  key={idx}
-                  variants={itemVariants}
-                  whileHover={{ y: -4 }}
-                  className={`glass-card rounded-3xl p-6 flex justify-between items-start relative overflow-hidden group transition-all border ${item.glowClass}`}
-                >
+                <TiltCard key={idx} glowClass={item.glowClass}>
                   <div className="space-y-1 z-10">
                     <span className="text-slate-400 text-[10px] font-black uppercase tracking-widest block">{item.title}</span>
                     <span className="text-3xl font-black text-white block mt-1">
-                      {item.value}
+                      <CountUp value={item.value} />
                     </span>
                     <span className="text-[11px] text-slate-400 font-bold block mt-1">{item.subtitle}</span>
                   </div>
                   <div className={`w-10 h-10 rounded-xl border ${item.gradient} flex items-center justify-center text-white z-10`}>
                     {item.icon}
                   </div>
-                </motion.div>
+                </TiltCard>
               ))
             )}
           </div>
@@ -762,16 +767,11 @@ function Dashboard() {
               ))
             ) : (
               adminStatsItems.map((item, idx) => (
-                <motion.div
-                  key={idx}
-                  variants={itemVariants}
-                  whileHover={{ y: -4 }}
-                  className={`glass-card rounded-3xl p-6 flex justify-between items-start relative overflow-hidden group transition-all border ${item.glowClass}`}
-                >
+                <TiltCard key={idx} glowClass={item.glowClass}>
                   <div className="space-y-2.5 z-10">
                     <span className="text-slate-400 text-[10px] font-black uppercase tracking-widest block">{item.title}</span>
                     <span className="text-3xl font-black text-white block mt-1">
-                      {item.value}
+                      <CountUp value={item.value} />
                     </span>
                     <div className="flex items-center gap-1.5 text-emerald-400 font-bold text-xs mt-1.5">
                       <TrendingUp size={14} />
@@ -782,7 +782,7 @@ function Dashboard() {
                   <div className={`w-10 h-10 rounded-xl border ${item.gradient} flex items-center justify-center text-white z-10`}>
                     {item.icon}
                   </div>
-                </motion.div>
+                </TiltCard>
               ))
             )}
           </div>

@@ -93,7 +93,7 @@ function Sidebar({ onClose }) {
                 HMS
               </h2>
               <p className="text-[9px] text-cyan-400 font-bold uppercase tracking-widest mt-0.5">
-                Hospital Node
+                Hospital Management System
               </p>
             </div>
           </div>
@@ -147,6 +147,11 @@ function Sidebar({ onClose }) {
           {/* PATIENT */}
           {role === "PATIENT" && (
             <>
+            <NavItem
+                to="/appointments"
+                icon={IconCalendar}
+                label="My Bookings"
+              />
               <NavItem
                 to="/doctors"
                 icon={IconStethoscope}
@@ -156,11 +161,6 @@ function Sidebar({ onClose }) {
                 to="/billing"
                 icon={IconFileInvoice}
                 label="My Invoices"
-              />
-              <NavItem
-                to="/appointments"
-                icon={IconCalendar}
-                label="My Bookings"
               />
             </>
           )}

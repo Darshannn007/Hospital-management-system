@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Outlet, useNavigate } from "react-router-dom";
+import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
 import { AnimatePresence, motion } from "framer-motion";
 import { 
@@ -23,6 +23,7 @@ function MainLayout() {
   const { role, user } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
   const headerRef = useRef(null);
 
   const demoNotifications = [
@@ -291,7 +292,18 @@ function MainLayout() {
         <div className={`flex-1 overflow-x-hidden overflow-y-auto z-10 relative transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${
           (activeDropdown !== null || showProfile) ? "blur-[6px] saturate-75 brightness-[0.7] pointer-events-none scale-[0.995]" : ""
         }`}>
-          <Outlet />
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={location.pathname}
+              initial={{ opacity: 0, y: 12, scale: 0.995 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -12, scale: 0.995 }}
+              transition={{ duration: 0.25, ease: "easeOut" }}
+              className="w-full h-full"
+            >
+              <Outlet />
+            </motion.div>
+          </AnimatePresence>
         </div>
 
       </div>

@@ -457,3 +457,119 @@ html:not(.dark) .skeleton-box {
     print-color-adjust: exact !important;
   }
 }
+
+/* ========================================================
+   🚀 HIGH-GRADE ANIMATIONS (Aura, Shimmer, 3D Perspective)
+   ======================================================== */
+
+/* Floating Background Orbs */
+@keyframes aura-float-1 {
+  0%, 100% {
+    transform: translate(0px, 0px) scale(1);
+  }
+  33% {
+    transform: translate(30px, -50px) scale(1.1);
+  }
+  66% {
+    transform: translate(-20px, 20px) scale(0.95);
+  }
+}
+
+@keyframes aura-float-2 {
+  0%, 100% {
+    transform: translate(0px, 0px) scale(1);
+  }
+  33% {
+    transform: translate(-40px, 40px) scale(1.15);
+  }
+  66% {
+    transform: translate(25px, -30px) scale(0.9);
+  }
+}
+
+.animate-aura-1 {
+  animation: aura-float-1 14s ease-in-out infinite;
+}
+
+.animate-aura-2 {
+  animation: aura-float-2 18s ease-in-out infinite;
+}
+
+/* Text Shimmer Effect */
+@keyframes shimmer-text {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.shimmer-text {
+  background: linear-gradient(90deg, #ffffff 0%, #38bdf8 40%, #818cf8 60%, #ffffff 100%);
+  background-size: 200% auto;
+  color: transparent;
+  -webkit-background-clip: text;
+  background-clip: text;
+  animation: shimmer-text 6s linear infinite;
+}
+
+html:not(.dark) .shimmer-text {
+  background: linear-gradient(90deg, #0f172a 0%, #0d9488 40%, #2563eb 60%, #0f172a 100%);
+  background-size: 200% auto;
+  color: transparent;
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+/* 3D Tilt Container Perspective */
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+/* Radar Pulse Indicator */
+@keyframes radar-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(16, 185, 129, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+  }
+}
+
+.radar-pulse-dot {
+  animation: radar-pulse 2s infinite;
+}
+
+/* --- ☀️ LIGHT MODE DUAL-THEME ANIMATION ENHANCEMENTS --- */
+html:not(.dark) .animate-aura-1 {
+  background-color: rgba(13, 148, 136, 0.2) !important; /* Clinical Teal glow */
+}
+
+html:not(.dark) .animate-aura-2 {
+  background-color: rgba(37, 99, 235, 0.15) !important; /* Soft Sapphire glow */
+}
+
+html:not(.dark) .glass-card:hover {
+  box-shadow: 0 20px 35px -10px rgba(13, 148, 136, 0.16), 0 10px 15px -5px rgba(0, 0, 0, 0.04) !important;
+}
+
+html:not(.dark) .radar-pulse-dot {
+  background-color: #0d9488 !important;
+  animation: radar-pulse-light 2s infinite !important;
+}
+
+@keyframes radar-pulse-light {
+  0% {
+    box-shadow: 0 0 0 0 rgba(13, 148, 136, 0.8);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(13, 148, 136, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(13, 148, 136, 0);
+  }
+}
