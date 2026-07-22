@@ -63,7 +63,7 @@ function Sidebar({ onClose }) {
               className="ml-auto text-cyan-400"
               transition={{ type: "spring", stiffness: 300, damping: 30 }}
             >
-              <IconChevronRight size={14} className="stroke-[3]" />
+              <IconChevronRight size={14} className="stroke-3"/>
             </motion.div>
           )}
         </>
