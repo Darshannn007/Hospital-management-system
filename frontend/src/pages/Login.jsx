@@ -113,7 +113,7 @@ function Login() {
   };
 
   const handleDemoPatientLogin = () => {
-    handleDemoLogin("patient@gmail.com", "1234", "Patient");
+    handleDemoLogin("patient1@gmail.com", "1234", "Patient");
   };
 
   // Animations configuration

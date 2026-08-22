@@ -18,7 +18,7 @@ export const uploadInvoiceForPatient = ({ patientId, paymentStatus, invoiceFile 
 };
 
 export const updateInvoicePaymentStatus = (invoiceId, status) => {
-  return api.put(`/billing/${invoiceId}/payment-status?status=${status}`, {});
+  return api.put(`/billing/${invoiceId}/payment_status?status=${status}`, {});
 };
 
 export const getMyInvoices = () => {
@@ -30,3 +30,12 @@ export const downloadMyInvoice = (invoiceId) => {
     responseType: "blob",
   });
 };
+
+export const createPaymentOrder = (amount) => {
+  return api.post("/payment/create-order", { amount });
+};
+
+export const verifyPayment = (paymentData) => {
+  return api.post("/payment/verify", paymentData);
+};
+

@@ -10,6 +10,7 @@ import com.hms.repository.DoctorRepository;
 import com.hms.repository.PatientRepository;
 import com.hms.repository.UserRepository;
 import com.hms.serviceInterface.UserLoginAuthServIntrfc;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -19,12 +20,16 @@ public class UserLoginAuthServ implements UserLoginAuthServIntrfc {
     private final JwtUtil jwtUtil;
     private final PatientRepository patientRepository;
     private final DoctorRepository doctorRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public UserLoginAuthServ(UserRepository userRepository, JwtUtil jwtUtil, PatientRepository patientRepository,DoctorRepository doctorRepository){
+    public UserLoginAuthServ(UserRepository userRepository, JwtUtil jwtUtil, 
+                              PatientRepository patientRepository, DoctorRepository doctorRepository,
+                              PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
-       this.doctorRepository = doctorRepository;
+        this.doctorRepository = doctorRepository;
         this.jwtUtil = jwtUtil;
         this.patientRepository = patientRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -37,7 +42,7 @@ public class UserLoginAuthServ implements UserLoginAuthServIntrfc {
         }
         UserEntity usr = new UserEntity();
         usr.setEmail(registerRequestDTO.getEmail());
-        usr.setPassword(registerRequestDTO.getPassword());
+        usr.setPassword(passwordEncoder.encode(registerRequestDTO.getPassword()));
         usr.setRole(registerRequestDTO.getRole());
         userRepository.save(usr);
 
@@ -68,7 +73,7 @@ public class UserLoginAuthServ implements UserLoginAuthServIntrfc {
         UserEntity user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found ✕"));
 
-        if (!user.getPassword().equals(pass)) {
+        if (!passwordEncoder.matches(pass, user.getPassword())) {
             throw new RuntimeException("Invalid password ✕");
         }
 

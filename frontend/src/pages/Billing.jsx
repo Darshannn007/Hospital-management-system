@@ -17,6 +17,8 @@ import {
   getMyInvoices,
   updateInvoicePaymentStatus,
   uploadInvoiceForPatient,
+  createPaymentOrder,
+  verifyPayment,
 } from "../services/billingService";
 
 const PAYMENT_STATUS = {
@@ -30,7 +32,7 @@ const getInvoiceNumber = (invoice) =>
 const getInvoiceDate = (invoice) => invoice.invoiceDate || invoice.date || invoice.createdAt;
 
 const getInvoiceAmount = (invoice) =>
-  invoice.totalAmount ?? invoice.amount ?? invoice.total ?? invoice.grandTotal ?? 0;
+  invoice.totalAmount ?? invoice.amount ?? invoice.total ?? invoice.grandTotal ?? 500;
 
 const getPatientIdFromInvoice = (invoice) =>
   invoice.patientId || invoice.patient?.id || invoice.patient?.patientId || "-";
@@ -230,6 +232,101 @@ const Billing = () => {
       toast.error("Error occurred while downloading invoice PDF");
     } finally {
       setDownloadingId(null);
+    }
+  };
+
+  const loadRazorpayScript = () => {
+    return new Promise((resolve) => {
+      if (window.Razorpay) {
+        resolve(true);
+        return;
+      }
+      const script = document.createElement("script");
+      script.src = "https://checkout.razorpay.com/v1/checkout.js";
+      script.onload = () => resolve(true);
+      script.onerror = () => resolve(false);
+      document.body.appendChild(script);
+    });
+  };
+
+  const handlePayment = async (invoice) => {
+    const invoiceId = invoice.id || invoice.invoiceId;
+    const amount = getInvoiceAmount(invoice);
+
+    if (amount <= 0) {
+      toast.error("Invalid amount");
+      return;
+    }
+
+    try {
+      setUpdatingId(invoiceId);
+      const scriptLoaded = await loadRazorpayScript();
+      if (!scriptLoaded) {
+        toast.error("Razorpay SDK failed to load. Check internet connection.");
+        return;
+      }
+
+      // 1. Create order on backend
+      console.log("Initiating payment for amount (Rupees):", amount);
+      const orderRes = await createPaymentOrder(amount);
+      console.log("Backend Order Response:", orderRes.data);
+      const { orderId, keyId, currency } = orderRes.data;
+
+      // 2. Open Razorpay Checkout Popup
+      const options = {
+        key: keyId,
+        amount: orderRes.data.amount, // Use the exact amount in paise returned by backend
+        currency: currency,
+        name: "HMS Care Health",
+        description: `Invoice Payment: ${getInvoiceNumber(invoice)}`,
+        order_id: orderId,
+        handler: async function (response) {
+          try {
+            setUpdatingId(invoiceId);
+            
+            // 3. Verify signature
+            const verifyRes = await verifyPayment({
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
+            });
+
+            if (verifyRes.data.status === "SUCCESS") {
+              // 4. Update status to DONE
+              await updateInvoicePaymentStatus(invoiceId, PAYMENT_STATUS.DONE);
+              toast.success("Payment Successful! 🎉");
+              fetchMyInvoices();
+            } else {
+              toast.error("Payment verification failed!");
+            }
+          } catch (err) {
+            console.log(err);
+            toast.error("Verification failed!");
+          } finally {
+            setUpdatingId(null);
+          }
+        },
+        prefill: {
+          name: "Patient",
+        },
+        theme: {
+          color: "#06b6d4",
+        },
+        modal: {
+          ondismiss: function () {
+            toast.error("Payment cancelled ✕");
+          }
+        }
+      };
+
+      const paymentObject = new window.Razorpay(options);
+      paymentObject.open();
+
+    } catch (err) {
+      console.log(err);
+      toast.error("Failed to initiate payment");
+    } finally {
+      setUpdatingId(null);
     }
   };
 
@@ -635,6 +732,15 @@ const Billing = () => {
                         </td>
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-2">
+                            {status !== PAYMENT_STATUS.DONE && (
+                              <button
+                                onClick={() => handlePayment(invoice)}
+                                disabled={updatingId === (invoice.id || invoice.invoiceId)}
+                                className="px-3 py-2 rounded-xl font-bold text-[10px] uppercase tracking-wider shadow-md flex items-center justify-center gap-1.5 bg-cyan-600 hover:bg-cyan-500 text-white transition-colors disabled:opacity-60"
+                              >
+                                {updatingId === (invoice.id || invoice.invoiceId) ? "Processing..." : "Pay Now"}
+                              </button>
+                            )}
                             <button
                               onClick={() => handleDownload(invoice)}
                               disabled={downloadingId === (invoice.id || invoice.invoiceId)}
